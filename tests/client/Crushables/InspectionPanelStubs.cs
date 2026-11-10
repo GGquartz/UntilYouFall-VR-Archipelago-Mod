@@ -89,16 +89,56 @@ namespace HarmonyLib
             (HarmonyMethod? Prefix, HarmonyMethod? Postfix, HarmonyMethod? Finalizer)
         > Patches = [];
 
+        public void PatchAll(Type type) { }
+
         public void Patch(
-            System.Reflection.MethodInfo original,
+            System.Reflection.MethodBase original,
             HarmonyMethod? prefix = null,
             HarmonyMethod? postfix = null,
             HarmonyMethod? finalizer = null
         ) => Patches[original.Name] = (prefix, postfix, finalizer);
     }
 
+    public enum MethodType
+    {
+        Normal,
+        Getter,
+        Setter,
+    }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class HarmonyPatch : Attribute
+    {
+        public HarmonyPatch(Type type, string name) { }
+
+        public HarmonyPatch(Type type, string name, MethodType methodType) { }
+
+        public HarmonyPatch(Type type, string name, params Type[] argumentTypes) { }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HarmonyPriority : Attribute
+    {
+        public HarmonyPriority(int priority) { }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HarmonyPrefix : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HarmonyPostfix : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HarmonyFinalizer : Attribute { }
+
+    public static class Priority
+    {
+        public const int First = 800;
+    }
+
     public class HarmonyMethod
     {
+        public int priority;
         public readonly System.Reflection.MethodInfo Method;
 
         public HarmonyMethod(Type type, string name) =>

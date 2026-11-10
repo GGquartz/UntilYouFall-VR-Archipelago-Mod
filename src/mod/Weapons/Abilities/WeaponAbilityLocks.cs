@@ -25,38 +25,7 @@ internal sealed class WeaponAbilityLocks
     {
         _instance = this;
         _abilitiesLog = log.Channel("APAbilities");
-        harmony.Patch(
-            AccessTools.Method(typeof(ArmamentAbilityUser), nameof(ArmamentAbilityUser.SetAbility)),
-            postfix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(Refresh))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ArmamentAbilityUser), nameof(ArmamentAbilityUser.ChargeSuper), Type.EmptyTypes),
-            prefix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(AllowCharge))
-        );
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(ArmamentAbilityUser),
-                nameof(ArmamentAbilityUser.ChargeSuper),
-                [typeof(float), typeof(bool)]
-            ),
-            prefix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(AllowCharge))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ArmamentAbilityUser), "OnWeaponCharged"),
-            prefix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(AllowCharge))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(AbilityChargeUINotifierInstanced), "OnFullCharge"),
-            prefix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(AllowChargeNotification))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Display)),
-            postfix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(UpdateInspectionPanel))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(InspectionUIPanelLQ), nameof(InspectionUIPanelLQ.Display)),
-            postfix: new HarmonyMethod(typeof(WeaponAbilityLocks), nameof(UpdateInspectionPanelLq))
-        );
+        harmony.PatchAll(typeof(WeaponAbilityLocks));
     }
 
     public bool Locked(string? guid) =>
@@ -88,6 +57,8 @@ internal sealed class WeaponAbilityLocks
         }
     }
 
+    [HarmonyPatch(typeof(ArmamentAbilityUser), nameof(ArmamentAbilityUser.SetAbility))]
+    [HarmonyPostfix]
     private static void Refresh(ArmamentAbilityUser __instance)
     {
         var user = __instance;
@@ -115,6 +86,10 @@ internal sealed class WeaponAbilityLocks
         ResetCharge(user);
     }
 
+    [HarmonyPatch(typeof(ArmamentAbilityUser), nameof(ArmamentAbilityUser.ChargeSuper), new Type[0])]
+    [HarmonyPatch(typeof(ArmamentAbilityUser), nameof(ArmamentAbilityUser.ChargeSuper), typeof(float), typeof(bool))]
+    [HarmonyPatch(typeof(ArmamentAbilityUser), "OnWeaponCharged")]
+    [HarmonyPrefix]
     private static bool AllowCharge(ArmamentAbilityUser __instance)
     {
         if (!_instance.Locked(__instance.Armament?.ID?.GUID))
@@ -124,6 +99,8 @@ internal sealed class WeaponAbilityLocks
         return false;
     }
 
+    [HarmonyPatch(typeof(AbilityChargeUINotifierInstanced), "OnFullCharge")]
+    [HarmonyPrefix]
     private static bool AllowChargeNotification(AbilityChargeUINotifierInstanced __instance, int __0)
     {
         var users = __instance._currentArmamentAbilityUser;
@@ -164,6 +141,8 @@ internal sealed class WeaponAbilityLocks
             state.SuperCharge = 0;
     }
 
+    [HarmonyPatch(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Display))]
+    [HarmonyPostfix]
     private static void UpdateInspectionPanel(InspectionUIPanel __instance, ArmamentID __0)
     {
         var panel = __instance.superPanel;
@@ -176,6 +155,8 @@ internal sealed class WeaponAbilityLocks
         SetCanvasLockedOverlay(__instance, panel, locked);
     }
 
+    [HarmonyPatch(typeof(InspectionUIPanelLQ), nameof(InspectionUIPanelLQ.Display))]
+    [HarmonyPostfix]
     private static void UpdateInspectionPanelLq(InspectionUIPanelLQ __instance, ArmamentID __0)
     {
         var panel = __instance.superPanel;

@@ -38,27 +38,7 @@ internal sealed class RuneforgeShop : IDisposable
         _client = client;
         _notify = notify;
         _log = log.Channel("APShop");
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete)),
-            prefix: new HarmonyMethod(typeof(RuneforgeShop), nameof(BuyOrBlockCrush))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(RewardInteractable), nameof(RewardInteractable.CanCrush)),
-            prefix: new HarmonyMethod(typeof(RuneforgeShop), nameof(CanCrush))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), nameof(RewardInteractable.GrabStart)),
-            prefix: new HarmonyMethod(typeof(RuneforgeShop), nameof(BlockLockedGrab)),
-            postfix: new HarmonyMethod(typeof(RuneforgeShop), nameof(HintOnGrab))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHand), "DoGrabStart", [typeof(HandInteractable)]),
-            prefix: new HarmonyMethod(typeof(RuneforgeShop), nameof(BlockLockedHandGrab))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(DescriptionInspectionPanel), nameof(DescriptionInspectionPanel.Populate)),
-            postfix: new HarmonyMethod(typeof(RuneforgeShop), nameof(CompactInspectionPanel))
-        );
+        harmony.PatchAll(typeof(RuneforgeShop));
     }
 
     public void BeforeFadeIn(LevelManager levelManager)
@@ -274,6 +254,8 @@ internal sealed class RuneforgeShop : IDisposable
     private ShopItem? Find(RewardInteractable? reward) =>
         reward == null ? null : _items.FirstOrDefault(item => item.Owns(reward));
 
+    [HarmonyPatch(typeof(PlayerHand), "DoGrabStart", typeof(HandInteractable))]
+    [HarmonyPrefix]
     private static bool BlockLockedHandGrab(HandInteractable __0)
     {
         var item = _instance.Find(__0?.TryCast<RewardInteractable>());
@@ -284,6 +266,8 @@ internal sealed class RuneforgeShop : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.GrabStart))]
+    [HarmonyPrefix]
     private static bool BlockLockedGrab(RewardInteractable __instance)
     {
         var item = _instance.Find(__instance);
@@ -294,6 +278,8 @@ internal sealed class RuneforgeShop : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.GrabStart))]
+    [HarmonyPostfix]
     private static void HintOnGrab(RewardInteractable __instance)
     {
         var item = _instance.Find(__instance);
@@ -323,6 +309,8 @@ internal sealed class RuneforgeShop : IDisposable
         return _canAfford;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.CanCrush), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool CanCrush(RewardInteractable __instance, ref bool __result)
     {
         var item = _instance.Find(__instance);
@@ -333,6 +321,8 @@ internal sealed class RuneforgeShop : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete))]
+    [HarmonyPrefix]
     private static bool BuyOrBlockCrush(RewardInteractable __instance)
     {
         var item = _instance.Find(__instance);
@@ -375,6 +365,8 @@ internal sealed class RuneforgeShop : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(DescriptionInspectionPanel), nameof(DescriptionInspectionPanel.Populate))]
+    [HarmonyPostfix]
     private static void CompactInspectionPanel(DescriptionInspectionPanel __instance, CrushInteractable __1)
     {
         if (__1?.TryCast<RewardInteractable>() is not { } reward || _instance.Find(reward) == null)

@@ -16,22 +16,7 @@ internal sealed class WeaponPurchaseUi
     {
         _instance = this;
         _locked = locked;
-        Patch(harmony, typeof(TitleUIPanel), nameof(RefreshTitle), nameof(RestoreTitle));
-        Patch(harmony, typeof(TitleUIPanelLQ), nameof(RefreshTitleLq), nameof(RestoreTitleLq));
-        Patch(harmony, typeof(TitleUIPanelLQTextMesh), nameof(RefreshTitleTextMesh));
-    }
-
-    private static void Patch(HarmonyLib.Harmony harmony, Type type, string postfix, string? prefix = null)
-    {
-        harmony.Patch(
-            AccessTools.Method(type, "Activate"),
-            prefix: prefix == null ? null : new HarmonyMethod(typeof(WeaponPurchaseUi), prefix),
-            postfix: new HarmonyMethod(typeof(WeaponPurchaseUi), postfix)
-        );
-        harmony.Patch(
-            AccessTools.Method(type, "RefreshCanAfford"),
-            postfix: new HarmonyMethod(typeof(WeaponPurchaseUi), postfix)
-        );
+        harmony.PatchAll(typeof(WeaponPurchaseUi));
     }
 
     private static bool LockedPurchase(CrushInteractable? purchase)
@@ -40,18 +25,28 @@ internal sealed class WeaponPurchaseUi
         return weapon != null && _instance._locked(weapon.ArmamentID);
     }
 
+    [HarmonyPatch(typeof(TitleUIPanel), "Activate")]
+    [HarmonyPatch(typeof(TitleUIPanel), "RefreshCanAfford")]
+    [HarmonyPostfix]
     private static void RefreshTitle(TitleUIPanel __instance)
     {
         HideRoot(__instance.purchaseRoot, __instance.currentPurchase);
     }
 
+    [HarmonyPatch(typeof(TitleUIPanelLQ), "Activate")]
+    [HarmonyPatch(typeof(TitleUIPanelLQ), "RefreshCanAfford")]
+    [HarmonyPostfix]
     private static void RefreshTitleLq(TitleUIPanelLQ __instance)
     {
         HideRoot(__instance.purchaseRoot, __instance.currentPurchase);
     }
 
+    [HarmonyPatch(typeof(TitleUIPanel), "Activate")]
+    [HarmonyPrefix]
     private static void RestoreTitle(TitleUIPanel __instance) => RestoreRoot(__instance.purchaseRoot);
 
+    [HarmonyPatch(typeof(TitleUIPanelLQ), "Activate")]
+    [HarmonyPrefix]
     private static void RestoreTitleLq(TitleUIPanelLQ __instance) => RestoreRoot(__instance.purchaseRoot);
 
     private static void HideRoot(GameObject? root, CrushInteractable? purchase)
@@ -74,6 +69,9 @@ internal sealed class WeaponPurchaseUi
             root.SetActive(active);
     }
 
+    [HarmonyPatch(typeof(TitleUIPanelLQTextMesh), "Activate")]
+    [HarmonyPatch(typeof(TitleUIPanelLQTextMesh), "RefreshCanAfford")]
+    [HarmonyPostfix]
     private static void RefreshTitleTextMesh(TitleUIPanelLQTextMesh __instance)
     {
         if (!LockedPurchase(__instance.currentPurchase))

@@ -34,15 +34,7 @@ internal sealed class ExhaustionTrap : TimedTrap
         )
     {
         _instance = this;
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerDash), nameof(PlayerDash.Update)),
-            prefix: new HarmonyMethod(typeof(ExhaustionTrap), nameof(BeginUpdate)),
-            finalizer: new HarmonyMethod(typeof(ExhaustionTrap), nameof(EndUpdate))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.LoadEndRun), [typeof(bool)]),
-            prefix: new HarmonyMethod(typeof(ExhaustionTrap), nameof(OnEndRun))
-        );
+        harmony.PatchAll(typeof(ExhaustionTrap));
     }
 
     protected override void OnActivated()
@@ -90,6 +82,8 @@ internal sealed class ExhaustionTrap : TimedTrap
         );
     }
 
+    [HarmonyPatch(typeof(PlayerDash), nameof(PlayerDash.Update))]
+    [HarmonyPrefix]
     private static void BeginUpdate(PlayerDash __instance, out bool __state)
     {
         __state = false;
@@ -114,6 +108,8 @@ internal sealed class ExhaustionTrap : TimedTrap
         }
     }
 
+    [HarmonyPatch(typeof(PlayerDash), nameof(PlayerDash.Update))]
+    [HarmonyFinalizer]
     private static Exception? EndUpdate(PlayerDash __instance, bool __state, Exception? __exception)
     {
         if (!__state)
@@ -133,6 +129,8 @@ internal sealed class ExhaustionTrap : TimedTrap
         return __exception;
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.LoadEndRun), typeof(bool))]
+    [HarmonyPrefix]
     private static void OnEndRun(LevelManager __instance)
     {
         if (_instance._level()?.Pointer == __instance.Pointer)

@@ -51,46 +51,7 @@ internal sealed partial class PlayerBonuses
         _damageLog = log.Channel("APDamage");
         _timingLog = log.Channel("APTiming");
         _stageProgressLog = log.Channel("APStageProgress");
-        harmony.Patch(
-            AccessTools.Method(typeof(Armament), nameof(Armament.ApplyTraits)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnTraitsApplied))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Armament), nameof(Armament.CollectTraits)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnTraitsCollected))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Armament), nameof(Armament.BindToHand)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnBound))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Armament), nameof(Armament.OnDestroy)),
-            prefix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnArmamentDestroyed))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.Start)),
-            prefix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnPlayerStarting))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.OnDestroy)),
-            prefix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnPlayerDestroyed))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Populate)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnInspectionPopulate))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Display)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnInspectionDisplay))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(CritPointInstanced), nameof(CritPointInstanced.SpawnCritPoint)),
-            prefix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnCriticalWindowStarting))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerDash), nameof(PlayerDash.Start)),
-            postfix: new HarmonyMethod(typeof(PlayerBonuses), nameof(OnDashStarting))
-        );
+        harmony.PatchAll(typeof(PlayerBonuses));
     }
 
     public void Update(ArmamentInventory? inventory, IReadOnlyDictionary<long, int>? counts)
@@ -134,6 +95,8 @@ internal sealed partial class PlayerBonuses
                     panel.RefreshText();
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.ApplyTraits))]
+    [HarmonyPostfix]
     private static void OnTraitsApplied(Armament __instance)
     {
         _instance._traitsAppliedArmaments.Add(__instance.Pointer);
@@ -142,6 +105,8 @@ internal sealed partial class PlayerBonuses
             _instance.ApplyBonuses(__instance);
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.CollectTraits))]
+    [HarmonyPostfix]
     private static void OnTraitsCollected(Armament __instance)
     {
         var added = _instance._traitsAppliedArmaments.Add(__instance.Pointer);
@@ -154,6 +119,8 @@ internal sealed partial class PlayerBonuses
             _instance.ApplyBonuses(__instance);
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.BindToHand))]
+    [HarmonyPostfix]
     private static void OnBound(Armament __instance)
     {
         _instance.Track(__instance);
@@ -164,6 +131,8 @@ internal sealed partial class PlayerBonuses
             _instance.ApplyBonuses(__instance);
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.OnDestroy))]
+    [HarmonyPrefix]
     private static void OnArmamentDestroyed(Armament __instance)
     {
         _instance._liveArmaments.RemoveAll(armament => armament.Pointer == __instance.Pointer);
@@ -171,6 +140,8 @@ internal sealed partial class PlayerBonuses
         _instance._enhancedAbilityLevels.Remove(__instance.Pointer);
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Start))]
+    [HarmonyPrefix]
     private static void OnPlayerStarting(PlayerHealth __instance)
     {
         _instance._playerStatsReady = true;
@@ -192,6 +163,8 @@ internal sealed partial class PlayerBonuses
             _instance.ApplyBonuses(armament);
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.OnDestroy))]
+    [HarmonyPrefix]
     private static void OnPlayerDestroyed()
     {
         _instance._playerStatsReady = false;
@@ -283,6 +256,8 @@ internal sealed partial class PlayerBonuses
         ApplyDashCharges(armament);
     }
 
+    [HarmonyPatch(typeof(CritPointInstanced), nameof(CritPointInstanced.SpawnCritPoint))]
+    [HarmonyPrefix]
     private static void OnCriticalWindowStarting(ref float __3)
     {
         var count = _instance._counts.GetValueOrDefault(ApItems.CriticalWindowBonusId);
@@ -292,6 +267,8 @@ internal sealed partial class PlayerBonuses
         __3 *= PlayerBonusRules.CriticalWindowMultiplier(count);
     }
 
+    [HarmonyPatch(typeof(PlayerDash), nameof(PlayerDash.Start))]
+    [HarmonyPostfix]
     private static void OnDashStarting(PlayerDash __instance)
     {
         var variable = __instance._dashChargeRestoreTimeVariable;

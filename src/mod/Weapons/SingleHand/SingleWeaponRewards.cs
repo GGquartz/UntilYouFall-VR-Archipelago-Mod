@@ -22,41 +22,13 @@ internal sealed class SingleWeaponRewards
         _active = active;
         _log = log.Channel("APRewards");
         _rewardDiagLog = log.Channel("APRewardDiag");
-        foreach (
-            var type in new[]
-            {
-                typeof(EmbeddedTraitAugment),
-                typeof(TraitAugment),
-                typeof(BaseArmamentTrait),
-                typeof(StatModArmamentTrait),
-                typeof(UpgradeSuperTrait),
-            }
-        )
-            Patch(harmony, type, "CanBeUsed", nameof(CanUseTrait));
-        Patch(harmony, typeof(RestoreHealthAugment), "CanBeUsed", nameof(UseHealthHand));
-        harmony.Patch(
-            AccessTools.Method(typeof(RestoreHealthAugment), "CanBeUsed"),
-            postfix: new HarmonyMethod(typeof(SingleWeaponRewards), nameof(LogHealthResult))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(AugmentUpgradeWeightedRandomSet), "RemoveInvalidElementsRecursive"),
-            prefix: new HarmonyMethod(typeof(SingleWeaponRewards), nameof(BeforeHealthFilter)),
-            postfix: new HarmonyMethod(typeof(SingleWeaponRewards), nameof(AfterHealthFilter))
-        );
-        Patch(harmony, typeof(EmbeddedTraitAugment), "Apply", nameof(UseWeapon));
-        Patch(harmony, typeof(EmbeddedTraitAugment), "Remove", nameof(UseWeapon));
-        Patch(harmony, typeof(ChargeSuperAugment), "OnCrush", nameof(UseWeapon));
-        Patch(harmony, typeof(RewardInteractable), "get_CanCrush", nameof(CanCrush));
-        Patch(harmony, typeof(RewardInteractable), "OnCrushComplete", nameof(Complete));
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), "OnCrushComplete"),
-            postfix: new HarmonyMethod(typeof(SingleWeaponRewards), nameof(LogCompleted))
-        );
+        harmony.PatchAll(typeof(SingleWeaponRewards));
     }
 
-    private static void Patch(HarmonyLib.Harmony harmony, Type type, string method, string prefix) =>
-        harmony.Patch(AccessTools.Method(type, method), prefix: new HarmonyMethod(typeof(SingleWeaponRewards), prefix));
-
+    [HarmonyPatch(typeof(EmbeddedTraitAugment), "Apply")]
+    [HarmonyPatch(typeof(EmbeddedTraitAugment), "Remove")]
+    [HarmonyPatch(typeof(ChargeSuperAugment), "OnCrush")]
+    [HarmonyPrefix]
     private static bool UseWeapon(PlayerHand __0)
     {
         var allow = SingleWeaponRewardRules.AllowWeapon(_instance._active(), __0?.BoundArmament != null);
@@ -69,6 +41,12 @@ internal sealed class SingleWeaponRewards
         return allow;
     }
 
+    [HarmonyPatch(typeof(EmbeddedTraitAugment), "CanBeUsed")]
+    [HarmonyPatch(typeof(TraitAugment), "CanBeUsed")]
+    [HarmonyPatch(typeof(BaseArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(StatModArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(UpgradeSuperTrait), "CanBeUsed")]
+    [HarmonyPrefix]
     private static bool CanUseTrait(PlayerHand __0, ref ArmamentAugment.UsageResult __result)
     {
         if (UseWeapon(__0))
@@ -78,6 +56,8 @@ internal sealed class SingleWeaponRewards
         return false;
     }
 
+    [HarmonyPatch(typeof(RestoreHealthAugment), "CanBeUsed")]
+    [HarmonyPrefix]
     private static void UseHealthHand(ref PlayerHand __0)
     {
         LogHealthEligibility("eligibility-enter", null, __0, "pending");
@@ -91,6 +71,8 @@ internal sealed class SingleWeaponRewards
         _instance._log.Write("Vitality eligibility redirected");
     }
 
+    [HarmonyPatch(typeof(AugmentUpgradeWeightedRandomSet), "RemoveInvalidElementsRecursive")]
+    [HarmonyPrefix]
     private static void BeforeHealthFilter(AugmentUpgradeWeightedRandomSet __0, ref PlayerHand __1, ref PlayerHand __2)
     {
         if (_instance._active())
@@ -111,12 +93,16 @@ internal sealed class SingleWeaponRewards
         LogHealthEligibility($"filter-before-right:{__0?.Pointer}", null, __2, "pending");
     }
 
+    [HarmonyPatch(typeof(AugmentUpgradeWeightedRandomSet), "RemoveInvalidElementsRecursive")]
+    [HarmonyPostfix]
     private static void AfterHealthFilter(AugmentUpgradeWeightedRandomSet __0, PlayerHand __1, PlayerHand __2)
     {
         LogHealthEligibility($"filter-after-left:{__0?.Pointer}", null, __1, "returned");
         LogHealthEligibility($"filter-after-right:{__0?.Pointer}", null, __2, "returned");
     }
 
+    [HarmonyPatch(typeof(RestoreHealthAugment), "CanBeUsed")]
+    [HarmonyPostfix]
     private static void LogHealthResult(
         RestoreHealthAugment __instance,
         PlayerHand __0,
@@ -176,6 +162,8 @@ internal sealed class SingleWeaponRewards
         || reward.TryCast<TraitAugment>() != null
         || reward.TryCast<ChargeSuperAugment>() != null;
 
+    [HarmonyPatch(typeof(RewardInteractable), "get_CanCrush")]
+    [HarmonyPrefix]
     private static bool CanCrush(RewardInteractable __instance, ref bool __result)
     {
         if (!_instance._active() || !RequiresWeapon(__instance.Upgrade) || UseWeapon(__instance.ActiveHand))
@@ -185,6 +173,8 @@ internal sealed class SingleWeaponRewards
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), "OnCrushComplete")]
+    [HarmonyPrefix]
     private static bool Complete(RewardInteractable __instance)
     {
         if (StartingTraitRewards.Owns(__instance))
@@ -235,6 +225,8 @@ internal sealed class SingleWeaponRewards
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), "OnCrushComplete")]
+    [HarmonyPostfix]
     private static void LogCompleted(RewardInteractable __instance) => LogReward("after", __instance);
 
     private static void LogReward(string phase, RewardInteractable interactable)

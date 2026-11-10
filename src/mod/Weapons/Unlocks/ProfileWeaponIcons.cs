@@ -10,30 +10,27 @@ internal sealed class ProfileWeaponIcons
 
     public ProfileWeaponIcons(HarmonyLib.Harmony harmony, Action<string> log)
     {
-        harmony.Patch(
-            AccessTools.Method(typeof(ProfileUI), nameof(ProfileUI.AttemptLoad)),
-            prefix: new HarmonyMethod(typeof(ProfileWeaponIcons), nameof(BeginPreview)),
-            postfix: new HarmonyMethod(typeof(ProfileWeaponIcons), nameof(ShowSavedIcons)),
-            finalizer: new HarmonyMethod(typeof(ProfileWeaponIcons), nameof(EndPreview))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(SavedArmamentEquip), nameof(SavedArmamentEquip.Deserialize)),
-            postfix: new HarmonyMethod(typeof(ProfileWeaponIcons), nameof(ReadSavedHand))
-        );
+        harmony.PatchAll(typeof(ProfileWeaponIcons));
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.AttemptLoad))]
+    [HarmonyPrefix]
     private static void BeginPreview(out SavedWeaponPreview? __state)
     {
         __state = _preview;
         _preview = new SavedWeaponPreview();
     }
 
+    [HarmonyPatch(typeof(SavedArmamentEquip), nameof(SavedArmamentEquip.Deserialize))]
+    [HarmonyPostfix]
     private static void ReadSavedHand(SavedArmamentEquip __instance, string? __0)
     {
         if (_preview != null && __instance.hand != null)
             _preview.Read(__instance.hand.GetState().Pointer, __0);
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.AttemptLoad))]
+    [HarmonyPostfix]
     private static void ShowSavedIcons(ProfileUI __instance)
     {
         if (_preview == null)
@@ -55,6 +52,8 @@ internal sealed class ProfileWeaponIcons
             __instance._rightHandArmament.enabled = showRight;
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.AttemptLoad))]
+    [HarmonyFinalizer]
     private static Exception? EndPreview(Exception? __exception, SavedWeaponPreview? __state)
     {
         _preview = __state;

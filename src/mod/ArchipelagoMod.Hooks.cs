@@ -11,6 +11,8 @@ namespace UntilYouFallArchipelago;
 
 public sealed partial class ArchipelagoMod
 {
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Start))]
+    [HarmonyPostfix]
     private static void OnPlayerHealthStart(PlayerHealth __instance) => _instance._playerHealth = __instance;
 
     private string FormatStageRewardContextForLog() =>
@@ -18,6 +20,14 @@ public sealed partial class ArchipelagoMod
             ? "profile=unknown seed=unknown index=unknown room=unknown"
             : $"profile={_levelManager.saveManager?.ProfileIndex} {_levelManager.DescribeForLog()}";
 
+    [HarmonyPatch(
+        typeof(ScreenFadeController),
+        nameof(ScreenFadeController.FadeTo),
+        typeof(float),
+        typeof(Color),
+        typeof(Il2CppSystem.Action)
+    )]
+    [HarmonyPrefix]
     private static void PrepareRuneforgeBeforeFadeIn(ScreenFadeController __instance, Color __1)
     {
         try
@@ -42,6 +52,8 @@ public sealed partial class ArchipelagoMod
         }
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartLoad))]
+    [HarmonyPrefix]
     private static void OnRoomLoad(LevelManager __instance, Campaign.RoomSelection level)
     {
         var combatRoom = level.Encounter != null && level.Room?.GUID != RuneforgeShopRules.RuneforgeRoomGuid;
@@ -61,6 +73,8 @@ public sealed partial class ArchipelagoMod
             );
     }
 
+    [HarmonyPatch(typeof(Il2Cpp.RoomCompletionHistory), nameof(Il2Cpp.RoomCompletionHistory.SetCompletionState))]
+    [HarmonyPostfix]
     private static void OnRoomCompletion(Il2Cpp.RoomCompletionHistory __instance, bool success)
     {
         var manager = __instance.levelManager;
@@ -145,6 +159,8 @@ public sealed partial class ArchipelagoMod
         }
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.OnLastEnemyKilled))]
+    [HarmonyPostfix]
     private static void OnEnemiesCleared(PlayerHealth __instance)
     {
         var manager = _instance._levelManager;
@@ -163,6 +179,8 @@ public sealed partial class ArchipelagoMod
         }
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.OnDestroy))]
+    [HarmonyPrefix]
     private static void ForgetPlayerHealth(PlayerHealth __instance)
     {
         if (_instance._playerHealth?.Pointer == __instance.Pointer)

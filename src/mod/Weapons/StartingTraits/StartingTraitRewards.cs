@@ -67,68 +67,15 @@ internal sealed partial class StartingTraitRewards : IDisposable
         _log = log.Channel("APStartingTraits");
         _localEvent = ScriptableObject.CreateInstance<GlobalEvent>();
         _localEvent.name = "APStartingTraits.Local";
-        Hook(harmony, typeof(LevelManager), nameof(LevelManager.StartRun), nameof(NewRun));
-        Hook(harmony, typeof(LevelManager), nameof(LevelManager.RestoreRun), nameof(Restored));
-        Hook(harmony, typeof(LevelManager), nameof(LevelManager.EndRun), nameof(Ended), prefix: true);
-        Hook(harmony, typeof(LevelManager), nameof(LevelManager.StartLoad), nameof(Loading), prefix: true);
-        Hook(harmony, typeof(LevelLoadingPhase), nameof(LevelLoadingPhase.Invoke), nameof(Ready));
-        Hook(harmony, typeof(RewardMomentController), nameof(RewardMomentController.Start), nameof(FindSource));
-        Hook(harmony, typeof(RewardSpawner), nameof(RewardSpawner.OnEnable), nameof(EnableSpawner), prefix: true);
-        Hook(harmony, typeof(RewardSpawner), nameof(RewardSpawner.PopulateSpawnRewards), nameof(Select), prefix: true);
-        Hook(harmony, typeof(RewardSpawner), nameof(RewardSpawner.Spawn), nameof(AllowSpawn), prefix: true);
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(RewardInteractable),
-                nameof(RewardInteractable.Initialize),
-                [typeof(ArmamentAugment)]
-            ),
-            postfix: new HarmonyMethod(typeof(StartingTraitRewards), nameof(Register))
-        );
-        Hook(
-            harmony,
-            typeof(RewardInteractable),
-            nameof(RewardInteractable.HandleOtherRewardCrushed),
-            nameof(KeepOffer),
-            prefix: true
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(RewardInteractable), nameof(RewardInteractable.CanCrush)),
-            postfix: new HarmonyMethod(typeof(StartingTraitRewards), nameof(CanCrush))
-        );
-        Hook(
-            harmony,
-            typeof(CrushInteractable),
-            nameof(CrushInteractable.FinishCrush),
-            nameof(BeforeFinish),
-            prefix: true
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete)),
-            prefix: new HarmonyMethod(typeof(StartingTraitRewards), nameof(Complete)) { priority = Priority.First }
-        );
-        Hook(
-            harmony,
-            typeof(RewardSpawner.RewardLoader),
-            nameof(RewardSpawner.RewardLoader.OnResourceLoadComplete),
-            nameof(AllowLoad),
-            prefix: true
-        );
-        Hook(
-            harmony,
-            typeof(RewardSpawner.RewardLoader),
-            nameof(RewardSpawner.RewardLoader.OnResourceLoadComplete),
-            nameof(Loaded)
-        );
+        harmony.PatchAll(typeof(StartingTraitRewards));
     }
 
-    private static void Hook(HarmonyLib.Harmony harmony, Type type, string method, string handler, bool prefix = false)
-    {
-        var patch = new HarmonyMethod(typeof(StartingTraitRewards), handler);
-        harmony.Patch(AccessTools.Method(type, method), prefix: prefix ? patch : null, postfix: prefix ? null : patch);
-    }
-
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartRun))]
+    [HarmonyPostfix]
     private static void NewRun(LevelManager __instance) => _instance.Begin(__instance, fresh: true);
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.RestoreRun))]
+    [HarmonyPostfix]
     private static void Restored(LevelManager __instance) => _instance.Begin(__instance, fresh: false);
 
     private static string RunKey(LevelManager manager) =>
@@ -157,6 +104,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         _log.Write($"run {(fresh ? "new" : "restore")} seed={manager.CurrentSeed}");
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.EndRun))]
+    [HarmonyPrefix]
     private static void Ended()
     {
         _instance.ClearFeedback();
@@ -165,6 +114,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         _instance._newRun = false;
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartLoad))]
+    [HarmonyPrefix]
     private static void Loading()
     {
         _instance.ClearFeedback();
@@ -175,6 +126,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         _instance._moment = null;
     }
 
+    [HarmonyPatch(typeof(RewardMomentController), nameof(RewardMomentController.Start))]
+    [HarmonyPostfix]
     private static void FindSource(RewardMomentController __instance)
     {
         var spawner = __instance.rewardSpawner;
@@ -185,6 +138,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         }
     }
 
+    [HarmonyPatch(typeof(LevelLoadingPhase), nameof(LevelLoadingPhase.Invoke))]
+    [HarmonyPostfix]
     private static void Ready(LevelLoadingPhase __instance)
     {
         var manager = _instance._manager;
@@ -458,6 +413,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         _log.Write($"sound complete={complete} requested={name} played={clip.name} loadState={clip.loadState}");
     }
 
+    [HarmonyPatch(typeof(RewardSpawner.RewardLoader), nameof(RewardSpawner.RewardLoader.OnResourceLoadComplete))]
+    [HarmonyPrefix]
     private static bool AllowLoad(RewardSpawner.RewardLoader __instance, bool __0, ref Object __1)
     {
         if (__instance.Spawner is null || !_instance._groups.TryGetValue(__instance.Spawner.Pointer, out var group))
@@ -497,6 +454,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         return true;
     }
 
+    [HarmonyPatch(typeof(RewardSpawner.RewardLoader), nameof(RewardSpawner.RewardLoader.OnResourceLoadComplete))]
+    [HarmonyPostfix]
     private static void Loaded(RewardSpawner.RewardLoader __instance)
     {
         if (__instance.Spawner is null || !_instance._groups.TryGetValue(__instance.Spawner.Pointer, out var group))

@@ -47,19 +47,7 @@ internal sealed class NoBlockingTrap : TimedTrap
     {
         _instance = this;
         _dodgeState = state;
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerDefense), nameof(PlayerDefense.HandleAttack)),
-            prefix: new HarmonyMethod(typeof(NoBlockingTrap), nameof(BeginAttack)),
-            finalizer: new HarmonyMethod(typeof(NoBlockingTrap), nameof(EndAttack))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyProjectile), nameof(EnemyProjectile.DoBlockCheck)),
-            prefix: new HarmonyMethod(typeof(NoBlockingTrap), nameof(AllowProjectileBlock))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.LoadEndRun), [typeof(bool)]),
-            prefix: new HarmonyMethod(typeof(NoBlockingTrap), nameof(OnEndRun))
-        );
+        harmony.PatchAll(typeof(NoBlockingTrap));
     }
 
     protected override bool Activate(int durationSeconds)
@@ -83,6 +71,8 @@ internal sealed class NoBlockingTrap : TimedTrap
         return _dodgeState.ShouldForceDodge(_owner != null && _player()?.Pointer == _owner.Pointer, _ready());
     }
 
+    [HarmonyPatch(typeof(PlayerDefense), nameof(PlayerDefense.HandleAttack))]
+    [HarmonyPrefix]
     private static void BeginAttack(PlayerDefense __instance, out bool? __state)
     {
         __state = null;
@@ -108,6 +98,8 @@ internal sealed class NoBlockingTrap : TimedTrap
         }
     }
 
+    [HarmonyPatch(typeof(PlayerDefense), nameof(PlayerDefense.HandleAttack))]
+    [HarmonyFinalizer]
     private static Exception? EndAttack(PlayerDefense __instance, bool? __state, Exception? __exception)
     {
         if (!__state.HasValue)
@@ -126,6 +118,8 @@ internal sealed class NoBlockingTrap : TimedTrap
         return __exception;
     }
 
+    [HarmonyPatch(typeof(EnemyProjectile), nameof(EnemyProjectile.DoBlockCheck))]
+    [HarmonyPrefix]
     private static bool AllowProjectileBlock(EnemyProjectile __instance)
     {
         if (!_instance._state.Active)
@@ -150,6 +144,8 @@ internal sealed class NoBlockingTrap : TimedTrap
         }
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.LoadEndRun), typeof(bool))]
+    [HarmonyPrefix]
     private static void OnEndRun(LevelManager __instance)
     {
         if (_instance._level()?.Pointer == __instance.Pointer)

@@ -16,8 +16,12 @@ namespace UntilYouFallArchipelago;
 
 internal sealed partial class PlayerBonuses
 {
+    [HarmonyPatch(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Populate))]
+    [HarmonyPostfix]
     private static void OnInspectionPopulate(InspectionUIPanel __instance) => _instance.UpdateInspection(__instance);
 
+    [HarmonyPatch(typeof(InspectionUIPanel), nameof(InspectionUIPanel.Display))]
+    [HarmonyPostfix]
     private static void OnInspectionDisplay(InspectionUIPanel __instance, ArmamentID __0, Armament __1, StatSet __2)
     {
         _instance.UpdateSuperDetail(__instance, __1);

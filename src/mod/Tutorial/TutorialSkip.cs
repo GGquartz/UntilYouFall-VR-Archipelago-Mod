@@ -21,28 +21,11 @@ internal sealed class TutorialSkip
         _instance = this;
         _connected = connected;
         _log = log.Channel("APTutorial");
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartGame)),
-            prefix: new HarmonyMethod(typeof(TutorialSkip), nameof(BeforeStartGame))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartRun)),
-            prefix: new HarmonyMethod(typeof(TutorialSkip), nameof(BeforeStartGame))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PopupUIController), nameof(PopupUIController.OnShowPopupUI)),
-            prefix: new HarmonyMethod(typeof(TutorialSkip), nameof(AllowPopup))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PopupUIRandomDisplay), nameof(PopupUIRandomDisplay.Display)),
-            prefix: new HarmonyMethod(typeof(TutorialSkip), nameof(AllowBattleTip))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PopupUIRandomDisplay), "Update"),
-            prefix: new HarmonyMethod(typeof(TutorialSkip), nameof(AllowBattleTip))
-        );
+        harmony.PatchAll(typeof(TutorialSkip));
     }
 
+    [HarmonyPatch(typeof(PopupUIController), nameof(PopupUIController.OnShowPopupUI))]
+    [HarmonyPrefix]
     private static bool AllowPopup(PopupUIAsset __0)
     {
         if (!_instance._connected() || __0 == null || !TutorialRules.IsTutorialPopup(__0.name))
@@ -53,6 +36,9 @@ internal sealed class TutorialSkip
         return false;
     }
 
+    [HarmonyPatch(typeof(PopupUIRandomDisplay), nameof(PopupUIRandomDisplay.Display))]
+    [HarmonyPatch(typeof(PopupUIRandomDisplay), "Update")]
+    [HarmonyPrefix]
     private static bool AllowBattleTip(PopupUIRandomDisplay __instance)
     {
         if (!_instance._connected())
@@ -81,6 +67,9 @@ internal sealed class TutorialSkip
         return false;
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartGame))]
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartRun))]
+    [HarmonyPrefix]
     private static void BeforeStartGame(LevelManager __instance)
     {
         if (!_instance._connected() || _instance._failed)

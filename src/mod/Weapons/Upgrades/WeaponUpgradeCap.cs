@@ -27,39 +27,7 @@ internal sealed class WeaponUpgradeCap
         _instance = this;
         _log = log.Channel("APWeaponUpgradeCap");
         _notifyTechnical = notifyTechnical;
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(ArmamentInventory),
-                nameof(ArmamentInventory.BuyArmament),
-                [typeof(ArmamentID), typeof(int)]
-            ),
-            prefix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(AllowPurchase))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ArmamentInventory), nameof(ArmamentInventory.LevelUp), [typeof(PlayerHandState)]),
-            prefix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(AllowLevelUp))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(PurchaseInteractable), nameof(PurchaseInteractable.CanCrush)),
-            prefix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(AllowPurchaseCrush))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(ArmamentID), nameof(ArmamentID.MaxUpgradeLevel)),
-            postfix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(CapMaxUpgradeLevel))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(UpgradeInteractable), nameof(UpgradeInteractable.HasNextLevel)),
-            postfix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(BlockUpgradeHasNextLevel))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush)),
-            prefix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(BeginFinishCrush)),
-            finalizer: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(EndFinishCrush))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(GlobalEvent), nameof(GlobalEvent.Raise), Type.EmptyTypes),
-            prefix: new HarmonyMethod(typeof(WeaponUpgradeCap), nameof(AllowGlobalEvent))
-        );
+        harmony.PatchAll(typeof(WeaponUpgradeCap));
     }
 
     public void Update(int? itemCount, bool canHaveAltar)
@@ -70,6 +38,8 @@ internal sealed class WeaponUpgradeCap
             UpdateAltarLabel(itemCount.Value, canHaveAltar);
     }
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.BuyArmament), typeof(ArmamentID), typeof(int))]
+    [HarmonyPrefix]
     private static bool AllowPurchase(ArmamentID __0, int __1, ref bool __result)
     {
         if (!WeaponUpgradeCapRules.IsBlockedUpgrade(__1, _instance._itemCount))
@@ -80,6 +50,8 @@ internal sealed class WeaponUpgradeCap
         return false;
     }
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.LevelUp), typeof(PlayerHandState))]
+    [HarmonyPrefix]
     private static bool AllowLevelUp(ArmamentInventory __instance, PlayerHandState __0)
     {
         if (_instance._itemCount == null)
@@ -92,6 +64,8 @@ internal sealed class WeaponUpgradeCap
         return false;
     }
 
+    [HarmonyPatch(typeof(PurchaseInteractable), nameof(PurchaseInteractable.CanCrush), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool AllowPurchaseCrush(PurchaseInteractable __instance, ref bool __result)
     {
         if (!WeaponUpgradeCapRules.IsBlockedUpgrade(__instance.ArmamentLevel, _instance._itemCount))
@@ -101,11 +75,15 @@ internal sealed class WeaponUpgradeCap
         return false;
     }
 
+    [HarmonyPatch(typeof(ArmamentID), nameof(ArmamentID.MaxUpgradeLevel), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void CapMaxUpgradeLevel(ref int __result)
     {
         __result = WeaponUpgradeCapRules.CapNativeMaxUpgradeLevel(__result, _instance._itemCount);
     }
 
+    [HarmonyPatch(typeof(UpgradeInteractable), nameof(UpgradeInteractable.HasNextLevel))]
+    [HarmonyPostfix]
     private static void BlockUpgradeHasNextLevel(UpgradeInteractable __instance, ref bool __result)
     {
         if (!__result || _instance._itemCount == null)
@@ -115,6 +93,8 @@ internal sealed class WeaponUpgradeCap
             __result = false;
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyPrefix]
     private static void BeginFinishCrush(CrushInteractable __instance, out bool __state)
     {
         var purchase = __instance?.TryCast<PurchaseInteractable>();
@@ -124,6 +104,8 @@ internal sealed class WeaponUpgradeCap
             _instance._blockedCrushDepth++;
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyFinalizer]
     private static Exception? EndFinishCrush(Exception? __exception, bool __state)
     {
         if (__state)
@@ -132,6 +114,8 @@ internal sealed class WeaponUpgradeCap
         return __exception;
     }
 
+    [HarmonyPatch(typeof(GlobalEvent), nameof(GlobalEvent.Raise), new Type[0])]
+    [HarmonyPrefix]
     private static bool AllowGlobalEvent(GlobalEvent __instance)
     {
         if (_instance._blockedCrushDepth <= 0)

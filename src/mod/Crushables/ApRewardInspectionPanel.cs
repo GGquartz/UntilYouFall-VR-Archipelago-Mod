@@ -23,12 +23,10 @@ internal static class ApRewardInspectionPanel
         )
     > OriginalLayouts = [];
 
-    public static void Install(HarmonyLib.Harmony harmony) =>
-        harmony.Patch(
-            AccessTools.Method(typeof(DescriptionInspectionPanel), nameof(DescriptionInspectionPanel.Populate)),
-            prefix: new HarmonyMethod(typeof(ApRewardInspectionPanel), nameof(RestoreBeforePopulate))
-        );
+    public static void Install(HarmonyLib.Harmony harmony) => harmony.PatchAll(typeof(ApRewardInspectionPanel));
 
+    [HarmonyPatch(typeof(DescriptionInspectionPanel), nameof(DescriptionInspectionPanel.Populate))]
+    [HarmonyPrefix]
     public static void RestoreBeforePopulate(DescriptionInspectionPanel __instance)
     {
         if (!OriginalLayouts.Remove(__instance.GetInstanceID(), out var original))

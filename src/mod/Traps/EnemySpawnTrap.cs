@@ -58,39 +58,7 @@ internal sealed class EnemySpawnTrap : IDisposable
         _level = level;
         _log = log.Channel("APEnemyTrapDiag");
         _notifyTechnical = notifyTechnical;
-        harmony.Patch(
-            AccessTools.Method(typeof(Enemy), nameof(Enemy.Awake)),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnEnemyAwake))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Enemy), nameof(Enemy.FinishInitialization)),
-            postfix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnEnemyReady))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Enemy), nameof(Enemy.OnDisable)),
-            postfix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnEnemyDisabled))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyKillController), nameof(EnemyKillController.Kill)),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnEnemyKill))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartLoad)),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnRoomLoad))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.LoadEndRun), [typeof(bool)]),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(OnLoadEndRun))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyManager), nameof(EnemyManager.RemoveItem), [typeof(Enemy)]),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(BeginRemoveEnemy)),
-            finalizer: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(EndRemoveEnemy))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(GlobalEvent), nameof(GlobalEvent.Raise), Type.EmptyTypes),
-            prefix: new HarmonyMethod(typeof(EnemySpawnTrap), nameof(AllowRoomClear))
-        );
+        harmony.PatchAll(typeof(EnemySpawnTrap));
     }
 
     public void Spawn()
@@ -212,6 +180,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         _log.Write("Run ended");
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.LoadEndRun), typeof(bool))]
+    [HarmonyPrefix]
     private static void OnLoadEndRun(LevelManager __instance)
     {
         if (_instance._level()?.Pointer == __instance.Pointer)
@@ -228,6 +198,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         _log.Write("Room enemies cleared");
     }
 
+    [HarmonyPatch(typeof(EnemyManager), nameof(EnemyManager.RemoveItem), typeof(Enemy))]
+    [HarmonyPrefix]
     private static void BeginRemoveEnemy(EnemyManager __instance, Enemy item, out GlobalEvent? __state)
     {
         __state = _instance._suppressedRoomClearEvent;
@@ -240,12 +212,16 @@ internal sealed class EnemySpawnTrap : IDisposable
             _instance._suppressedRoomClearEvent = __instance.onLastEnemyKilled;
     }
 
+    [HarmonyPatch(typeof(EnemyManager), nameof(EnemyManager.RemoveItem), typeof(Enemy))]
+    [HarmonyFinalizer]
     private static Exception? EndRemoveEnemy(Exception? __exception, GlobalEvent? __state)
     {
         _instance._suppressedRoomClearEvent = __state;
         return __exception;
     }
 
+    [HarmonyPatch(typeof(GlobalEvent), nameof(GlobalEvent.Raise), new Type[0])]
+    [HarmonyPrefix]
     private static bool AllowRoomClear(GlobalEvent __instance)
     {
         if (_instance._suppressedRoomClearEvent?.Pointer != __instance.Pointer)
@@ -254,6 +230,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(Enemy), nameof(Enemy.Awake))]
+    [HarmonyPrefix]
     private static void OnEnemyAwake(Enemy __instance)
     {
         if (_instance._capturing)
@@ -278,6 +256,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         }
     }
 
+    [HarmonyPatch(typeof(Enemy), nameof(Enemy.FinishInitialization))]
+    [HarmonyPostfix]
     private static void OnEnemyReady(Enemy __instance)
     {
         if (!__instance.name.StartsWith(SpawnName, StringComparison.Ordinal))
@@ -299,6 +279,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         _instance.LogEnemyState(__instance, "ready");
     }
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Kill))]
+    [HarmonyPrefix]
     private static void OnEnemyKill(EnemyKillController __instance)
     {
         try
@@ -348,6 +330,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         }
     }
 
+    [HarmonyPatch(typeof(Enemy), nameof(Enemy.OnDisable))]
+    [HarmonyPostfix]
     private static void OnEnemyDisabled(Enemy __instance)
     {
         if (!_instance._spawnedEnemies.Remove(__instance.GetInstanceID()))
@@ -361,6 +345,8 @@ internal sealed class EnemySpawnTrap : IDisposable
         );
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartLoad))]
+    [HarmonyPrefix]
     private static void OnRoomLoad(Campaign.RoomSelection level)
     {
         _instance._runEnded = false;

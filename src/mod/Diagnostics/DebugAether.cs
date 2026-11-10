@@ -18,20 +18,20 @@ internal static class DebugAether
             return;
         }
 
-        harmony.Patch(
-            AccessTools.Method(typeof(ProfileUI), nameof(ProfileUI.LoadProfile)),
-            prefix: new HarmonyMethod(typeof(DebugAether), nameof(IsNewProfile)),
-            postfix: new HarmonyMethod(typeof(DebugAether), nameof(Grant))
-        );
+        harmony.PatchAll(typeof(DebugAether));
 
         log.Write("DebugAether", $"Enabled - New save will get {DebugAetherRules.GrantAmount:N0} aether");
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
+    [HarmonyPrefix]
     private static void IsNewProfile(ProfileUI __instance, out bool __state)
     {
         __state = DebugAetherRules.ShouldGrant(_enabled, __instance._isNewGame);
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
+    [HarmonyPostfix]
     private static void Grant(ProfileUI __instance, bool __state)
     {
         if (!__state || __instance._currencyVariable == null || __instance._saveManager == null)

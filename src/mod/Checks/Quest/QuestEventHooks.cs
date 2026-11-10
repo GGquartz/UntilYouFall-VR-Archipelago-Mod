@@ -55,110 +55,14 @@ internal sealed class QuestEventHooks
         _client = client;
         _level = level;
         _log = log.Channel("APQuestEvents");
-        Patch(harmony, typeof(PlayerDefense), nameof(PlayerDefense.OnAttackBlocked), nameof(Blocked));
-        Patch(harmony, typeof(PlayerDefense), nameof(PlayerDefense.OnAttackDodged), nameof(Dodged));
-        Patch(harmony, typeof(EnemyHealth), nameof(EnemyHealth.BreakGuard), nameof(GuardBreak), prefix: true);
-        Patch(harmony, typeof(EnemyProjectile), nameof(EnemyProjectile.OnPlayerDestroyProjectile), nameof(Deflected));
-        Patch(harmony, typeof(LevelManager), nameof(LevelManager.StartRun), nameof(Started));
-        Patch(harmony, typeof(PlayerCombatant), nameof(PlayerCombatant.OnHealthDamaged), nameof(Combo));
-        Patch(harmony, typeof(Armament), nameof(Armament.AddTraitUpgrade), nameof(Traits));
-        Patch(
-            harmony,
-            typeof(Il2CppSG.Claymore.Armaments.Abilities.ArmamentAbility),
-            nameof(Il2CppSG.Claymore.Armaments.Abilities.ArmamentAbility.OnActivationSuccess),
-            nameof(SuperUsed)
-        );
-        Patch(
-            harmony,
-            typeof(Il2CppSG.Claymore.Armaments.Abilities.SoulburnProjectile),
-            nameof(Il2CppSG.Claymore.Armaments.Abilities.SoulburnProjectile.OnProjectileHit),
-            nameof(SoulburnHit),
-            prefix: true
-        );
-        Patch(
-            harmony,
-            typeof(Il2CppSG.Claymore.Status.SoulBurnHitProperty),
-            nameof(Il2CppSG.Claymore.Status.SoulBurnHitProperty.Apply),
-            nameof(SoulBurnApplied)
-        );
-        Patch(
-            harmony,
-            typeof(Il2CppSG.Claymore.Armaments.Abilities.ShardstormProjectile),
-            nameof(Il2CppSG.Claymore.Armaments.Abilities.ShardstormProjectile.DoTick),
-            nameof(ShardstormTick),
-            prefix: true
-        );
-        Patch(harmony, typeof(UpgradeSuperTrait), nameof(UpgradeSuperTrait.OnCrushComplete), nameof(Super));
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyKillController), nameof(EnemyKillController.Update)),
-            prefix: new HarmonyMethod(typeof(QuestEventHooks), nameof(BeforeEnemyFlightUpdate)),
-            postfix: new HarmonyMethod(typeof(QuestEventHooks), nameof(AfterEnemyFlightUpdate))
-        );
-        Patch(
-            harmony,
-            typeof(RoomCompletionHistory),
-            nameof(RoomCompletionHistory.SetCompletionState),
-            nameof(HistoryChanged)
-        );
-        Patch(
-            harmony,
-            typeof(RoomCompletionHistory),
-            nameof(RoomCompletionHistory.SetCrushedReward),
-            nameof(OnRewardPicked)
-        );
-        Patch(
-            harmony,
-            typeof(RoomCompletionHistory),
-            nameof(RoomCompletionHistory.QuickCashout),
-            nameof(QuickCashout),
-            prefix: true
-        );
-        Patch(harmony, typeof(CashOutScreen), nameof(CashOutScreen.DoCashOutSave), nameof(CashingOut), prefix: true);
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyKillController), nameof(EnemyKillController.Kill)),
-            prefix: new HarmonyMethod(typeof(QuestEventHooks), nameof(BeforeKill)),
-            postfix: new HarmonyMethod(typeof(QuestEventHooks), nameof(AfterKill))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.Damage)),
-            prefix: new HarmonyMethod(typeof(QuestEventHooks), nameof(BeforeDamage)),
-            postfix: new HarmonyMethod(typeof(QuestEventHooks), nameof(AfterDamage))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.DealMassiveDamage)),
-            prefix: new HarmonyMethod(typeof(QuestEventHooks), nameof(BeforeDamage)),
-            postfix: new HarmonyMethod(typeof(QuestEventHooks), nameof(AfterMassiveDamage))
-        );
-        Patch(
-            harmony,
-            typeof(RoomCompletionHistory),
-            nameof(RoomCompletionHistory.SetCompletionState),
-            nameof(StageCompleted)
-        );
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(ArmamentInventory),
-                nameof(ArmamentInventory.BuyArmament),
-                [typeof(ArmamentID), typeof(int)]
-            ),
-            postfix: new HarmonyMethod(typeof(QuestEventHooks), nameof(Bought))
-        );
-        Patch(harmony, typeof(MeleeWeapon), nameof(MeleeWeapon.DoHit), nameof(MeleeHit));
-    }
-
-    private static void Patch(HarmonyLib.Harmony harmony, Type type, string method, string handler, bool prefix = false)
-    {
-        var target = AccessTools.Method(type, method);
-        if (target == null)
+        try
         {
-            _instance._log.Write($"{type.Name}.{method} not found");
-            return;
+            harmony.PatchAll(typeof(QuestEventHooks));
         }
-        var patch = new HarmonyMethod(typeof(QuestEventHooks), handler);
-        if (prefix)
-            harmony.Patch(target, prefix: patch);
-        else
-            harmony.Patch(target, postfix: patch);
+        catch (Exception exception)
+        {
+            _log.Write($"Quest tracking disabled: {exception.Message}");
+        }
     }
 
     private bool InRun()
@@ -171,7 +75,6 @@ internal sealed class QuestEventHooks
             && StageChecks.TryGetStage(manager.Campaign?.GUID, manager.LevelIndex, true, out _);
     }
 
-    // Every hook asks this first: the quest must be on the board, unfinished and its weapon/ability unlocks owned.
     private static bool Tracked(QuestSource source) => _instance._client.QuestTracked(source);
 
     private static void Count(QuestSource source) =>
@@ -191,6 +94,8 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(PlayerDefense), nameof(PlayerDefense.OnAttackBlocked))]
+    [HarmonyPostfix]
     private static void Blocked()
     {
         var melee = Tracked(QuestSource.MeleeBlocks);
@@ -222,24 +127,35 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(PlayerDefense), nameof(PlayerDefense.OnAttackDodged))]
+    [HarmonyPostfix]
     private static void Dodged()
     {
         if (Tracked(QuestSource.Dodges) && _instance.InRun())
             Count(QuestSource.Dodges);
     }
 
+    [HarmonyPatch(typeof(EnemyProjectile), nameof(EnemyProjectile.OnPlayerDestroyProjectile))]
+    [HarmonyPostfix]
     private static void Deflected()
     {
         if (Tracked(QuestSource.RangedBlocks) && _instance.InRun())
             Count(QuestSource.RangedBlocks);
     }
 
+    [HarmonyPatch(typeof(EnemyHealth), nameof(EnemyHealth.BreakGuard))]
+    [HarmonyPrefix]
     private static void GuardBreak(EnemyHealth __instance)
     {
         if (Tracked(QuestSource.GuardBreaks) && _instance.InRun() && !__instance.IsGuardBroken)
             Count(QuestSource.GuardBreaks);
     }
 
+    [HarmonyPatch(
+        typeof(Il2CppSG.Claymore.Armaments.Abilities.ArmamentAbility),
+        nameof(Il2CppSG.Claymore.Armaments.Abilities.ArmamentAbility.OnActivationSuccess)
+    )]
+    [HarmonyPostfix]
     private static void SuperUsed(Il2CppSG.Claymore.Armaments.Abilities.ArmamentAbility __instance)
     {
         if (!Tracked(QuestSource.AllSupers))
@@ -261,6 +177,8 @@ internal sealed class QuestEventHooks
         );
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartRun))]
+    [HarmonyPostfix]
     private static void Started(LevelManager __instance) =>
         Handle(
             "start run",
@@ -279,6 +197,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(PlayerCombatant), nameof(PlayerCombatant.OnHealthDamaged))]
+    [HarmonyPostfix]
     private static void Combo(int __2, float __3) =>
         Handle(
             QuestSource.LongCombo,
@@ -289,6 +209,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.AddTraitUpgrade))]
+    [HarmonyPostfix]
     private static void Traits(Armament __instance) =>
         Handle(
             "traits",
@@ -312,6 +234,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(UpgradeSuperTrait), nameof(UpgradeSuperTrait.OnCrushComplete))]
+    [HarmonyPostfix]
     private static void Super(Armament __0) =>
         Handle(
             QuestSource.SuperLevel4,
@@ -322,9 +246,13 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Update))]
+    [HarmonyPrefix]
     private static void BeforeEnemyFlightUpdate(EnemyKillController __instance, out bool __state) =>
         __state = __instance._isTrackingLaunchDeath;
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Update))]
+    [HarmonyPostfix]
     private static void AfterEnemyFlightUpdate(EnemyKillController __instance, bool __state)
     {
         if (!__state || !Tracked(QuestSource.RagdollDistance))
@@ -341,6 +269,8 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.SetCrushedReward))]
+    [HarmonyPostfix]
     private static void OnRewardPicked(RoomCompletionHistory __instance, ArmamentAugment __0) =>
         Handle(
             "reward",
@@ -366,6 +296,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.SetCompletionState))]
+    [HarmonyPostfix]
     private static void HistoryChanged(RoomCompletionHistory __instance) =>
         Handle(
             "aether",
@@ -388,6 +320,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(CashOutScreen), nameof(CashOutScreen.DoCashOutSave))]
+    [HarmonyPrefix]
     private static void CashingOut(CashOutScreen __instance) =>
         Handle(
             "cash out",
@@ -409,6 +343,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.QuickCashout))]
+    [HarmonyPrefix]
     private static void QuickCashout(RoomCompletionHistory __instance) =>
         Handle(
             "quick cash out",
@@ -436,6 +372,11 @@ internal sealed class QuestEventHooks
         ProjectileHits[enemy.Pointer] = (source, until);
     }
 
+    [HarmonyPatch(
+        typeof(Il2CppSG.Claymore.Status.SoulBurnHitProperty),
+        nameof(Il2CppSG.Claymore.Status.SoulBurnHitProperty.Apply)
+    )]
+    [HarmonyPostfix]
     private static void SoulBurnApplied(Il2CppSG.Claymore.Status.SoulBurnHitProperty __instance, EnemyHealth health) =>
         Handle(
             QuestSource.SoulBurnKills,
@@ -452,6 +393,11 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(
+        typeof(Il2CppSG.Claymore.Armaments.Abilities.SoulburnProjectile),
+        nameof(Il2CppSG.Claymore.Armaments.Abilities.SoulburnProjectile.OnProjectileHit)
+    )]
+    [HarmonyPrefix]
     private static void SoulburnHit(UnityEngine.Collider hitCollider) =>
         Handle(
             QuestSource.SoulBurnKills,
@@ -462,11 +408,20 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(
+        typeof(Il2CppSG.Claymore.Armaments.Abilities.ShardstormProjectile),
+        nameof(Il2CppSG.Claymore.Armaments.Abilities.ShardstormProjectile.DoTick)
+    )]
+    [HarmonyPrefix]
     private static void ShardstormTick(Enemy e) =>
         Handle(QuestSource.ShardstormKills, () => RecordProjectileHit(e, QuestSource.ShardstormKills));
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Kill))]
+    [HarmonyPrefix]
     private static void BeforeKill(EnemyKillController __instance, out bool __state) => __state = __instance._isDying;
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Kill))]
+    [HarmonyPostfix]
     private static void AfterKill(EnemyKillController __instance, bool __state)
     {
         if (__state || !__instance._isDying)
@@ -516,6 +471,8 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.DoHit))]
+    [HarmonyPostfix]
     private static void MeleeHit(MeleeWeapon __instance, ClaymoreEntity __0)
     {
         if (!Tracked(QuestSource.MultiHitSwings))
@@ -576,6 +533,9 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Damage))]
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.DealMassiveDamage))]
+    [HarmonyPrefix]
     private static void BeforeDamage(PlayerHealth __instance, out float __state)
     {
         __state = __instance.CurrentHealth;
@@ -584,9 +544,13 @@ internal sealed class QuestEventHooks
 
     private static bool DamageTracked() => Tracked(QuestSource.BrinkOfRuin) || Tracked(QuestSource.Untouched);
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.DealMassiveDamage))]
+    [HarmonyPostfix]
     private static void AfterMassiveDamage(PlayerHealth __instance, float __state) =>
         AfterDamage(__instance, __state, 0f);
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Damage))]
+    [HarmonyPostfix]
     private static void AfterDamage(PlayerHealth __instance, float __state, float __result)
     {
         if (!DamageTracked())
@@ -613,6 +577,8 @@ internal sealed class QuestEventHooks
         }
     }
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.SetCompletionState))]
+    [HarmonyPostfix]
     private static void StageCompleted(RoomCompletionHistory __instance, bool __0) =>
         Handle(
             QuestSource.Untouched,
@@ -641,6 +607,8 @@ internal sealed class QuestEventHooks
             }
         );
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.BuyArmament), typeof(ArmamentID), typeof(int))]
+    [HarmonyPostfix]
     private static void Bought(int __1, bool __result)
     {
         _instance._log.Write($"BuyArmament level={__1} result={__result}");

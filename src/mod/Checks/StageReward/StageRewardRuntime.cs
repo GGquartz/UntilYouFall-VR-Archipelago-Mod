@@ -63,47 +63,7 @@ internal sealed class StageRewardRuntime : IDisposable
         _room = room;
         _log = log.Channel("APStageReward");
         _forceEveryAether = forceEveryAether;
-        PatchPostfix(harmony, typeof(RewardSpawner), "PopulateSpawnRewards", nameof(ReplaceSelectedReward));
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(RewardInteractable),
-                nameof(RewardInteractable.Initialize),
-                [typeof(ArmamentAugment)]
-            ),
-            postfix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(RegisterReward))
-        );
-        PatchPostfix(harmony, typeof(RewardInteractable), nameof(RewardInteractable.GrabStart), nameof(HintOnGrab));
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), "HandleOtherRewardCrushed"),
-            prefix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(Decline))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete)),
-            prefix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(BeginComplete)),
-            postfix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(Complete)),
-            finalizer: new HarmonyMethod(typeof(StageRewardRuntime), nameof(EndComplete))
-        );
-        harmony.Patch(
-            AccessTools.Method(
-                typeof(Il2Cpp.RoomCompletionHistory),
-                nameof(Il2Cpp.RoomCompletionHistory.SetCrushedReward)
-            ),
-            prefix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(UseHistoryPlaceholder))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(RewardInteractable), nameof(RewardInteractable.DisplayName)),
-            prefix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(OverrideDisplayName))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(RewardInteractable), nameof(RewardInteractable.DisplayDescription)),
-            prefix: new HarmonyMethod(typeof(StageRewardRuntime), nameof(OverrideDisplayDescription))
-        );
-        PatchPostfix(
-            harmony,
-            typeof(DescriptionInspectionPanel),
-            nameof(DescriptionInspectionPanel.Populate),
-            nameof(CompactInspectionPanel)
-        );
+        harmony.PatchAll(typeof(StageRewardRuntime));
     }
 
     public void Update()
@@ -128,9 +88,8 @@ internal sealed class StageRewardRuntime : IDisposable
         }
     }
 
-    private static void PatchPostfix(HarmonyLib.Harmony harmony, Type type, string method, string patch) =>
-        harmony.Patch(AccessTools.Method(type, method), postfix: new HarmonyMethod(typeof(StageRewardRuntime), patch));
-
+    [HarmonyPatch(typeof(RewardSpawner), "PopulateSpawnRewards")]
+    [HarmonyPostfix]
     private static void ReplaceSelectedReward(RewardSpawner __instance) =>
         _instance.Safe(() => _instance.TryReplace(__instance));
 
@@ -244,6 +203,8 @@ internal sealed class StageRewardRuntime : IDisposable
 
     private readonly HashSet<int> _nativeAetherRewards = [];
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.Initialize), typeof(ArmamentAugment))]
+    [HarmonyPostfix]
     private static void RegisterReward(RewardInteractable __instance, ArmamentAugment augment) =>
         _instance.Safe(() =>
         {
@@ -265,6 +226,8 @@ internal sealed class StageRewardRuntime : IDisposable
             );
         });
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.GrabStart))]
+    [HarmonyPostfix]
     private static void HintOnGrab(RewardInteractable __instance) =>
         _instance.Safe(() =>
         {
@@ -276,6 +239,8 @@ internal sealed class StageRewardRuntime : IDisposable
             _instance._log.Write($"Grabbed location={offer.Decision.LocationId} hint=requested");
         });
 
+    [HarmonyPatch(typeof(RewardInteractable), "HandleOtherRewardCrushed")]
+    [HarmonyPrefix]
     private static void Decline(RewardInteractable __instance) =>
         _instance.Safe(() =>
         {
@@ -291,9 +256,13 @@ internal sealed class StageRewardRuntime : IDisposable
             );
         });
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete))]
+    [HarmonyPrefix]
     private static void BeginComplete(RewardInteractable __instance) =>
         _completingOffer = _instance.TryGet(__instance, out var offer) ? offer : null;
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete))]
+    [HarmonyPostfix]
     private static void Complete(RewardInteractable __instance) =>
         _instance.Safe(() =>
         {
@@ -311,6 +280,8 @@ internal sealed class StageRewardRuntime : IDisposable
             }
         });
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete))]
+    [HarmonyFinalizer]
     private static Exception? EndComplete(Exception? __exception)
     {
         _completingOffer = null;
@@ -318,6 +289,8 @@ internal sealed class StageRewardRuntime : IDisposable
         return __exception;
     }
 
+    [HarmonyPatch(typeof(Il2Cpp.RoomCompletionHistory), nameof(Il2Cpp.RoomCompletionHistory.SetCrushedReward))]
+    [HarmonyPrefix]
     private static void UseHistoryPlaceholder(ref ArmamentAugment crushedRewardDef)
     {
         try
@@ -337,6 +310,8 @@ internal sealed class StageRewardRuntime : IDisposable
         }
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.DisplayName), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool OverrideDisplayName(RewardInteractable __instance, ref string __result)
     {
         if (!_instance.TryGet(__instance, out var offer))
@@ -346,6 +321,8 @@ internal sealed class StageRewardRuntime : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.DisplayDescription), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool OverrideDisplayDescription(RewardInteractable __instance, ref string __result)
     {
         if (!_instance.TryGet(__instance, out var offer))
@@ -355,6 +332,8 @@ internal sealed class StageRewardRuntime : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(DescriptionInspectionPanel), nameof(DescriptionInspectionPanel.Populate))]
+    [HarmonyPostfix]
     private static void CompactInspectionPanel(DescriptionInspectionPanel __instance, CrushInteractable __1) =>
         _instance.Safe(() =>
         {

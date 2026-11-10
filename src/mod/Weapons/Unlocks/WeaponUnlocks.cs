@@ -54,82 +54,21 @@ internal sealed class WeaponUnlocks
         _handsLog = log.Channel("APHands");
         _notifyTechnical = notifyTechnical;
         _client = client;
-        harmony.Patch(
-            AccessTools.Method(typeof(ProfileUI), nameof(ProfileUI.LoadProfile)),
-            prefix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(BeforeProfileLoad)),
-            postfix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(AfterProfileLoad))
-        );
-        Patch(
-            harmony,
-            typeof(ArmamentInventory),
-            nameof(ArmamentInventory.GiveArmament),
-            nameof(AllowGrant),
-            [typeof(ArmamentID), typeof(int)]
-        );
-        Patch(harmony, typeof(ArmamentInventory), nameof(ArmamentInventory.BuyArmament), nameof(AllowPurchase));
-        Patch(harmony, typeof(ArmamentInventory), nameof(ArmamentInventory.CanBuy), nameof(AllowPurchase));
-        Patch(harmony, typeof(ArmamentInventory), nameof(ArmamentInventory.GetLevel), nameof(ReadLevel));
-        Patch(harmony, typeof(ArmamentInventory), nameof(ArmamentInventory.IsPurchased), nameof(ReadOwnership));
-        Patch(harmony, typeof(ArmamentInventory), nameof(ArmamentInventory.LevelUp), nameof(AllowLevelUp));
-        Patch(harmony, typeof(WeaponRackSlot), nameof(WeaponRackSlot.Bind), nameof(AllowRackBind));
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(WeaponRackSlot), nameof(WeaponRackSlot.CanAfford)),
-            prefix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(RackCanAfford))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(PurchaseInteractable), nameof(PurchaseInteractable.CanCrush)),
-            prefix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(CanCrush))
-        );
-        Patch(harmony, typeof(PlayerHand), nameof(PlayerHand.Bind), nameof(BindDefinition), [typeof(ArmamentID)]);
-        Patch(harmony, typeof(PlayerHand), nameof(PlayerHand.Bind), nameof(BindInstance), [typeof(Armament)]);
-        Patch(harmony, typeof(PlayerHand), nameof(PlayerHand.Rebind), nameof(BindInstance));
-        Patch(harmony, typeof(PlayerHand), "DoGrabStart", nameof(AllowGrab), [typeof(HandInteractable)]);
-        foreach (
-            var type in new[]
-            {
-                typeof(HandInteractable),
-                typeof(Armament),
-                typeof(CrushableHeart),
-                typeof(CrushInteractable),
-                typeof(PurchaseInteractable),
-                typeof(RewardInteractable),
-                typeof(TwoHandedSecondaryGrip),
-            }
-        )
-            Patch(
-                harmony,
-                type,
-                nameof(HandInteractable.GrabStart),
-                nameof(AllowDirectGrabStart),
-                [typeof(PlayerHand)]
-            );
-        harmony.Patch(
-            AccessTools.Method(typeof(WeaponRackSlot), nameof(WeaponRackSlot.Refresh)),
-            postfix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(RefreshSlot))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(WeaponRackSlot), nameof(WeaponRackSlot.DisplayVisuals)),
-            postfix: new HarmonyMethod(typeof(WeaponUnlocks), nameof(RefreshSlot))
-        );
+        harmony.PatchAll(typeof(WeaponUnlocks));
         _ = new WeaponPurchaseUi(harmony, IsLocked, _log.Sink);
         _ = new WeaponHintRunestones(harmony, IsLocked, client, _log.Sink);
     }
 
-    private static void Patch(
-        HarmonyLib.Harmony harmony,
-        Type type,
-        string method,
-        string prefix,
-        Type[]? args = null
-    ) =>
-        harmony.Patch(AccessTools.Method(type, method, args), prefix: new HarmonyMethod(typeof(WeaponUnlocks), prefix));
-
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
+    [HarmonyPrefix]
     private static void BeforeProfileLoad(ProfileUI __instance, out bool __state)
     {
         __state = __instance._isNewGame;
         _instance._freshProfile = -1;
     }
 
+    [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
+    [HarmonyPostfix]
     private static void AfterProfileLoad(ProfileUI __instance, bool __state)
     {
         if (!__state)
@@ -148,8 +87,13 @@ internal sealed class WeaponUnlocks
         return weapon != null && !_allowed.Contains(weapon.Id);
     }
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.GiveArmament), typeof(ArmamentID), typeof(int))]
+    [HarmonyPrefix]
     private static bool AllowGrant(ArmamentID __0) => _instance._giving || !_instance.IsLocked(__0);
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.BuyArmament))]
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.CanBuy))]
+    [HarmonyPrefix]
     private static bool AllowPurchase(ArmamentID __0, ref bool __result)
     {
         if (!_instance.IsLocked(__0))
@@ -159,8 +103,12 @@ internal sealed class WeaponUnlocks
         return false;
     }
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.IsPurchased))]
+    [HarmonyPrefix]
     private static bool ReadOwnership(ArmamentID __0, ref bool __result) => AllowPurchase(__0, ref __result);
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.GetLevel))]
+    [HarmonyPrefix]
     private static bool ReadLevel(ArmamentID __0, ref int __result)
     {
         if (!_instance.IsLocked(__0))
@@ -170,13 +118,21 @@ internal sealed class WeaponUnlocks
         return false;
     }
 
+    [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.LevelUp))]
+    [HarmonyPrefix]
     private static bool AllowLevelUp(PlayerHandState __0) => !_instance.IsLocked(__0.Armament);
 
+    [HarmonyPatch(typeof(WeaponRackSlot), nameof(WeaponRackSlot.Bind))]
+    [HarmonyPrefix]
     private static bool AllowRackBind(WeaponRackSlot __instance) => !_instance.IsLocked(__instance.ArmamentID);
 
+    [HarmonyPatch(typeof(WeaponRackSlot), nameof(WeaponRackSlot.CanAfford), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool RackCanAfford(WeaponRackSlot __instance, ref bool __result) =>
         AllowPurchase(__instance.ArmamentID, ref __result);
 
+    [HarmonyPatch(typeof(PurchaseInteractable), nameof(PurchaseInteractable.CanCrush), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool CanCrush(PurchaseInteractable __instance, ref bool __result)
     {
         if (!_instance.IsLocked(__instance.ArmamentID))
@@ -186,8 +142,18 @@ internal sealed class WeaponUnlocks
         return false;
     }
 
+    [HarmonyPatch(typeof(HandInteractable), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(Armament), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(CrushableHeart), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(CrushInteractable), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(PurchaseInteractable), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(RewardInteractable), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPatch(typeof(TwoHandedSecondaryGrip), nameof(HandInteractable.GrabStart), typeof(PlayerHand))]
+    [HarmonyPrefix]
     private static bool AllowDirectGrabStart(HandInteractable __instance, PlayerHand __0) => AllowGrab(__0, __instance);
 
+    [HarmonyPatch(typeof(PlayerHand), "DoGrabStart", typeof(HandInteractable))]
+    [HarmonyPrefix]
     private static bool AllowGrab(PlayerHand __instance, HandInteractable? __0)
     {
         var hand = __instance;
@@ -225,6 +191,9 @@ internal sealed class WeaponUnlocks
         return false;
     }
 
+    [HarmonyPatch(typeof(PlayerHand), nameof(PlayerHand.Bind), typeof(Armament))]
+    [HarmonyPatch(typeof(PlayerHand), nameof(PlayerHand.Rebind))]
+    [HarmonyPrefix]
     private static bool BindInstance(PlayerHand __instance, Armament __0)
     {
         if (!_instance.HandUnlocked(__instance))
@@ -247,6 +216,8 @@ internal sealed class WeaponUnlocks
         return false;
     }
 
+    [HarmonyPatch(typeof(PlayerHand), nameof(PlayerHand.Bind), typeof(ArmamentID))]
+    [HarmonyPrefix]
     private static bool BindDefinition(PlayerHand __instance, ref ArmamentID __0)
     {
         if (!_instance.HandUnlocked(__instance))
@@ -348,6 +319,9 @@ internal sealed class WeaponUnlocks
                 _definitions[definition.GUID] = definition;
     }
 
+    [HarmonyPatch(typeof(WeaponRackSlot), nameof(WeaponRackSlot.Refresh))]
+    [HarmonyPatch(typeof(WeaponRackSlot), nameof(WeaponRackSlot.DisplayVisuals))]
+    [HarmonyPostfix]
     private static void RefreshSlot(WeaponRackSlot __instance)
     {
         if (!_instance._visualsEnabled)

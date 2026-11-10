@@ -24,7 +24,7 @@ internal sealed class PauseModStatus : ConnectionStatusLabel
             return;
         }
 
-        harmony.Patch(onEnable, postfix: new HarmonyMethod(typeof(PauseModStatus), nameof(Show)));
+        harmony.Hook<PauseModStatus>(onEnable, postfix: nameof(Show));
         log.Write(Category, "Pause menu mod status enabled");
     }
 

@@ -46,52 +46,7 @@ internal sealed class DifficultyUnlocks : IDisposable
         _instance = this;
         _log = log.Channel("APDifficulty");
         _stageProgressLog = log.Channel("APStageProgress");
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(CrushInteractable), nameof(CrushInteractable.CanCrush)),
-            prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(CanCrush))
-        );
-        foreach (
-            var method in new[] { nameof(CrushInteractable.FinishCrush), nameof(CrushInteractable.ProxyCrushComplete) }
-        )
-            harmony.Patch(
-                AccessTools.Method(typeof(CrushInteractable), method),
-                prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(AllowCompletion))
-            );
-        harmony.Patch(
-            AccessTools.Method(typeof(DifficultyInteractable), nameof(DifficultyInteractable.OnCrushComplete)),
-            prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(AllowCompletion))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(
-                typeof(DifficultyInteractable),
-                nameof(DifficultyInteractable.DisplayDescription)
-            ),
-            postfix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(ExtendStoneDescription))
-        );
-        foreach (
-            var method in new[] { nameof(CrushInteractable.OnResourceLoadComplete), nameof(CrushInteractable.OnEnable) }
-        )
-            harmony.Patch(
-                AccessTools.Method(typeof(CrushInteractable), method),
-                postfix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(RefreshLoadedStone))
-            );
-        harmony.Patch(
-            AccessTools.Method(typeof(DifficultyCompletionToggler), "OnEnable"),
-            prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(ShowNightmare))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(SaveManager), nameof(SaveManager.LoadProfile)),
-            prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(BeforeProfileLoad)),
-            finalizer: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(AfterProfileLoad))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(SavedInt), nameof(SavedInt.ApplyDefault)),
-            postfix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(ProfileDefaulted))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartRun)),
-            prefix: new HarmonyMethod(typeof(DifficultyUnlocks), nameof(BeforeRun))
-        );
+        harmony.PatchAll(typeof(DifficultyUnlocks));
     }
 
     private bool Locked(DifficultyInteractable? stone) =>
@@ -99,6 +54,8 @@ internal sealed class DifficultyUnlocks : IDisposable
         && stone?._selectedDifficulty != null
         && !_settings.Allows(stone._selectedDifficulty.Value, _owned);
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.CanCrush), MethodType.Getter)]
+    [HarmonyPrefix]
     private static bool CanCrush(CrushInteractable __instance, ref bool __result)
     {
         if (!_instance.Locked(__instance.TryCast<DifficultyInteractable>()))
@@ -108,6 +65,10 @@ internal sealed class DifficultyUnlocks : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.ProxyCrushComplete))]
+    [HarmonyPatch(typeof(DifficultyInteractable), nameof(DifficultyInteractable.OnCrushComplete))]
+    [HarmonyPrefix]
     private static bool AllowCompletion(CrushInteractable __instance)
     {
         var stone = __instance.TryCast<DifficultyInteractable>();
@@ -121,6 +82,8 @@ internal sealed class DifficultyUnlocks : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(DifficultyInteractable), nameof(DifficultyInteractable.DisplayDescription), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void ExtendStoneDescription(DifficultyInteractable __instance, ref string __result)
     {
         var level = __instance._selectedDifficulty?.Value ?? -1;
@@ -145,6 +108,9 @@ internal sealed class DifficultyUnlocks : IDisposable
             __result += $"\n{ApColors.Rich(ApColors.Gold, $"Goal: {goal}")}";
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.OnResourceLoadComplete))]
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.OnEnable))]
+    [HarmonyPostfix]
     private static void RefreshLoadedStone(CrushInteractable __instance)
     {
         var stone = __instance.TryCast<DifficultyInteractable>();
@@ -251,6 +217,8 @@ internal sealed class DifficultyUnlocks : IDisposable
             RestoreGhost(stone);
     }
 
+    [HarmonyPatch(typeof(DifficultyCompletionToggler), "OnEnable")]
+    [HarmonyPrefix]
     private static bool ShowNightmare(DifficultyCompletionToggler __instance)
     {
         if (_instance._settings == null || __instance.objectToToggle == null || !__instance.gameObject.scene.IsValid())
@@ -270,20 +238,28 @@ internal sealed class DifficultyUnlocks : IDisposable
         return true;
     }
 
+    [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.LoadProfile))]
+    [HarmonyPrefix]
     private static void BeforeProfileLoad(SaveManager __instance, int __0)
     {
         _instance._loadingManager = __instance.Pointer;
         _instance._loadingProfile = __0;
     }
 
+    [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.LoadProfile))]
+    [HarmonyFinalizer]
     private static void AfterProfileLoad() => _instance._loadingProfile = -1;
 
+    [HarmonyPatch(typeof(SavedInt), nameof(SavedInt.ApplyDefault))]
+    [HarmonyPostfix]
     private static void ProfileDefaulted(SavedInt __instance)
     {
         if (_instance._loadingProfile >= 0 && GameDifficulty.IsSettingVariable(__instance.variable))
             _instance._freshProfiles.Add((_instance._loadingManager, _instance._loadingProfile));
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartRun))]
+    [HarmonyPrefix]
     private static void BeforeRun(LevelManager __instance) => _instance.ApplyStarting(__instance);
 
     public void Update(LevelManager? manager, DifficultySettings? settings, IReadOnlyCollection<long> owned)

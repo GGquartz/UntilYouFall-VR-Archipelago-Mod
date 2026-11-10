@@ -20,44 +20,7 @@ internal sealed class ExtraTraitSlots
     {
         _instance = this;
         _log = log.Channel("APTraits");
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(Armament), nameof(Armament.UpgradeSockets)),
-            postfix: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(AddExtraSocket))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(Armament), nameof(Armament.AvailableSockets)),
-            postfix: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(AddExtraSocket))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(typeof(IntVariable), nameof(IntVariable.Value)),
-            postfix: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(AddSocketValue))
-        );
-        foreach (
-            var panelType in new[]
-            {
-                typeof(TraitDisplayPanel),
-                typeof(TraitDisplayPanelLQ),
-                typeof(TraitDisplayPanelLQTextMesh),
-            }
-        )
-            harmony.Patch(
-                AccessTools.Method(panelType, nameof(TraitDisplayPanel.Populate)),
-                prefix: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(BeginInspectionSocket)),
-                finalizer: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(EndInspectionSocket))
-            );
-        foreach (
-            var traitType in new[]
-            {
-                typeof(BaseArmamentTrait),
-                typeof(StatModArmamentTrait),
-                typeof(UpgradeSuperTrait),
-            }
-        )
-            harmony.Patch(
-                AccessTools.Method(traitType, "CanBeUsed"),
-                prefix: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(BeginTraitSocket)),
-                finalizer: new HarmonyMethod(typeof(ExtraTraitSlots), nameof(EndSocket))
-            );
+        harmony.PatchAll(typeof(ExtraTraitSlots));
     }
 
     public void Update(IReadOnlyCollection<long>? unlocks)
@@ -83,6 +46,9 @@ internal sealed class ExtraTraitSlots
         }
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.UpgradeSockets), MethodType.Getter)]
+    [HarmonyPatch(typeof(Armament), nameof(Armament.AvailableSockets), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void AddExtraSocket(Armament __instance, ref int __result)
     {
         if (_socketVariable != null && _socketVariable.Pointer == __instance.InstancedVariables.TraitSockets.Pointer)
@@ -93,12 +59,20 @@ internal sealed class ExtraTraitSlots
             __result = ExtraTraitSlotRules.Apply(__result, weapon.Id, _instance._unlocks);
     }
 
+    [HarmonyPatch(typeof(TraitDisplayPanel), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyPatch(typeof(TraitDisplayPanelLQ), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyPatch(typeof(TraitDisplayPanelLQTextMesh), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyPrefix]
     private static void BeginInspectionSocket(ArmamentID __0, out IntVariable? __state)
     {
         __state = _socketVariable;
         SetSocketVariable(__0?.CurrentInstance);
     }
 
+    [HarmonyPatch(typeof(BaseArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(StatModArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(UpgradeSuperTrait), "CanBeUsed")]
+    [HarmonyPrefix]
     private static void BeginTraitSocket(PlayerHand __0, out IntVariable? __state)
     {
         __state = _socketVariable;
@@ -115,12 +89,18 @@ internal sealed class ExtraTraitSlots
         _socketVariable = armament?.InstancedVariables?.TraitSockets;
     }
 
+    [HarmonyPatch(typeof(IntVariable), nameof(IntVariable.Value), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void AddSocketValue(IntVariable __instance, ref int __result)
     {
         if (_socketVariable != null && __instance.Pointer == _socketVariable.Pointer)
             __result += 1;
     }
 
+    [HarmonyPatch(typeof(TraitDisplayPanel), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyPatch(typeof(TraitDisplayPanelLQ), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyPatch(typeof(TraitDisplayPanelLQTextMesh), nameof(TraitDisplayPanel.Populate))]
+    [HarmonyFinalizer]
     private static Exception? EndInspectionSocket(Exception? __exception, IntVariable? __state)
     {
         var scoped = _socketVariable != null;
@@ -132,6 +112,10 @@ internal sealed class ExtraTraitSlots
         return null;
     }
 
+    [HarmonyPatch(typeof(BaseArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(StatModArmamentTrait), "CanBeUsed")]
+    [HarmonyPatch(typeof(UpgradeSuperTrait), "CanBeUsed")]
+    [HarmonyFinalizer]
     private static Exception? EndSocket(Exception? __exception, IntVariable? __state)
     {
         _socketVariable = __state;

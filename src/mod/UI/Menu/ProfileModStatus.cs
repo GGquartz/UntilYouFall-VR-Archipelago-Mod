@@ -24,10 +24,10 @@ internal sealed class ProfileModStatus : ConnectionStatusLabel
             return;
         }
 
-        harmony.Patch(onEnable, postfix: new HarmonyMethod(typeof(ProfileModStatus), nameof(Show)));
-        harmony.Patch(
+        harmony.Hook<ProfileModStatus>(onEnable, postfix: nameof(Show));
+        harmony.Hook<ProfileModStatus>(
             AccessTools.Method(typeof(ProfileUI), nameof(ProfileUI.AttemptLoad)),
-            postfix: new HarmonyMethod(typeof(ProfileModStatus), nameof(Show))
+            postfix: nameof(Show)
         );
 
         log.Write(Category, "Profile selection mod status enabled");

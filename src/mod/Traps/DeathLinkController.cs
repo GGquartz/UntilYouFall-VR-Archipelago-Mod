@@ -66,10 +66,10 @@ internal sealed class DeathLinkController
                 _log.Write($"{name} not found");
                 return;
             }
-            harmony.Patch(exit, prefix: new HarmonyMethod(typeof(DeathLinkController), nameof(BeginVoluntaryExit)));
+            harmony.Hook<DeathLinkController>(exit, prefix: nameof(BeginVoluntaryExit));
         }
 
-        harmony.Patch(target, postfix: new HarmonyMethod(typeof(DeathLinkController), nameof(Killed)));
+        harmony.Hook<DeathLinkController>(target, postfix: nameof(Killed));
         _log.Write("Ready source=PlayerDeathController.OnPlayerKilled");
     }
 

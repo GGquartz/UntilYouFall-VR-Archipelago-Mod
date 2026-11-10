@@ -20,26 +20,7 @@ internal sealed class AetherMultiplier
         _instance = this;
         _itemCount = itemCount;
         _log = log.Channel("APMultiplier");
-        harmony.Patch(
-            AccessTools.PropertyGetter(
-                typeof(AetherMoteArmamentAugment),
-                nameof(AetherMoteArmamentAugment.AetherAmount)
-            ),
-            prefix: new HarmonyMethod(typeof(AetherMultiplier), nameof(EnterAugment)),
-            postfix: new HarmonyMethod(typeof(AetherMultiplier), nameof(ScaleAmount))
-        );
-        harmony.Patch(
-            AccessTools.PropertyGetter(
-                typeof(RoomCompletionHistory.RoomData),
-                nameof(RoomCompletionHistory.RoomData.AetherRewardAmount)
-            ),
-            postfix: new HarmonyMethod(typeof(AetherMultiplier), nameof(ScaleHistoryAmount))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.CalculatePayout)),
-            prefix: new HarmonyMethod(typeof(AetherMultiplier), nameof(OverrideEnemyPayout)),
-            postfix: new HarmonyMethod(typeof(AetherMultiplier), nameof(LogPayout))
-        );
+        harmony.PatchAll(typeof(AetherMultiplier));
     }
 
     public int ItemCount() => AetherMultiplierRules.Clamp(_itemCount());
@@ -58,8 +39,12 @@ internal sealed class AetherMultiplier
 
     private static bool _inAugment;
 
+    [HarmonyPatch(typeof(AetherMoteArmamentAugment), nameof(AetherMoteArmamentAugment.AetherAmount), MethodType.Getter)]
+    [HarmonyPrefix]
     private static void EnterAugment() => _inAugment = true;
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.CalculatePayout))]
+    [HarmonyPrefix]
     private static void OverrideEnemyPayout(ref float multiplier)
     {
         if (_inAugment)
@@ -75,6 +60,8 @@ internal sealed class AetherMultiplier
         );
     }
 
+    [HarmonyPatch(typeof(AetherMoteArmamentAugment), nameof(AetherMoteArmamentAugment.AetherAmount), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void ScaleAmount(AetherMoteArmamentAugment __instance, ref int __result)
     {
         _inAugment = false;
@@ -92,6 +79,8 @@ internal sealed class AetherMultiplier
         __result = scaled;
     }
 
+    [HarmonyPatch(typeof(RoomCompletionHistory), nameof(RoomCompletionHistory.CalculatePayout))]
+    [HarmonyPostfix]
     private static void LogPayout(int basePayout, float multiplier, int __result)
     {
         if (_instance._lastPayout == (basePayout, multiplier, __result))
@@ -101,6 +90,12 @@ internal sealed class AetherMultiplier
         _instance._log.Write($"Calculate payout base={basePayout} multiplier={multiplier:F2} result={__result}");
     }
 
+    [HarmonyPatch(
+        typeof(RoomCompletionHistory.RoomData),
+        nameof(RoomCompletionHistory.RoomData.AetherRewardAmount),
+        MethodType.Getter
+    )]
+    [HarmonyPostfix]
     private static void ScaleHistoryAmount(RoomCompletionHistory.RoomData __instance, ref int __result)
     {
         if (!__instance.IsCrushedAetherReward)

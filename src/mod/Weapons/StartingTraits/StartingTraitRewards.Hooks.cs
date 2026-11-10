@@ -13,8 +13,12 @@ namespace UntilYouFallArchipelago;
 
 internal sealed partial class StartingTraitRewards : IDisposable
 {
+    [HarmonyPatch(typeof(RewardSpawner), nameof(RewardSpawner.OnEnable))]
+    [HarmonyPrefix]
     private static bool EnableSpawner(RewardSpawner __instance) => !_instance._groups.ContainsKey(__instance.Pointer);
 
+    [HarmonyPatch(typeof(RewardSpawner), nameof(RewardSpawner.Spawn))]
+    [HarmonyPrefix]
     private static bool AllowSpawn(RewardSpawner __instance, int __0)
     {
         if (!_instance._groups.TryGetValue(__instance.Pointer, out var group))
@@ -27,6 +31,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
             && StartingTraitRules.Available(_instance._run, group.Items[__0]);
     }
 
+    [HarmonyPatch(typeof(RewardSpawner), nameof(RewardSpawner.PopulateSpawnRewards))]
+    [HarmonyPrefix]
     private static bool Select(RewardSpawner __instance)
     {
         if (!_instance._groups.TryGetValue(__instance.Pointer, out var group))
@@ -36,6 +42,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
         return false;
     }
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.Initialize), typeof(ArmamentAugment))]
+    [HarmonyPostfix]
     private static void Register(RewardInteractable __instance, ArmamentAugment __0)
     {
         var spawner = __instance.GetComponentInParent<RewardSpawner>();
@@ -79,9 +87,13 @@ internal sealed partial class StartingTraitRewards : IDisposable
         && hand.BoundArmament.AvailableSockets > 0
         && reward.CanBeUsed(hand) == ArmamentAugment.UsageResult.Valid;
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.HandleOtherRewardCrushed))]
+    [HarmonyPrefix]
     private static bool KeepOffer(RewardInteractable __instance) =>
         !_instance._rewards.TryGetValue(__instance.Pointer, out var entry) || entry.Group.Retired;
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.CanCrush), MethodType.Getter)]
+    [HarmonyPostfix]
     private static void CanCrush(RewardInteractable __instance, ref bool __result)
     {
         if (!_instance._rewards.TryGetValue(__instance.Pointer, out var entry))
@@ -95,6 +107,8 @@ internal sealed partial class StartingTraitRewards : IDisposable
             && Usable(__instance.Upgrade, __instance.ActiveHand);
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyPrefix]
     private static bool BeforeFinish(CrushInteractable __instance)
     {
         if (!_instance._rewards.ContainsKey(__instance.Pointer))
@@ -110,6 +124,9 @@ internal sealed partial class StartingTraitRewards : IDisposable
     internal static bool Owns(RewardInteractable reward) =>
         _instance != null && _instance._rewards.ContainsKey(reward.Pointer);
 
+    [HarmonyPatch(typeof(RewardInteractable), nameof(RewardInteractable.OnCrushComplete))]
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
     private static bool Complete(RewardInteractable __instance)
     {
         if (!_instance._rewards.TryGetValue(__instance.Pointer, out var entry))

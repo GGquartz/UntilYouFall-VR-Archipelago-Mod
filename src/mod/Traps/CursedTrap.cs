@@ -35,15 +35,7 @@ internal sealed class CursedTrap : TimedTrap
     {
         _instance = this;
         _curseState = state;
-        harmony.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.Damage)),
-            prefix: new HarmonyMethod(typeof(CursedTrap), nameof(BeforeDamage)),
-            postfix: new HarmonyMethod(typeof(CursedTrap), nameof(AfterDamage))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.LoadEndRun), [typeof(bool)]),
-            prefix: new HarmonyMethod(typeof(CursedTrap), nameof(OnEndRun))
-        );
+        harmony.PatchAll(typeof(CursedTrap));
     }
 
     private bool Applies(PlayerHealth health)
@@ -61,6 +53,8 @@ internal sealed class CursedTrap : TimedTrap
             && health.Pointer == _player()?.Pointer;
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Damage))]
+    [HarmonyPrefix]
     private static void BeforeDamage(PlayerHealth __instance, Enemy __0, ref float __1, out float? __state)
     {
         __state = null;
@@ -87,6 +81,8 @@ internal sealed class CursedTrap : TimedTrap
         }
     }
 
+    [HarmonyPatch(typeof(PlayerHealth), nameof(PlayerHealth.Damage))]
+    [HarmonyPostfix]
     private static void AfterDamage(PlayerHealth __instance, float? __state, float __result)
     {
         if (!__state.HasValue)
@@ -104,6 +100,8 @@ internal sealed class CursedTrap : TimedTrap
         }
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.LoadEndRun), typeof(bool))]
+    [HarmonyPrefix]
     private static void OnEndRun(LevelManager __instance)
     {
         if (_instance._level()?.Pointer == __instance.Pointer)

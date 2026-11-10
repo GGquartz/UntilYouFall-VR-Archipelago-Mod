@@ -48,34 +48,7 @@ internal sealed class EnemyStasis : TimedTrap
     {
         _instance = this;
         _stasis = (EnemyStasisState)_state;
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.HandleHit)),
-            prefix: new HarmonyMethod(typeof(EnemyStasis), nameof(AllowHit))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.Tick)),
-            prefix: new HarmonyMethod(typeof(EnemyStasis), nameof(Repin))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.HandleOnset)),
-            postfix: new HarmonyMethod(typeof(EnemyStasis), nameof(Repin))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.Complete)),
-            postfix: new HarmonyMethod(typeof(EnemyStasis), nameof(OnComplete))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.Clear)),
-            postfix: new HarmonyMethod(typeof(EnemyStasis), nameof(OnClear))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Stasis), nameof(Stasis.Extend)),
-            postfix: new HarmonyMethod(typeof(EnemyStasis), nameof(OnExtend))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.LoadEndRun), [typeof(bool)]),
-            prefix: new HarmonyMethod(typeof(EnemyStasis), nameof(OnEndRun))
-        );
+        harmony.PatchAll(typeof(EnemyStasis));
     }
 
     public new void Receive()
@@ -298,8 +271,16 @@ internal sealed class EnemyStasis : TimedTrap
             effect.endTime = Math.Max(target.NativeEndTime, Time.time + (float)_stasis.RemainingSeconds);
     }
 
-    private static void Repin(Stasis __instance) => _instance.Pin(__instance);
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.Tick))]
+    [HarmonyPrefix]
+    private static void RepinBeforeTick(Stasis __instance) => _instance.Pin(__instance);
 
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.HandleOnset))]
+    [HarmonyPostfix]
+    private static void RepinAfterOnset(Stasis __instance) => _instance.Pin(__instance);
+
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.HandleHit))]
+    [HarmonyPrefix]
     private static bool AllowHit(Stasis __instance)
     {
         try
@@ -329,8 +310,12 @@ internal sealed class EnemyStasis : TimedTrap
         return true;
     }
 
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.Complete))]
+    [HarmonyPostfix]
     private static void OnComplete(Stasis __instance) => ObserveEnd(__instance, "native complete");
 
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.Clear))]
+    [HarmonyPostfix]
     private static void OnClear(Stasis __instance) => ObserveEnd(__instance, "native clear");
 
     private static void ObserveEnd(Stasis effect, string phase)
@@ -339,6 +324,8 @@ internal sealed class EnemyStasis : TimedTrap
             _instance.LogState(target, phase);
     }
 
+    [HarmonyPatch(typeof(Stasis), nameof(Stasis.Extend))]
+    [HarmonyPostfix]
     private static void OnExtend(Stasis __instance, Stasis other)
     {
         if (
@@ -352,6 +339,8 @@ internal sealed class EnemyStasis : TimedTrap
         _instance.LogState(target, "vanilla extend preserved");
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.LoadEndRun), typeof(bool))]
+    [HarmonyPrefix]
     private static void OnEndRun(LevelManager __instance)
     {
         if (_instance._level()?.Pointer == __instance.Pointer)

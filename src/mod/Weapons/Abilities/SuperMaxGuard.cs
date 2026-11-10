@@ -13,12 +13,11 @@ internal static class SuperMaxGuard
     public static void Install(HarmonyLib.Harmony harmony, Action<string> log)
     {
         _log = log.Channel("APAbilities");
-        harmony.Patch(
-            AccessTools.Method(typeof(UpgradeSuperTrait), "CanBeUsed"),
-            postfix: new HarmonyMethod(typeof(SuperMaxGuard), nameof(Postfix))
-        );
+        harmony.PatchAll(typeof(SuperMaxGuard));
     }
 
+    [HarmonyPatch(typeof(UpgradeSuperTrait), "CanBeUsed")]
+    [HarmonyPostfix]
     private static void Postfix(PlayerHand __0, ref ArmamentAugment.UsageResult __result)
     {
         try

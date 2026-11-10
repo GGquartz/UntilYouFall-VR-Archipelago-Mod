@@ -62,6 +62,7 @@
     <Compile Include="../../src/mod/Crushables/ItemVisualModels.cs" Link="ItemVisualModels.cs" />
     <Compile Include="../../src/mod/Crushables/ItemVisuals.cs" Link="ItemVisuals.cs" />
     <Compile Include="../../src/mod/Crushables/ApRewardInspectionPanel.cs" Link="ApRewardInspectionPanel.cs" />
+    <Compile Include="../../src/mod/HarmonyExtensions.cs" Link="HarmonyExtensions.cs" />
     <EmbeddedResource
       Include="../../src/mod/Crushables/Assets/ap-logo.meshbin"
       LogicalName="UntilYouFall.Crushables.ApLogo.meshbin"

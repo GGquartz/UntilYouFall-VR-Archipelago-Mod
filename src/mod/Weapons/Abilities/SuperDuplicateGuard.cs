@@ -12,14 +12,11 @@ internal static class SuperDuplicateGuard
     public static void Install(HarmonyLib.Harmony harmony, Action<string> log)
     {
         _log = log.Channel("APAbilities");
-        var method = AccessTools.Method(typeof(ArmamentAbilityUser), "OnSuperActivated");
-        harmony.Patch(
-            method,
-            prefix: new HarmonyMethod(typeof(SuperDuplicateGuard), nameof(Prefix)),
-            finalizer: new HarmonyMethod(typeof(SuperDuplicateGuard), nameof(Restore))
-        );
+        harmony.PatchAll(typeof(SuperDuplicateGuard));
     }
 
+    [HarmonyPatch(typeof(ArmamentAbilityUser), "OnSuperActivated")]
+    [HarmonyPrefix]
     private static void Prefix(ArmamentAbilityUser __instance, out AbilityTree? __state)
     {
         __state = null;
@@ -46,6 +43,8 @@ internal static class SuperDuplicateGuard
         }
     }
 
+    [HarmonyPatch(typeof(ArmamentAbilityUser), "OnSuperActivated")]
+    [HarmonyFinalizer]
     private static void Restore(AbilityTree? __state)
     {
         if (__state != null)

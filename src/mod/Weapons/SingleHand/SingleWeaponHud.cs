@@ -23,16 +23,8 @@ internal sealed class SingleWeaponHud
         _active = active;
         _abilityLocked = abilityLocked;
         _log = log.Channel("APWeaponUI");
-        Patch(harmony, nameof(AbilityChargeUINoCanvas.Update), nameof(UpdateSuper));
-        Patch(harmony, nameof(AbilityChargeUINoCanvas.SetAlpha), nameof(SetAlpha));
-        Patch(harmony, nameof(AbilityChargeUINoCanvas.SetTarget), nameof(SetTarget));
+        harmony.PatchAll(typeof(SingleWeaponHud));
     }
-
-    private static void Patch(HarmonyLib.Harmony harmony, string method, string prefix) =>
-        harmony.Patch(
-            AccessTools.Method(typeof(AbilityChargeUINoCanvas), method),
-            prefix: new HarmonyMethod(typeof(SingleWeaponHud), prefix)
-        );
 
     private static bool Hidden(AbilityChargeUINoCanvas ui)
     {
@@ -48,6 +40,8 @@ internal sealed class SingleWeaponHud
         );
     }
 
+    [HarmonyPatch(typeof(AbilityChargeUINoCanvas), nameof(AbilityChargeUINoCanvas.Update))]
+    [HarmonyPrefix]
     private static bool UpdateSuper(AbilityChargeUINoCanvas __instance)
     {
         if (!Hidden(__instance))
@@ -57,6 +51,8 @@ internal sealed class SingleWeaponHud
         return false;
     }
 
+    [HarmonyPatch(typeof(AbilityChargeUINoCanvas), nameof(AbilityChargeUINoCanvas.SetTarget))]
+    [HarmonyPrefix]
     private static bool SetTarget(AbilityChargeUINoCanvas __instance, Armament __0)
     {
         if (!_instance._active())
@@ -68,6 +64,8 @@ internal sealed class SingleWeaponHud
         return false;
     }
 
+    [HarmonyPatch(typeof(AbilityChargeUINoCanvas), nameof(AbilityChargeUINoCanvas.SetAlpha))]
+    [HarmonyPrefix]
     private static void SetAlpha(AbilityChargeUINoCanvas __instance, ref float __0)
     {
         if (Hidden(__instance))

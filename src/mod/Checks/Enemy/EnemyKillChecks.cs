@@ -30,15 +30,13 @@ internal sealed class EnemyKillChecks
         _record = record;
         _onKill = onKill;
         _log = log.Channel("APEnemy");
-        harmony.Patch(
-            AccessTools.Method(typeof(EnemyKillController), nameof(EnemyKillController.Kill)),
-            prefix: new HarmonyMethod(typeof(EnemyKillChecks), nameof(BeforeKill)),
-            postfix: new HarmonyMethod(typeof(EnemyKillChecks), nameof(AfterKill))
-        );
+        harmony.PatchAll(typeof(EnemyKillChecks));
 
         _log.Write($"Ready types={EnemyChecks.All.Length} source=EnemyKillController.Kill");
     }
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Kill))]
+    [HarmonyPrefix]
     private static void BeforeKill(EnemyKillController __instance, out EnemyCheck? __state)
     {
         __state = null;
@@ -84,6 +82,8 @@ internal sealed class EnemyKillChecks
         }
     }
 
+    [HarmonyPatch(typeof(EnemyKillController), nameof(EnemyKillController.Kill))]
+    [HarmonyPostfix]
     private static void AfterKill(EnemyKillController __instance, EnemyCheck? __state)
     {
         try

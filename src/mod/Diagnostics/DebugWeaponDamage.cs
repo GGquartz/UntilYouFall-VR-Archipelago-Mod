@@ -20,14 +20,13 @@ internal static class DebugWeaponDamage
             return;
         }
 
-        harmony.Patch(
-            AccessTools.Method(typeof(Armament), nameof(Armament.BindToHand)),
-            postfix: new HarmonyMethod(typeof(DebugWeaponDamage), nameof(OnBound))
-        );
+        harmony.PatchAll(typeof(DebugWeaponDamage));
 
         _log.Write("Enabled weapon damage HealthDamage=99 GuardDamage=99");
     }
 
+    [HarmonyPatch(typeof(Armament), nameof(Armament.BindToHand))]
+    [HarmonyPostfix]
     private static void OnBound(Armament __instance)
     {
         if (!Weapons.Any(weapon => weapon.Pointer == __instance.Pointer))

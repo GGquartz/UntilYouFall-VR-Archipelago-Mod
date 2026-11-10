@@ -14,12 +14,11 @@ internal static class EmptyHandInspection
     public static void Install(HarmonyLib.Harmony harmony, Action<string> log)
     {
         _log = log.Channel("APInspection");
-        harmony.Patch(
-            AccessTools.Method(typeof(HandUIEmitter), nameof(HandUIEmitter.LateUpdate)),
-            prefix: new HarmonyMethod(typeof(EmptyHandInspection), nameof(LateUpdate))
-        );
+        harmony.PatchAll(typeof(EmptyHandInspection));
     }
 
+    [HarmonyPatch(typeof(HandUIEmitter), nameof(HandUIEmitter.LateUpdate))]
+    [HarmonyPrefix]
     private static bool LateUpdate(HandUIEmitter __instance)
     {
         var hand = __instance.currentHand;

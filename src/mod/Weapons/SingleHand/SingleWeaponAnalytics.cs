@@ -17,33 +17,11 @@ internal sealed class SingleWeaponAnalytics
         _instance = this;
         _active = active;
         _log = log.Channel("APWeaponAnalytics");
-        Patch(
-            harmony,
-            typeof(PlayerArmamentAnalyticsEvent),
-            nameof(PlayerArmamentAnalyticsEvent.Record),
-            nameof(RecordPlayerArmament)
-        );
-        Patch(
-            harmony,
-            typeof(ArmamentAnalyticsEvent),
-            nameof(ArmamentAnalyticsEvent.Record),
-            nameof(RecordRunArmaments)
-        );
-        Patch(harmony, typeof(BeginRunAnalyticsEvent), nameof(BeginRunAnalyticsEvent.Record), nameof(RecordBeginRun));
-        Patch(
-            harmony,
-            typeof(PlayerKilledArmamentAnalyticsEvent),
-            nameof(PlayerKilledArmamentAnalyticsEvent.Record),
-            nameof(RecordPlayerKilled)
-        );
+        harmony.PatchAll(typeof(SingleWeaponAnalytics));
     }
 
-    private static void Patch(HarmonyLib.Harmony harmony, Type type, string method, string prefix) =>
-        harmony.Patch(
-            AccessTools.Method(type, method),
-            prefix: new HarmonyMethod(typeof(SingleWeaponAnalytics), prefix)
-        );
-
+    [HarmonyPatch(typeof(PlayerArmamentAnalyticsEvent), nameof(PlayerArmamentAnalyticsEvent.Record))]
+    [HarmonyPrefix]
     private static bool RecordPlayerArmament(PlayerArmamentAnalyticsEvent __instance)
     {
         if (!_instance._active())
@@ -52,6 +30,8 @@ internal sealed class SingleWeaponAnalytics
         return _instance.CheckPair(__instance._leftHandState, __instance._rightHandState, "PlayerArmament");
     }
 
+    [HarmonyPatch(typeof(ArmamentAnalyticsEvent), nameof(ArmamentAnalyticsEvent.Record))]
+    [HarmonyPrefix]
     private static bool RecordRunArmaments(ArmamentAnalyticsEvent __instance)
     {
         if (!_instance._active())
@@ -60,6 +40,8 @@ internal sealed class SingleWeaponAnalytics
         return _instance.CheckPair(__instance._leftHandState, __instance._rightHandState, "RunArmaments");
     }
 
+    [HarmonyPatch(typeof(PlayerKilledArmamentAnalyticsEvent), nameof(PlayerKilledArmamentAnalyticsEvent.Record))]
+    [HarmonyPrefix]
     private static bool RecordPlayerKilled(
         PlayerKilledArmamentAnalyticsEvent __instance,
         PlayerKilledArmamentAnalyticsEvent.HandID __0
@@ -76,6 +58,8 @@ internal sealed class SingleWeaponAnalytics
         return _instance.Check(WeaponAnalyticsRules.AllowHand(hand?.Armament != null), "PlayerKilled");
     }
 
+    [HarmonyPatch(typeof(BeginRunAnalyticsEvent), nameof(BeginRunAnalyticsEvent.Record))]
+    [HarmonyPrefix]
     private static bool RecordBeginRun(BeginRunAnalyticsEvent __instance)
     {
         if (!_instance._active())

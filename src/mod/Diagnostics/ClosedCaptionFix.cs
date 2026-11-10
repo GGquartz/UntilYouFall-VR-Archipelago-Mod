@@ -15,24 +15,11 @@ internal sealed class ClosedCaptionFix
     {
         _instance = this;
         _log = log.Channel("APCaptionFix");
-        harmony.Patch(
-            AccessTools.Method(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.Display)),
-            postfix: new HarmonyMethod(typeof(ClosedCaptionFix), nameof(ApplyCaptionRender))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.Disappear)),
-            postfix: new HarmonyMethod(typeof(ClosedCaptionFix), nameof(ApplyCaptionRender))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.UpdateDisplay)),
-            postfix: new HarmonyMethod(typeof(ClosedCaptionFix), nameof(ApplyCaptionRender))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(ClosedCaptionUIHQ), nameof(ClosedCaptionUIHQ.UpdateDrawEffect)),
-            prefix: new HarmonyMethod(typeof(ClosedCaptionFix), nameof(GuardDrawEffect))
-        );
+        harmony.PatchAll(typeof(ClosedCaptionFix));
     }
 
+    [HarmonyPatch(typeof(ClosedCaptionUIHQ), nameof(ClosedCaptionUIHQ.UpdateDrawEffect))]
+    [HarmonyPrefix]
     private static bool GuardDrawEffect(ClosedCaptionUIHQ __instance)
     {
         if (__instance.isActiveAndEnabled && VisibleCharacters(__instance) > 0)
@@ -42,6 +29,10 @@ internal sealed class ClosedCaptionFix
         return false;
     }
 
+    [HarmonyPatch(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.Display))]
+    [HarmonyPatch(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.Disappear))]
+    [HarmonyPatch(typeof(ClosedCaptionUI), nameof(ClosedCaptionUI.UpdateDisplay))]
+    [HarmonyPostfix]
     private static void ApplyCaptionRender(ClosedCaptionUI __instance)
     {
         var characters = VisibleCharacters(__instance);

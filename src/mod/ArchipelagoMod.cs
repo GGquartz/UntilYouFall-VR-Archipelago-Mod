@@ -15,6 +15,7 @@ using UntilYouFall.Shared;
     "https://github.com/GGquartz/"
 )]
 [assembly: MelonGame("Schell Games", "UntilYouFall")]
+[assembly: HarmonyDontPatchAll]
 [assembly: AssemblyVersion(UntilYouFallArchipelago.ModMetadata.Version)]
 [assembly: AssemblyFileVersion(UntilYouFallArchipelago.ModMetadata.Version)]
 [assembly: AssemblyInformationalVersion(UntilYouFallArchipelago.ModMetadata.Version)]
@@ -267,37 +268,7 @@ public sealed partial class ArchipelagoMod : MelonMod
         );
         _ = new QuestEventHooks(HarmonyInstance, _apClient, () => _levelManager, log);
 
-        HarmonyInstance.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.Start)),
-            postfix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(OnPlayerHealthStart))
-        );
-        HarmonyInstance.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartLoad)),
-            prefix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(OnRoomLoad))
-        );
-        HarmonyInstance.Patch(
-            AccessTools.Method(
-                typeof(ScreenFadeController),
-                nameof(ScreenFadeController.FadeTo),
-                [typeof(float), typeof(Color), typeof(Il2CppSystem.Action)]
-            ),
-            prefix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(PrepareRuneforgeBeforeFadeIn))
-        );
-        HarmonyInstance.Patch(
-            AccessTools.Method(
-                typeof(Il2Cpp.RoomCompletionHistory),
-                nameof(Il2Cpp.RoomCompletionHistory.SetCompletionState)
-            ),
-            postfix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(OnRoomCompletion))
-        );
-        HarmonyInstance.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.OnLastEnemyKilled)),
-            postfix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(OnEnemiesCleared))
-        );
-        HarmonyInstance.Patch(
-            AccessTools.Method(typeof(PlayerHealth), nameof(PlayerHealth.OnDestroy)),
-            prefix: new HarmonyMethod(typeof(ArchipelagoMod), nameof(ForgetPlayerHealth))
-        );
+        HarmonyInstance.PatchAll(typeof(ArchipelagoMod));
 
         LoggerInstance.Msg($"Archipelago mod loaded (v{ModMetadata.Version})");
     }

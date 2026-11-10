@@ -39,21 +39,13 @@ internal sealed class EliteEncounterTrap : IDisposable
         {
             _log.Write($"Disabled: cannot read saved room overrides {exception}");
         }
-        harmony.Patch(
-            AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartLoad)),
-            prefix: new HarmonyMethod(typeof(EliteEncounterTrap), nameof(BeforeLoad)) { priority = Priority.First },
-            postfix: new HarmonyMethod(typeof(EliteEncounterTrap), nameof(AfterLoad))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(RewardSpawner), nameof(RewardSpawner.PopulateSpawnRewards)),
-            prefix: new HarmonyMethod(typeof(EliteEncounterTrap), nameof(BeforeRewards)) { priority = Priority.First }
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(Enemy), nameof(Enemy.FinishInitialization)),
-            postfix: new HarmonyMethod(typeof(EliteEncounterTrap), nameof(EnemyReady))
-        );
+        var startLoad = AccessTools.Method(typeof(LevelManager), nameof(LevelManager.StartLoad));
+        harmony.PatchAll(typeof(EliteEncounterTrap));
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartLoad))]
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
     private static void BeforeLoad(LevelManager __instance, ref Campaign.RoomSelection level)
     {
         try
@@ -193,6 +185,8 @@ internal sealed class EliteEncounterTrap : IDisposable
         level = replacement;
     }
 
+    [HarmonyPatch(typeof(LevelManager), nameof(LevelManager.StartLoad))]
+    [HarmonyPostfix]
     private static void AfterLoad(LevelManager __instance)
     {
         try
@@ -248,6 +242,9 @@ internal sealed class EliteEncounterTrap : IDisposable
         && _roomClone != null
         && _manager.CurrentLevel?.Room?.GetInstanceID() == _roomClone.GetInstanceID();
 
+    [HarmonyPatch(typeof(RewardSpawner), nameof(RewardSpawner.PopulateSpawnRewards))]
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
     private static void BeforeRewards(RewardSpawner __instance)
     {
         try
@@ -267,6 +264,8 @@ internal sealed class EliteEncounterTrap : IDisposable
         }
     }
 
+    [HarmonyPatch(typeof(Enemy), nameof(Enemy.FinishInitialization))]
+    [HarmonyPostfix]
     private static void EnemyReady(Enemy __instance)
     {
         try

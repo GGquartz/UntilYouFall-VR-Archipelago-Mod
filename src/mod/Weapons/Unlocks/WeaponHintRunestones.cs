@@ -27,24 +27,15 @@ internal sealed class WeaponHintRunestones
         _locked = locked;
         _client = client;
         _log = log.Channel("APWeaponHint");
-        harmony.Patch(
-            AccessTools.Method(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush)),
-            prefix: new HarmonyMethod(typeof(WeaponHintRunestones), nameof(BeforeFinish)),
-            postfix: new HarmonyMethod(typeof(WeaponHintRunestones), nameof(AfterFinish)),
-            finalizer: new HarmonyMethod(typeof(WeaponHintRunestones), nameof(EndFinish))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(PurchaseInteractable), nameof(PurchaseInteractable.OnCrushComplete)),
-            prefix: new HarmonyMethod(typeof(WeaponHintRunestones), nameof(Complete))
-        );
-        harmony.Patch(
-            AccessTools.Method(typeof(WeaponRackSlot), nameof(WeaponRackSlot.Buy)),
-            prefix: new HarmonyMethod(typeof(WeaponHintRunestones), nameof(AllowBuy))
-        );
+        harmony.PatchAll(typeof(WeaponHintRunestones));
     }
 
+    [HarmonyPatch(typeof(WeaponRackSlot), nameof(WeaponRackSlot.Buy))]
+    [HarmonyPrefix]
     private static bool AllowBuy(WeaponRackSlot __instance) => !_instance._locked(__instance.ArmamentID);
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyPrefix]
     private static bool BeforeFinish(CrushInteractable __instance, out FinishState? __state)
     {
         __state = null;
@@ -61,6 +52,8 @@ internal sealed class WeaponHintRunestones
         return true;
     }
 
+    [HarmonyPatch(typeof(PurchaseInteractable), nameof(PurchaseInteractable.OnCrushComplete))]
+    [HarmonyPrefix]
     private static bool Complete(PurchaseInteractable __instance)
     {
         if (!_instance._locked(__instance.ArmamentID))
@@ -76,6 +69,8 @@ internal sealed class WeaponHintRunestones
         return false;
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyPostfix]
     private static void AfterFinish(CrushInteractable __instance, FinishState? __state)
     {
         if (__state == null)
@@ -89,6 +84,8 @@ internal sealed class WeaponHintRunestones
         _instance._log.Write($"Crush finished requestSent={sent} native remat started");
     }
 
+    [HarmonyPatch(typeof(CrushInteractable), nameof(CrushInteractable.FinishCrush))]
+    [HarmonyFinalizer]
     private static Exception? EndFinish(CrushInteractable __instance, FinishState? __state, Exception? __exception)
     {
         if (__state == null)
