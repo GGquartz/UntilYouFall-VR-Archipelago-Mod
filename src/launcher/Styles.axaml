@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <Color x:Key="WindowBackground">#181A22</Color>
+    <Color x:Key="TextColor">#E8EAF0</Color>
+    <SolidColorBrush x:Key="WindowBrush" Color="{StaticResource WindowBackground}" />
+    <SolidColorBrush x:Key="GoldBrush" Color="#F2B82E" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#969CAC" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#6EC882" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#EB6E64" />
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource WindowBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextColor}" />
+    <Setter Property="FontFamily" Value="avares://UYFArchipelagoLauncher/Assets/Fonts#Jost* Medium" />
+  </Style>
+
+  <Style Selector="TextBlock.heading">
+    <Setter Property="Foreground" Value="{StaticResource GoldBrush}" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="TextBlock.secondary">
+    <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
+  </Style>
+
+  <Style Selector="TabControl > TabItem">
+    <Setter Property="Padding" Value="16,6" />
+  </Style>
+
+  <Style Selector="StackPanel.page">
+    <Setter Property="Margin" Value="14" />
+    <Setter Property="Spacing" Value="8" />
+  </Style>
+</Styles>

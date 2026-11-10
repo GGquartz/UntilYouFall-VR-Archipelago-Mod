@@ -1,0 +1,16 @@
+#!/bin/sh
+root=$(git rev-parse --show-toplevel)
+cd "$root" || exit 1
+export DOTNET_CLI_HOME="$root/.cache/dotnet" NUGET_PACKAGES="$root/.cache/nuget" DOTNET_NOLOGO=1
+
+staged() { git diff --cached --name-only -z --diff-filter=ACM -- "$1"; }
+has_staged() { git diff --cached --name-only --diff-filter=ACM -- "$1" | grep -q .; }
+
+if has_staged '*.cs'; then
+  staged '*.cs' | xargs -0 dotnet csharpier format || exit 1
+  staged '*.cs' | xargs -0 git add --
+fi
+if has_staged '*.py'; then
+  staged '*.py' | xargs -0 python -m ruff format || exit 1
+  staged '*.py' | xargs -0 git add --
+fi

@@ -1,0 +1,9 @@
+[tool.ruff]
+line-length = 120
+extend-exclude = [".cache", ".local", "dist", "output", "ap-test", "logs", "assets"]
+
+[tool.ruff.lint]
+select = ["E9", "F", "I"]
+
+[tool.ruff.format]
+line-ending = "auto"

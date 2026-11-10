@@ -1,0 +1,497 @@
+[
+ {
+  "Name": "Unleashed Potential",
+  "Tier": 1,
+  "Source": "WeaponUpgraded",
+  "Icon": "ACH_WEAPON_UPGRADED",
+  "Need": {
+   "Upgrades": 1
+  },
+  "Description": "Upgrade a weapon",
+  "Target": 1
+ },
+ {
+  "Name": "On the Wings of the Knight",
+  "Tier": 1,
+  "Source": "RagdollDistance",
+  "Icon": "ACH_RAGDOLL_DISTANCE",
+  "Need": {},
+  "NoProgressionRewards": true,
+  "Description": "Launch a defeated opponent 10 meters into the air",
+  "Target": 1
+ },
+ {
+  "Name": "Parry Party",
+  "Tier": 1,
+  "Source": "MeleeBlocks",
+  "Icon": "ACH_MELEE_BLOCKS",
+  "Need": {},
+  "Description": "Successfully block 250 melee attacks",
+  "Target": 250
+ },
+ {
+  "Name": "Cleaver of Captains",
+  "Tier": 1,
+  "Source": "CaptainsKilled",
+  "Icon": "ACH_CAPTAINS_KILLED",
+  "Need": {},
+  "Description": "Defeat 10 Captains",
+  "Target": 10
+ },
+ {
+  "Name": "Slayer of Spellweavers",
+  "Tier": 1,
+  "Source": "SpellweaversKilled",
+  "Icon": "ACH_SPELLWEAVERS_KILLED",
+  "Need": {},
+  "Description": "Defeat 10 Spellweavers",
+  "Target": 10
+ },
+ {
+  "Name": "Dodge, Duck, Dip, Dive and Dodge",
+  "Tier": 1,
+  "Source": "Dodges",
+  "Icon": "ACH_DODGES",
+  "Need": {},
+  "Description": "Successfully dodge 50 attacks",
+  "Target": 50
+ },
+ {
+  "Name": "Buntmaster",
+  "Tier": 2,
+  "Source": "RangedBlocks",
+  "Icon": "ACH_RANGEDBLOCKS",
+  "Need": {},
+  "Description": "Successfully deflect 50 ranged attacks",
+  "Target": 50
+ },
+ {
+  "Name": "Guard Breaker",
+  "Tier": 1,
+  "Source": "GuardBreaks",
+  "Icon": "ACH_GUARDBREAKS",
+  "Need": {},
+  "Description": "Inflict 100 Guard Breaks",
+  "Target": 100
+ },
+ {
+  "Name": "Killer of Knights",
+  "Tier": 1,
+  "Source": "KnightsKilled",
+  "Icon": "ACH_KNIGHTS_KILLED",
+  "Need": {},
+  "Description": "Defeat 10 Knights",
+  "Target": 10
+ },
+ {
+  "Name": "Hewer of Husks",
+  "Tier": 1,
+  "Source": "HusksKilled",
+  "Icon": "ACH_HUSKS_KILLED",
+  "Need": {},
+  "Description": "Defeat 100 Husks",
+  "Target": 100
+ },
+ {
+  "Name": "Quick on the Draw",
+  "Tier": 2,
+  "Source": "LongCombo",
+  "Icon": "ACH_LONG_COMBO",
+  "Need": {},
+  "Description": "Complete a Critical Strike Combo of 6 or longer",
+  "Target": 6
+ },
+ {
+  "Name": "Burning a Hole in your Armor",
+  "Tier": 2,
+  "Source": "AetherRun",
+  "Icon": "ACH_AETHER_RUN",
+  "Need": {},
+  "Description": "Collect 3000 Aether in a single run",
+  "Target": 3000
+ },
+ {
+  "Name": "Tricked Out",
+  "Tier": 2,
+  "Source": "TraitsOnWeapon",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
+  "Need": {},
+  "Description": "In a run, have 6 or more Traits equipped to a single weapon",
+  "Target": 6
+ },
+ {
+  "Name": "Cognitive Overload",
+  "Tier": 2,
+  "Source": "TraitsEquipped",
+  "Icon": "ACH_MANY_TRAITS_EQUIPPED",
+  "Need": {},
+  "Description": "In a run, equip 10 or more Traits",
+  "Target": 10
+ },
+ {
+  "Name": "Fat Stacks of Aether",
+  "Tier": 2,
+  "Source": "AetherTotal",
+  "Icon": "ACH_AETHER_TOTAL",
+  "Need": {},
+  "Description": "Earn 10,000 Aether total from runs",
+  "Target": 10000
+ },
+ {
+  "Name": "Super-est",
+  "Tier": 2,
+  "Source": "SuperLevel4",
+  "Icon": "ACH_SUPER_LEVEL_4",
+  "Need": {},
+  "Description": "In a run, upgrade a Super to Level IV",
+  "Target": 4
+ },
+ {
+  "Name": "Unempower-er",
+  "Tier": 2,
+  "Source": "EmpoweredsKilled",
+  "Icon": "ACH_EMPOWEREDS_KILLED",
+  "Need": {},
+  "Description": "Defeat 10 Empowered Enemies",
+  "Target": 10
+ },
+ {
+  "Name": "A Fine Collection",
+  "Tier": 3,
+  "Source": "WeaponsAcquired",
+  "Icon": "ACH_WEAPONS_ACQUIRED_12",
+  "Need": {
+   "WeaponCount": 12
+  },
+  "Description": "Acquire 12 unique weapons",
+  "Target": 12
+ },
+ {
+  "Name": "Masterwork",
+  "Tier": 3,
+  "Source": "WeaponMaxed",
+  "Icon": "ACH_WEAPON_UPGRADED_X",
+  "Need": {
+   "Upgrades": 9
+  },
+  "Description": "Upgrade a weapon to its maximum level",
+  "Target": 1
+ },
+ {
+  "Name": "Katarstrophy",
+  "Tier": 3,
+  "Icon": "ACH_SHATTEREDWOODS_KATARS",
+  "Need": {
+   "Weapons": [
+    "Gemini Stranded",
+    "Gemini Esper"
+   ]
+  },
+  "Description": "Clear a run using both Gemini Stranded and Gemini Esper",
+  "Target": 1
+ },
+ {
+  "Name": "Champion of The Runeguard",
+  "Tier": 3,
+  "Icon": "ACH_RUNEGUARD",
+  "Need": {
+   "Weapons": [
+    "Engraved Arming Sword",
+    "Knight-Blooded Crest"
+   ]
+  },
+  "Description": "Clear a run using both the Engraved Arming Sword and Knight-Blooded Crest",
+  "Target": 1
+ },
+ {
+  "Name": "Titan's Grip",
+  "Tier": 3,
+  "Icon": "ACH_SHATTEREDWOODS_HEAVYWEAPONS",
+  "Need": {
+   "AnyWeapons": [
+    "Heartsplitter",
+    "Vestal's Wrath",
+    "Mistcutter"
+   ],
+   "AnyCount": 2
+  },
+  "Description": "Clear a run using any combination of Heartsplitter, Vestal's Wrath, or Mistcutter",
+  "Target": 1
+ },
+ {
+  "Name": "Spellweaver-in-Training",
+  "Tier": 3,
+  "Icon": "ACH_SHATTEREDWOODS_SPELLSWORD",
+  "Need": {
+   "Weapons": [
+    "Ritual Dagger",
+    "Spellsword's Charm"
+   ]
+  },
+  "Description": "Clear a run using both the Ritual Dagger and Spellsword's Charm",
+  "Target": 1
+ },
+ {
+  "Name": "Fundamentalist",
+  "Tier": 3,
+  "Icon": "ACH_SHATTEREDWOODS_STARTER_WEAPONS",
+  "Need": {
+   "Weapons": [
+    "Engraved Arming Sword",
+    "Rokari Keenblade"
+   ]
+  },
+  "Description": "Clear a run using both the Engraved Arming Sword and Rokari Keenblade",
+  "Target": 1
+ },
+ {
+  "Name": "Champion of the Soul Tenders",
+  "Tier": 3,
+  "Icon": "ACH_SOUL_TENDERS",
+  "Need": {
+   "Weapons": [
+    "Vestal's Wrath",
+    "Ritual Dagger"
+   ]
+  },
+  "Description": "Clear a run using both Vestal's Wrath and the Ritual Dagger",
+  "Target": 1
+ },
+ {
+  "Name": "Champion of The Unbroken",
+  "Tier": 3,
+  "Icon": "ACH_UNBROKEN",
+  "Need": {
+   "Weapons": [
+    "Heartsplitter",
+    "Gemini Stranded"
+   ]
+  },
+  "Description": "Clear a run using both Heartsplitter and Gemini Stranded",
+  "Target": 1
+ },
+ {
+  "Name": "Champion of the Void Keepers",
+  "Tier": 3,
+  "Icon": "ACH_VOID_KEEPERS",
+  "Need": {
+   "Weapons": [
+    "Mistcutter",
+    "Spellsword's Charm"
+   ]
+  },
+  "Description": "Clear a run using both Mistcutter and Spellsword's Charm",
+  "Target": 1
+ },
+ {
+  "Name": "Speedrun",
+  "Tier": 3,
+  "Source": "Speedrun",
+  "Icon": "ACH_SPEEDRUN",
+  "Need": {},
+  "Description": "Clear the Shattered Woods in 25 minutes or less",
+  "Target": 1
+ },
+ {
+  "Name": "Ain't Got Time to Heal",
+  "Tier": 3,
+  "Source": "NoVitality",
+  "Icon": "ACH_SHATTEREDWOODS_NO_HEAL",
+  "Need": {},
+  "Description": "Clear the Shattered Woods Campaign without ever using a Shard of Vitality",
+  "Target": 1
+ },
+ {
+  "Name": "Sword God",
+  "Tier": 3,
+  "Source": "NoResolve",
+  "Icon": "ACH_SHATTEREDWOODS_NIGHTMAREST",
+  "Need": {},
+  "Description": "Complete the Shattered Woods Campaign without ever using a Shard of Resolve",
+  "Target": 1
+ },
+ {
+  "Name": "Untouched",
+  "Tier": 2,
+  "Source": "Untouched",
+  "Icon": "ACH_COMBOS_COMPLETED",
+  "Need": {},
+  "Description": "Clear 7 stages in a row without taking damage",
+  "Target": 7
+ },
+ {
+  "Name": "Cold Iron Verdict",
+  "Tier": 2,
+  "Source": "ViciousKills",
+  "Icon": "CUSTOM_COLD_IRON_VERDICT",
+  "Need": {
+   "Weapons": [
+    "Cold Iron Greataxe"
+   ],
+   "Abilities": [
+    "Vicious Strike"
+   ]
+  },
+  "Description": "Deal the final blow to 5 enemies with Cold Iron Greataxe's Vicious Strike",
+  "Target": 5
+ },
+ {
+  "Name": "Shatter Storm",
+  "Tier": 2,
+  "Source": "ShardstormKills",
+  "Icon": "CUSTOM_SHATTER_STORM",
+  "Need": {
+   "AnyWeapons": [
+    "Gemini Esper",
+    "High Arcanist's Blade"
+   ],
+   "AnyCount": 1,
+   "Abilities": [
+    "Shardstorm"
+   ]
+  },
+  "Description": "Defeat 10 enemies using Shardstorm",
+  "Target": 10
+ },
+ {
+  "Name": "Burning Retribution",
+  "Tier": 2,
+  "Source": "SoulBurnKills",
+  "Icon": "CUSTOM_BURNING_RETRIBUTION",
+  "Need": {
+   "AnyWeapons": [
+    "Ritual Dagger",
+    "Vestal's Wrath"
+   ],
+   "AnyCount": 1,
+   "Abilities": [
+    "Soul Burn"
+   ]
+  },
+  "Description": "Defeat 10 enemies using Soul Burn",
+  "Target": 10
+ },
+ {
+  "Name": "Unbreakable Wall",
+  "Tier": 2,
+  "Source": "BulwarkBlocks",
+  "Icon": "CUSTOM_UNBREAKABLE_WALL",
+  "Need": {
+   "AnyWeapons": [
+    "Engraved Arming Sword",
+    "Captain's Warhammer"
+   ],
+   "AnyCount": 1,
+   "Abilities": [
+    "Bulwark"
+   ]
+  },
+  "Description": "Block 25 attacks with Bulwark active",
+  "Target": 25
+ },
+ {
+  "Name": "Full Arsenal",
+  "Tier": 3,
+  "Source": "AllSupers",
+  "Icon": "CUSTOM_FULL_ARSENAL",
+  "Need": {
+   "AllSupers": true
+  },
+  "Description": "Use every Super at least once",
+  "Target": 9
+ },
+ {
+  "Name": "Vow of Poverty",
+  "Tier": 3,
+  "Source": "NoAetherReward",
+  "Icon": "ACH_AETHER_BANKED",
+  "Need": {},
+  "Description": "Clear a run without picking any Aether rewards",
+  "Target": 1
+ },
+ {
+  "Name": "Monk of Rokar",
+  "Tier": 3,
+  "Icon": "ACH_SHATTEREDWOODS_MONK",
+  "Need": {
+   "Weapons": [
+    "Knight-Blooded Crest",
+    "Spellsword's Charm"
+   ]
+  },
+  "Description": "Clear stage 14 using both the Knight-Blooded Crest and Spellsword's Charm",
+  "Target": 1,
+  "Stage": 14
+ },
+ {
+  "Name": "Extermin-aether",
+  "Tier": 2,
+  "Source": "HorrorStages",
+  "Icon": "ACH_HORRORS_KILLED",
+  "Need": {},
+  "Description": "Defeat 3 Aether Horrors",
+  "Target": 3
+ },
+ {
+  "Name": "Wrecker of Fools",
+  "Tier": 2,
+  "Source": "EnemiesKilled",
+  "Icon": "ACH_ENEMIES_KILLED",
+  "Need": {},
+  "Description": "Defeat 250 enemies",
+  "Target": 250
+ },
+ {
+  "Name": "Forged in Iron",
+  "Tier": 3,
+  "Icon": "CUSTOM_FORGED_IN_IRON",
+  "Need": {
+   "Weapons": [
+    "Captain's Warhammer",
+    "Cold Iron Greataxe"
+   ]
+  },
+  "Description": "Clear a run using both Captain's Warhammer and Cold Iron Greataxe",
+  "Target": 1
+ },
+ {
+  "Name": "Brink of Ruin",
+  "Tier": 2,
+  "Source": "BrinkOfRuin",
+  "Icon": "CUSTOM_BRINK_OF_RUIN",
+  "Need": {},
+  "Description": "Enter the near death state 3 times in a single run",
+  "Target": 3
+ },
+ {
+  "Name": "Sold Out",
+  "Tier": 1,
+  "Source": "ShopPurchase",
+  "Icon": "CUSTOM_SOLD_OUT",
+  "Need": {},
+  "Description": "Buy something from the shop",
+  "Target": 1
+ },
+ {
+  "Name": "Crowd Control",
+  "Tier": 1,
+  "Source": "KillsInWindow",
+  "Icon": "CUSTOM_CROWD_CONTROL",
+  "Need": {},
+  "Description": "Defeat 3 enemies in 5 seconds",
+  "Target": 3
+ },
+ {
+  "Name": "Sweeping Statement",
+  "Tier": 1,
+  "Source": "MultiHitSwings",
+  "Icon": "ACH_WEAPON_PURCHASED",
+  "Need": {
+   "Weapons": [
+    "Heartsplitter"
+   ]
+  },
+  "Description": "Hit 2 enemies in one strike 5 times using Heartsplitter",
+  "Target": 5
+ }
+]

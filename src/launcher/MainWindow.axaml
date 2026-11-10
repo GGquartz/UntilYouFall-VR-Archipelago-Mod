@@ -1,0 +1,38 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:views="using:UntilYouFall.Launcher.Views"
+  x:Class="UntilYouFall.Launcher.MainWindow"
+  Title="Until You Fall Archipelago Launcher"
+  Icon="avares://UYFArchipelagoLauncher/Assets/uyf.ico"
+  Width="800"
+  Height="700"
+  MinWidth="760"
+  MinHeight="560"
+>
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,24,Auto" Margin="16,10,16,0" Height="64">
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Classes="heading" FontSize="20" Text="UYF Archipelago launcher" />
+        <TextBlock x:Name="LauncherVersion" Classes="secondary" />
+      </StackPanel>
+      <Image Grid.Column="1" Source="avares://UYFArchipelagoLauncher/Assets/uyf-logo.png" Height="56" />
+      <Image Grid.Column="3" Source="avares://UYFArchipelagoLauncher/Assets/archipelago.png" Height="56" />
+    </Grid>
+
+    <TabControl Margin="0,6,0,0">
+      <TabItem Header="Install">
+        <views:InstallView x:Name="InstallView" />
+      </TabItem>
+      <TabItem Header="Options">
+        <views:OptionsView x:Name="OptionsView" />
+      </TabItem>
+      <TabItem Header="Connect">
+        <views:ConnectView x:Name="ConnectView" />
+      </TabItem>
+      <TabItem Header="Help">
+        <views:HelpView x:Name="HelpView" />
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

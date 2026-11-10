@@ -1,0 +1,752 @@
+[
+  {
+    "name": "Shard of Vitality",
+    "class": "filler",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Left Hand",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": false
+  },
+  {
+    "name": "Right Hand",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": false
+  },
+  {
+    "name": "Spellsword's Charm",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Knight-Blooded Crest",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Engraved Arming Sword",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Heartsplitter",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Ritual Dagger",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "High Arcanist's Blade",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Fate's End",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Cold Iron Greataxe",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Captain's Warhammer",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Mistcutter",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Stranded",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Esper",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Vestal's Wrath",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Rokari Keenblade",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Duelist's Edge",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Spellsword's Charm",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Knight-Blooded Crest",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Engraved Arming Sword",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Heartsplitter",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Ritual Dagger",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: High Arcanist's Blade",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Fate's End",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Cold Iron Greataxe",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Captain's Warhammer",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Mistcutter",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Gemini Stranded",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Gemini Esper",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Vestal's Wrath",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Rokari Keenblade",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Trait Slot: Duelist's Edge",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Progressive Max Weapon Upgrade Level",
+    "class": "progression",
+    "maxCopies": 9,
+    "canStartWith": true
+  },
+  {
+    "name": "100 Aether",
+    "class": "filler",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Progressive Aether Multiplier",
+    "class": "useful",
+    "maxCopies": 5,
+    "canStartWith": true
+  },
+  {
+    "name": "500 Aether",
+    "class": "useful",
+    "maxCopies": 10,
+    "canStartWith": true
+  },
+  {
+    "name": "750 Aether",
+    "class": "useful",
+    "maxCopies": 10,
+    "canStartWith": true
+  },
+  {
+    "name": "1000 Aether",
+    "class": "useful",
+    "maxCopies": 5,
+    "canStartWith": true
+  },
+  {
+    "name": "Super Charge",
+    "class": "filler",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Enemy Stasis",
+    "class": "filler",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Bulwark",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Concussive Blast",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Empowered Strike",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Shardstorm",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Soul Burn",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Stasis Strike",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Titan's Strength",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Vicious Strike",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Void Trap",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: Maximum Health +1",
+    "class": "useful",
+    "maxCopies": 5,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: Dash Charges +1",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: Dash Impact +5",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: Combo Limit +1",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: Enhance Super",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: +10% Critical Strike Window Length",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Player Bonus: -10% Dash Recharge Time",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Enemy Spawn Trap",
+    "class": "trap",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Elite Encounter Trap",
+    "class": "trap",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Dodge Only Trap",
+    "class": "trap",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Exhaustion Trap",
+    "class": "trap",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Cursed Trap",
+    "class": "trap",
+    "maxCopies": 10,
+    "canStartWith": false
+  },
+  {
+    "name": "Difficulty: Relaxed",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Difficulty: Challenging",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Difficulty: Relentless",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Difficulty: Nightmare",
+    "class": "progression",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Progressive Shop Unlock",
+    "class": "progression",
+    "maxCopies": 4,
+    "canStartWith": true
+  },
+  {
+    "name": "Knight-Blooded Crest Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Knight-Blooded Crest Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Engraved Arming Sword Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Engraved Arming Sword Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Heartsplitter Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Heartsplitter Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Ritual Dagger Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Ritual Dagger Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "High Arcanist's Blade Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "High Arcanist's Blade Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Fate's End Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Fate's End Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Cold Iron Greataxe Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Cold Iron Greataxe Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Captain's Warhammer Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Captain's Warhammer Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Mistcutter Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Mistcutter Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Stranded Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Stranded Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Esper Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Gemini Esper Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Vestal's Wrath Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Vestal's Wrath Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Rokari Keenblade Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Rokari Keenblade Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Duelist's Edge Health Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Duelist's Edge Guard Damage +1",
+    "class": "filler",
+    "maxCopies": 3,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Alternating Strikes",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Arcane",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Balanced",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Bloodthirsty",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Chrono-Locked",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Enkindled",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Flame-Starved",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Fleet",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Frenzied",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Guarded",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Heartseeker",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Honed",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Hungering",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Juggernaut",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Kinetic Siphon",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Lethal Elegance",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Nimble",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Pristine",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Resonant",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Serrated",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Sparklight",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Staggering",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Stalwart",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Tenacious",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Unyielding",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Void Scarred",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Void Touched",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Starting Trait: Weighted",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Starting Trait Pick",
+    "class": "useful",
+    "maxCopies": 1,
+    "canStartWith": true
+  },
+  {
+    "name": "Extra Starting Trait Option",
+    "class": "useful",
+    "maxCopies": 3,
+    "canStartWith": true
+  }
+]

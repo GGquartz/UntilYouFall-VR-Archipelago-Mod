@@ -1,0 +1,43 @@
+name: Launcher on Linux
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  workflow_dispatch:
+
+jobs:
+  launcher:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Launcher logic tests
+        run: dotnet run --project tests/launcher
+
+      - name: Linux install flow
+        run: dotnet run --project tests/launcher-ui
+
+      - name: Publish the Linux launcher
+        run: >
+          dotnet publish src/launcher/UntilYouFall.Launcher.csproj -c Release -r linux-x64
+          --self-contained true -p:InvariantGlobalization=true -o publish
+
+      - name: Start the published launcher under Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          chmod +x publish/UYFArchipelagoLauncher
+          status=0
+          xvfb-run -a timeout 10 ./publish/UYFArchipelagoLauncher || status=$?
+          echo "exit code: $status"
+          test "$status" -eq 124

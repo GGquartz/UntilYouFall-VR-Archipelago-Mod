@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.cache/
+*.csproj.user
+__pycache__/
+*.pyc
+/ap-test/
+/assets/quest-icon-sources/
+dist/UYFArchipelagoLauncher/
+dist/UYFArchipelagoLauncher-linux/
+dist/UYF-Archipelago-*
+
+/.local/
+/output/
+/.vs/
+/host.yaml
+/logs/

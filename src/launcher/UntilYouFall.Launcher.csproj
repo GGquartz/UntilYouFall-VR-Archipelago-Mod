@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>UYFArchipelagoLauncher</AssemblyName>
+    <RootNamespace>UntilYouFall.Launcher</RootNamespace>
+    <Version>0.1.0</Version>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <ApplicationIcon>Resources\uyf.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="Resources/archipelago.png" Link="Assets/archipelago.png" />
+    <AvaloniaResource Include="Resources/uyf-logo.png" Link="Assets/uyf-logo.png" />
+    <AvaloniaResource Include="Resources/Fonts/*.ttf" Link="Assets/Fonts/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="Resources/uyf.ico" Link="Assets/uyf.ico" />
+    <EmbeddedResource Include="Resources/options.json" LogicalName="options.json" />
+    <EmbeddedResource Include="Resources/general-options.json" LogicalName="general-options.json" />
+    <EmbeddedResource Include="Resources/items.json" LogicalName="items.json" />
+    <EmbeddedResource Include="../apworld/until_you_fall/archipelago.json" LogicalName="archipelago.json" />
+    <InternalsVisibleTo Include="LauncherTests" />
+    <InternalsVisibleTo Include="LauncherUiTests" />
+  </ItemGroup>
+</Project>

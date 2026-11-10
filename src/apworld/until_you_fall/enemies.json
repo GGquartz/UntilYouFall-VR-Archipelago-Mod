@@ -1,0 +1,12 @@
+[
+  {"Id": 910301, "Name": "Lesser Husk", "EarliestStage": 1, "Guids": ["7f7132e9b8bdaac448bd24a13c3cce0a"]},
+  {"Id": 910302, "Name": "Unraveled Husk", "EarliestStage": 1, "Guids": ["acb8d3eed23466446a9e879acaa3d66f"]},
+  {"Id": 910303, "Name": "Rokari Knight", "EarliestStage": 3, "Guids": ["b0036f00d8d07d341baa59e3aa561f6e"]},
+  {"Id": 910304, "Name": "Rokari Captain", "EarliestStage": 5, "Guids": ["ec5d0d42ff65c9c4d995e14374f158d6"]},
+  {"Id": 910305, "Name": "Rokari Spellweaver", "EarliestStage": 8, "Guids": ["196b438e206a47a44b733f4c3c6d2a9b"]},
+  {"Id": 910306, "Name": "Empowered Knight", "EarliestStage": 12, "Guids": ["dd344cc397e68d145867653177114959"]},
+  {"Id": 910307, "Name": "Rokari Honor Guard", "EarliestStage": 14, "ExcludeFromSpawnTrap": true, "Guids": ["0db6afb83519ed84e81f13f2bdd25fb5"]},
+  {"Id": 910308, "Name": "Empowered Captain", "EarliestStage": 17, "Guids": ["9de7908d36e62d348841c19b010060e3"]},
+  {"Id": 910309, "Name": "Empowered Spellweaver", "EarliestStage": 17, "Guids": ["9a1c3092a052a0946a0e9369fb9c5e56"]},
+  {"Id": 910310, "Name": "Aether Horror", "EarliestStage": 7, "ExcludeFromSpawnTrap": true, "Guids": ["52d24c14814c28c4f8c8c5fe17f3ec9c", "4a1bd840d43c3ad4dbf480d1682bf784"]}
+]

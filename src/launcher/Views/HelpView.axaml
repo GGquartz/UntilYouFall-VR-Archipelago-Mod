@@ -1,0 +1,34 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:core="using:UntilYouFall.Launcher.Core"
+  x:Class="UntilYouFall.Launcher.Views.HelpView"
+>
+  <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto" Margin="14">
+    <TextBlock Classes="heading" Text="Versions" />
+    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,6,0,0" Classes="secondary">
+      <TextBlock Text="Component" Classes="secondary" />
+      <TextBlock Grid.Column="1" Text="Package / required" Classes="secondary" />
+      <TextBlock Grid.Column="2" Text="Installed in game" Classes="secondary" />
+    </Grid>
+    <ListBox x:Name="Versions" Grid.Row="2">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="core:ComponentVersion">
+          <Grid ColumnDefinitions="*,*,*">
+            <TextBlock Text="{Binding Component}" />
+            <TextBlock Grid.Column="1" Text="{Binding Package}" />
+            <TextBlock Grid.Column="2" Text="{Binding Installed}" />
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <Button Grid.Row="3" Content="Refresh versions" Margin="0,8,0,0" Click="RefreshVersions_Click" />
+
+    <TextBlock Grid.Row="4" Classes="heading" Text="Logs" Margin="0,16,0,6" />
+    <StackPanel Grid.Row="5" Spacing="6">
+      <Button Content="Export logs" Click="ExportLogs_Click" />
+      <TextBlock Classes="secondary" Text="Send this in the Archipelago discord for help" />
+      <TextBlock Classes="secondary" Text="(Log will not contain sensitive information or AP room information)" />
+    </StackPanel>
+  </Grid>
+</UserControl>

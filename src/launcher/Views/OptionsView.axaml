@@ -1,0 +1,92 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:UntilYouFall.Launcher.ViewModels"
+  xmlns:views="using:UntilYouFall.Launcher.Views"
+  x:Class="UntilYouFall.Launcher.Views.OptionsView"
+>
+  <DockPanel Margin="14">
+    <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
+      <TextBlock x:Name="Validation" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="Save YAML" Click="SaveYaml_Click" />
+        <Button Content="Reset to defaults" Click="Reset_Click" />
+      </StackPanel>
+    </StackPanel>
+
+    <ScrollViewer>
+      <StackPanel>
+        <StackPanel Spacing="4" Margin="0,0,12,10">
+          <TextBlock Classes="heading" Text="Player name" />
+          <TextBox x:Name="PlayerName" Text="Player" TextChanged="PlayerName_TextChanged" />
+        </StackPanel>
+
+        <ItemsControl x:Name="OptionList" Margin="0,0,12,0">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:OptionViewModel">
+              <Border BorderBrush="#3A3E4C" BorderThickness="0,1,0,0" Padding="0,12,0,12">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="heading" Text="{Binding Label}" />
+                  <TextBlock Classes="secondary" Text="{Binding Help}" TextWrapping="Wrap" />
+                  <ComboBox
+                    IsVisible="{Binding IsChoice}"
+                    ItemsSource="{Binding Choices}"
+                    SelectedItem="{Binding SelectedChoice}"
+                    Width="300"
+                  />
+                  <NumericUpDown
+                    IsVisible="{Binding IsNumberBox}"
+                    Minimum="{Binding Min}"
+                    Maximum="{Binding Max}"
+                    Value="{Binding Number}"
+                    Increment="1"
+                    FormatString="0"
+                    Width="160"
+                    HorizontalAlignment="Left"
+                  />
+                  <StackPanel IsVisible="{Binding IsSlider}" Orientation="Horizontal" Spacing="12">
+                    <Slider
+                      Width="300"
+                      Minimum="{Binding Min}"
+                      Maximum="{Binding Max}"
+                      Value="{Binding Number}"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                    />
+                    <TextBlock Text="{Binding Number}" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <CheckBox IsVisible="{Binding IsToggle}" Content="Enabled" IsChecked="{Binding Flag}" />
+                  <TextBox IsVisible="{Binding IsList}" Text="{Binding Text}" />
+                  <views:ItemPicker IsVisible="{Binding IsItems}" />
+                  <ItemsControl IsVisible="{Binding IsWeights}" ItemsSource="{Binding Weights}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:WeightRow">
+                        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,2">
+                          <TextBlock Text="{Binding Name}" Width="190" VerticalAlignment="Center" />
+                          <NumericUpDown
+                            Minimum="0"
+                            Maximum="100"
+                            Value="{Binding Amount}"
+                            Increment="5"
+                            FormatString="0"
+                            Width="130"
+                          />
+                          <TextBlock
+                            Text="{Binding Percent}"
+                            Classes="secondary"
+                            Width="60"
+                            VerticalAlignment="Center"
+                          />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

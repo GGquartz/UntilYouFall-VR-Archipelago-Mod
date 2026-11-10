@@ -1,0 +1,48 @@
+name: Multiworld
+
+# Real Generate runs of Until You Fall solo, with every other game Archipelago ships and in 5-slot multiworlds.
+# Needs the complete Archipelago source (all worlds), so it is slower than the APWorld job.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: multiworld-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AP_VERSION: "0.6.8"
+  SKIP_REQUIREMENTS_UPDATE: "1"
+
+jobs:
+  multiworld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Archipelago source with all worlds
+        run: |
+          git clone --depth 1 --branch "$AP_VERSION" https://github.com/ArchipelagoMW/Archipelago.git "$RUNNER_TEMP/Archipelago"
+          cp -r src/apworld/until_you_fall "$RUNNER_TEMP/Archipelago/worlds/until_you_fall"
+          pip install -r "$RUNNER_TEMP/Archipelago/requirements.txt"
+          for requirements in "$RUNNER_TEMP"/Archipelago/worlds/*/requirements.txt; do pip install -r "$requirements"; done
+          pip install "setuptools<81"
+          echo "PYTHONPATH=$RUNNER_TEMP/Archipelago:tests/multiworld" >> "$GITHUB_ENV"
+
+      - name: Multiworld generation tests
+        run: python -u -m unittest discover -v -s tests/multiworld -p "test_*.py"

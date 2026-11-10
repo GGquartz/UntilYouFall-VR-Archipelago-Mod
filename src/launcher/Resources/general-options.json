@@ -1,0 +1,71 @@
+[
+  {
+    "key": "accessibility",
+    "display": "Accessibility",
+    "help": "Set rules for reachability of your items/locations.\n\n**Full:** ensure everything can be reached and acquired.\n\n**Minimal:** ensure what is needed to reach your goal can be acquired.",
+    "type": "choice",
+    "choices": [
+      "full",
+      "minimal"
+    ],
+    "default": "full"
+  },
+  {
+    "key": "progression_balancing",
+    "display": "Progression Balancing",
+    "help": "A system that can move progression earlier, to try and prevent the player from getting stuck and bored early.\n\nA lower setting means more getting stuck. A higher setting means less getting stuck.",
+    "type": "range",
+    "min": 0,
+    "max": 99,
+    "default": 50
+  },
+  {
+    "key": "local_items",
+    "display": "Local Items",
+    "help": "Forces these items to be in their native world.",
+    "type": "items",
+    "default": []
+  },
+  {
+    "key": "non_local_items",
+    "display": "Non-local Items",
+    "help": "Forces these items to be outside their native world.",
+    "type": "items",
+    "default": []
+  },
+  {
+    "key": "start_inventory_from_pool",
+    "display": "Start Inventory from Pool",
+    "help": "Start with the specified amount of these items and don't place them in the world. Example: {Bomb: 1, Arrow: 3}\n\nThe game decides what the replacement items will be.",
+    "type": "inventory",
+    "default": {}
+  },
+  {
+    "key": "start_hints",
+    "display": "Start Hints",
+    "help": "Start with these item's locations prefilled into the ``!hint`` command.",
+    "type": "items",
+    "default": []
+  },
+  {
+    "key": "start_location_hints",
+    "display": "Start Location Hints",
+    "help": "Start with these locations and their item prefilled into the ``!hint`` command.",
+    "type": "list",
+    "default": []
+  },
+  {
+    "key": "priority_locations",
+    "display": "Priority Locations",
+    "help": "Prevent these locations from having an unimportant item.",
+    "type": "list",
+    "default": []
+  },
+  {
+    "key": "exclude_locations",
+    "display": "Excluded Locations",
+    "help": "Prevent these locations from having an important item.",
+    "type": "list",
+    "default": []
+  }
+]

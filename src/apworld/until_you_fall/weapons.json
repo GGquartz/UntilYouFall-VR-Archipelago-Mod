@@ -1,0 +1,17 @@
+[
+  {"Id":910010,"TraitSlotItemId":910400,"Super":"Void Trap","Name":"Spellsword's Charm","Guid":"a2ce53704b1d9da4580691bcecbbddaf","TwoHanded":false,"LogicRequiresBothHands":true,"SecondaryOnly":true,"NoDamageItems":true},
+  {"Id":910011,"TraitSlotItemId":910401,"Super":"Concussive Blast","Name":"Knight-Blooded Crest","Guid":"1722aa7b759704d418f82de1af1320a7","TwoHanded":false,"LogicRequiresBothHands":true,"SecondaryOnly":true,"DamageItemId":910500},
+  {"Id":910012,"TraitSlotItemId":910402,"Super":"Bulwark","Name":"Engraved Arming Sword","Guid":"24ca3149a1e3166429ab0d597de47ce8","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910502,"VanillaHand":"Left"},
+  {"Id":910013,"TraitSlotItemId":910403,"Super":"Empowered Strike","Name":"Heartsplitter","Guid":"d2492d63bff2a254181e3f2a24a24ebd","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910504},
+  {"Id":910014,"TraitSlotItemId":910404,"Super":"Soul Burn","Name":"Ritual Dagger","Guid":"ab81358bf13dee24996871aa43226efc","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910506},
+  {"Id":910015,"TraitSlotItemId":910405,"Super":"Shardstorm","Name":"High Arcanist's Blade","Guid":"4aa91e6959cc1d34485462e8af6f9b4c","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910508},
+  {"Id":910016,"TraitSlotItemId":910406,"Super":"Titan's Strength","Name":"Fate's End","Guid":"860c357328c7a1347b6c3dfe699fb2f1","TwoHanded":true,"LogicRequiresBothHands":true,"DamageItemId":910510},
+  {"Id":910017,"TraitSlotItemId":910407,"Super":"Vicious Strike","Name":"Cold Iron Greataxe","Guid":"a276f4a7dd6e2cf4e8d8c59755f56ae1","TwoHanded":true,"LogicRequiresBothHands":true,"DamageItemId":910512},
+  {"Id":910018,"TraitSlotItemId":910408,"Super":"Bulwark","Name":"Captain's Warhammer","Guid":"7387f11ab2661d440b007666879bbc56","TwoHanded":true,"LogicRequiresBothHands":true,"DamageItemId":910514},
+  {"Id":910019,"TraitSlotItemId":910409,"Super":"Void Trap","Name":"Mistcutter","Guid":"c3c1b988e4a500c489c6858066c16eac","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910516},
+  {"Id":910020,"TraitSlotItemId":910410,"Super":"Concussive Blast","Name":"Gemini Stranded","Guid":"2e3895e66009b7d4c8ebe855a6c46a44","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910518},
+  {"Id":910021,"TraitSlotItemId":910411,"Super":"Shardstorm","Name":"Gemini Esper","Guid":"a4924126a033cf3468f30b29896b8d98","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910520},
+  {"Id":910022,"TraitSlotItemId":910412,"Super":"Soul Burn","Name":"Vestal's Wrath","Guid":"31aa56b53be0def43a6299a661da18ff","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910522},
+  {"Id":910023,"TraitSlotItemId":910413,"Super":"Stasis Strike","Name":"Rokari Keenblade","Guid":"ce7cf585e7d8f8b49ae31272a82db25a","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910524,"VanillaHand":"Right"},
+  {"Id":910024,"TraitSlotItemId":910414,"Super":"Stasis Strike","Name":"Duelist's Edge","Guid":"d99d24aab9333184fb9b90e6319eb71f","TwoHanded":false,"LogicRequiresBothHands":false,"DamageItemId":910526}
+]

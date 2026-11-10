@@ -1,0 +1,125 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
+    <Compile Include="../../src/mod/Shop/RuneforgeShopLayout.cs" Link="RuneforgeShopLayout.cs" />
+    <Compile Include="../../src/mod/Weapons/Catalog/WeaponCatalog.cs" Link="WeaponCatalog.cs" />
+    <Compile Include="../../src/mod/Weapons/Catalog/WeaponAbilityCatalog.cs" Link="WeaponAbilityCatalog.cs" />
+    <Compile Include="../../src/mod/Weapons/StartingLoadout/StartingWeaponRules.cs" Link="StartingWeaponRules.cs" />
+    <Compile Include="../../src/mod/Weapons/StartingLoadout/StartingHandsRules.cs" Link="StartingHandsRules.cs" />
+    <Compile Include="../../src/mod/Weapons/StartingLoadout/HandUnlockRules.cs" Link="HandUnlockRules.cs" />
+    <Compile Include="../../src/mod/Weapons/Traits/ExtraTraitSlotRules.cs" Link="ExtraTraitSlotRules.cs" />
+    <Compile Include="../../src/mod/Weapons/StartingTraits/StartingTraitRules.cs" Link="StartingTraitRules.cs" />
+    <Compile Include="../../src/mod/**/ArchipelagoClient*.cs" LinkBase="ArchipelagoClient" />
+    <Compile Include="../../src/mod/Archipelago/ClientSlotSettings.cs" Link="ClientSlotSettings.cs" />
+    <Compile Include="../../src/mod/Archipelago/ClientNotifications.cs" Link="ClientNotifications.cs" />
+    <Compile Include="../../src/mod/Archipelago/ClientConnection.cs" Link="ClientConnection.cs" />
+    <Compile Include="../../src/mod/Archipelago/ClientProgress.cs" Link="ClientProgress.cs" />
+    <Compile Include="../../src/mod/Archipelago/ReceivedItemHistory.cs" Link="ReceivedItemHistory.cs" />
+    <EmbeddedResource
+      Include="../../src/apworld/until_you_fall/starting_traits.json"
+      LogicalName="UntilYouFall.StartingTraits.json"
+    />
+    <Compile Include="../../src/mod/Weapons/Abilities/WeaponAbilityRules.cs" Link="WeaponAbilityRules.cs" />
+    <Compile Include="../../src/mod/Player/PlayerBonusRules.cs" Link="PlayerBonusRules.cs" />
+    <Compile Include="../../src/mod/Weapons/WeaponDamageBonusRules.cs" Link="WeaponDamageBonusRules.cs" />
+    <Compile Include="../../src/mod/Weapons/Upgrades/WeaponUpgradeCapRules.cs" Link="WeaponUpgradeCapRules.cs" />
+    <Compile Include="../../src/mod/Diagnostics/LogChannel.cs" Link="LogChannel.cs" />
+    <Compile Include="../../src/mod/Diagnostics/DebugAetherRules.cs" Link="DebugAetherRules.cs" />
+    <Compile Include="../../src/mod/Diagnostics/ClosedCaptionFixRules.cs" Link="ClosedCaptionFixRules.cs" />
+    <Compile Include="../../src/mod/UI/WorldTextRules.cs" Link="WorldTextRules.cs" />
+    <Compile Include="../../src/mod/Traps/EnemySpawnTrapRules.cs" Link="EnemySpawnTrapRules.cs" />
+    <Compile Include="../../src/mod/Traps/NoBlockingTrapState.cs" Link="NoBlockingTrapState.cs" />
+    <Compile Include="../../src/mod/Traps/TimedTrapState.cs" Link="TimedTrapState.cs" />
+    <Compile Include="../../src/mod/Traps/CursedTrapState.cs" Link="CursedTrapState.cs" />
+    <Compile Include="../../src/mod/Traps/DeathLinkRules.cs" Link="DeathLinkRules.cs" />
+    <Compile Include="../../src/mod/Traps/DeathLinkController.cs" Link="DeathLinkController.cs" />
+    <Compile Include="../../src/mod/Items/EnemyStasisState.cs" Link="EnemyStasisState.cs" />
+    <Compile Include="../../src/mod/Items/SuperChargeRules.cs" Link="SuperChargeRules.cs" />
+    <Compile Include="../../src/mod/Traps/TimedTrapHudLayout.cs" Link="TimedTrapHudLayout.cs" />
+    <Compile Include="../../src/mod/Traps/ExhaustionDashRecharge.cs" Link="ExhaustionDashRecharge.cs" />
+    <Compile Include="../../src/mod/Traps/EliteEncounterTrapRules.cs" Link="EliteEncounterTrapRules.cs" />
+    <Compile Include="../../src/mod/Traps/EliteEncounterOverrides.cs" Link="EliteEncounterOverrides.cs" />
+    <Compile Include="../../src/mod/Scene/LevelManagerRoomExtensions.cs" Link="LevelManagerRoomExtensions.cs" />
+    <Compile Include="../../src/mod/Economy/AetherFillerRules.cs" Link="AetherFillerRules.cs" />
+    <Compile Include="../../src/mod/Economy/AetherFiller.cs" Link="AetherFiller.cs" />
+    <Compile Include="../../src/mod/Economy/AetherMultiplierRules.cs" Link="AetherMultiplierRules.cs" />
+    <Compile Include="../../src/mod/Economy/AetherHubAnchorRules.cs" Link="AetherHubAnchorRules.cs" />
+    <Compile Include="../../src/mod/Economy/AetherRewardScaleRules.cs" Link="AetherRewardScaleRules.cs" />
+    <Compile Include="../../src/mod/UI/Notifications/TechnicalNoticeGate.cs" Link="TechnicalNoticeGate.cs" />
+    <Compile Include="../../src/mod/UI/Notifications/NotificationPanelLayout.cs" Link="NotificationPanelLayout.cs" />
+    <Compile Include="../../src/mod/Weapons/SingleHand/WeaponAnalyticsRules.cs" Link="WeaponAnalyticsRules.cs" />
+    <Compile Include="../../src/mod/Weapons/Unlocks/WeaponUiRules.cs" Link="WeaponUiRules.cs" />
+    <Compile Include="../../src/mod/Weapons/SingleHand/SingleWeaponRewardRules.cs" Link="SingleWeaponRewardRules.cs" />
+    <Compile Include="../../src/mod/Shop/RuneforgeShopRules.cs" Link="RuneforgeShopRules.cs" />
+    <Compile Include="../../src/mod/Crushables/ApLogoMeshData.cs" Link="ApLogoMeshData.cs" />
+    <Compile Include="../../src/mod/Crushables/ApLogoVisualRules.cs" Link="ApLogoVisualRules.cs" />
+    <Compile Include="../../src/mod/Crushables/ItemVisualModels.cs" Link="ItemVisualModels.cs" />
+    <Compile Include="../../src/mod/Crushables/ItemVisuals.cs" Link="ItemVisuals.cs" />
+    <Compile Include="../../src/mod/Crushables/ApRewardInspectionPanel.cs" Link="ApRewardInspectionPanel.cs" />
+    <EmbeddedResource
+      Include="../../src/mod/Crushables/Assets/ap-logo.meshbin"
+      LogicalName="UntilYouFall.Crushables.ApLogo.meshbin"
+    />
+    <EmbeddedResource Include="../../src/apworld/until_you_fall/weapons.json" LogicalName="UntilYouFall.Weapons.json" />
+    <EmbeddedResource
+      Include="../../src/apworld/until_you_fall/weapon_abilities.json"
+      LogicalName="UntilYouFall.WeaponAbilities.json"
+    />
+    <EmbeddedResource Include="../../src/apworld/until_you_fall/items.json" LogicalName="UntilYouFall.Items.json" />
+    <EmbeddedResource
+      Include="../../src/apworld/until_you_fall/locations.json"
+      LogicalName="UntilYouFall.Locations.json"
+    />
+    <EmbeddedResource
+      Include="../../src/apworld/until_you_fall/difficulties.json"
+      LogicalName="UntilYouFall.Difficulties.json"
+    />
+    <EmbeddedResource
+      Include="../../src/apworld/until_you_fall/option_ranges.json"
+      LogicalName="UntilYouFall.OptionRanges.json"
+    />
+    <Compile Include="../../src/mod/Archipelago/ApState.cs" Link="ApState.cs" />
+    <Compile Include="../../src/mod/Archipelago/ApState.*.cs" LinkBase="ApState" />
+    <Compile Include="../../src/mod/Difficulty/DifficultySettings.cs" Link="DifficultySettings.cs" />
+    <Compile Include="../../src/mod/UI/ApColors.cs" Link="ApColors.cs" />
+    <Compile Include="../../src/mod/UI/Notifications/ApNotice.cs" Link="ApNotice.cs" />
+    <Compile Include="../../src/mod/UI/Notifications/ApNotificationUi.cs" Link="ApNotificationUi.cs" />
+    <Compile Include="../../src/mod/UI/WristConsole/ApConsoleMessage.cs" Link="ApConsoleMessage.cs" />
+    <Compile Include="../../src/mod/UI/WristConsole/ApConsoleBuffer.cs" Link="ApConsoleBuffer.cs" />
+    <Compile Include="../../src/mod/Archipelago/ApItems.cs" Link="ApItems.cs" />
+    <Compile Include="../../src/mod/Archipelago/ApItems.Generated.cs" Link="ApItems.Generated.cs" />
+    <Compile Include="../../src/mod/Archipelago/OptionRanges.Generated.cs" Link="OptionRanges.Generated.cs" />
+    <Compile Include="../../src/mod/Checks/LocationDefinitions.Generated.cs" Link="LocationDefinitions.Generated.cs" />
+    <Compile
+      Include="../../src/mod/Difficulty/DifficultySettings.Generated.cs"
+      Link="DifficultySettings.Generated.cs"
+    />
+    <Compile Include="../../src/mod/Archipelago/GoalRules.cs" Link="GoalRules.cs" />
+    <Compile Include="../../src/mod/Checks/Stage/StageChecks.cs" Link="StageChecks.cs" />
+    <Compile Include="../../src/mod/Checks/Stage/StageDifficultyChecks.cs" Link="StageDifficultyChecks.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardChecks.cs" Link="StageRewardChecks.cs" />
+    <Compile Include="../../src/mod/Checks/Shop/ShopChecks.cs" Link="ShopChecks.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardProgress.cs" Link="StageRewardProgress.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardOfferRules.cs" Link="StageRewardOfferRules.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardRuntimeRules.cs" Link="StageRewardRuntimeRules.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardItemInfo.cs" Link="StageRewardItemInfo.cs" />
+    <Compile Include="../../src/mod/Checks/StageReward/StageRewardInspection.cs" Link="StageRewardInspection.cs" />
+    <Compile
+      Include="../../src/mod/Checks/StageReward/StageRewardDiagnosticGuard.cs"
+      Link="StageRewardDiagnosticGuard.cs"
+    />
+    <Compile Include="../../src/mod/Checks/Enemy/EnemyChecks.cs" Link="EnemyChecks.cs" />
+    <EmbeddedResource Include="../../src/apworld/until_you_fall/enemies.json" LogicalName="UntilYouFall.Enemies.json" />
+    <Compile Include="../../src/mod/Checks/Quest/QuestChecks.cs" Link="QuestChecks.cs" />
+    <EmbeddedResource Include="../../src/apworld/until_you_fall/quests.json" LogicalName="UntilYouFall.Quests.json" />
+    <Compile Include="../../src/mod/Tutorial/TutorialRules.cs" Link="TutorialRules.cs" />
+    <Compile Include="../../src/mod/Archipelago/ModMetadata.cs" Link="ModMetadata.cs" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.7.1" />
+  </ItemGroup>
+</Project>

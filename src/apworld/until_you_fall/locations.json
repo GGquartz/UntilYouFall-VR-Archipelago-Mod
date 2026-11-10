@@ -1,0 +1,18 @@
+{
+  "StageCount": 21,
+  "StageWeaponBaseId": 911000,
+  "StageRewardBaseId": 911400,
+  "StageDifficultyBaseId": 911500,
+  "ShopBaseId": 911600,
+  "ShopSections": 5,
+  "ShopSlotsPerSection": 6,
+  "ShopPrices": [500, 1000, 1500, 2000, 2500],
+  "QuestBaseId": 912000,
+  "QuestRewardStride": 3,
+  "QuestsPerTier": 6,
+  "StageBossSuffixes": {
+    "7": " - Defeat Boss 1",
+    "14": " - Defeat Boss 2",
+    "21": " - Defeat Final Boss"
+  }
+}

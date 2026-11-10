@@ -1,0 +1,33 @@
+{
+  "DamageItemCopies": 3,
+  "DamageStats": ["Health", "Guard"],
+  "StartingTraitCopies": 1,
+  "Items": [
+    {"Key":"LeftHand","Id":910003,"Name":"Left Hand","Classification":"progression","Group":"Hand"},
+    {"Key":"RightHand","Id":910004,"Name":"Right Hand","Classification":"progression","Group":"Hand"},
+    {"Key":"ProgressiveWeaponUpgradeLevel","Id":910415,"Name":"Progressive Max Weapon Upgrade Level","Classification":"progression","Copies":9},
+    {"Key":"AetherFiller","Id":910416,"Name":"100 Aether","Classification":"filler","Group":"AetherBundle","Amount":100,"FillerShare":70},
+    {"Key":"SuperCharge","Id":910421,"Name":"Super Charge","Classification":"filler","FillerShare":10},
+    {"Key":"EnemyStasis","Id":910422,"Name":"Enemy Stasis","Classification":"filler","FillerShare":10},
+    {"Key":"ShardOfVitality","Id":910002,"Name":"Shard of Vitality","Classification":"filler","Amount":5,"FillerShare":10},
+    {"Key":"ProgressiveShopUnlock","Id":910470,"Name":"Progressive Shop Unlock","Classification":"progression"},
+    {"Key":"ProgressiveAetherMultiplier","Id":910417,"Name":"Progressive Aether Multiplier","Classification":"useful","Copies":5},
+    {"Key":"EnemySpawnTrap","Id":910450,"Name":"Enemy Spawn Trap","Classification":"trap","Group":"Trap"},
+    {"Key":"EliteEncounterTrap","Id":910451,"Name":"Elite Encounter Trap","Classification":"trap","Group":"Trap"},
+    {"Key":"DodgeOnlyTrap","Id":910452,"Name":"Dodge Only Trap","Classification":"trap","Group":"Trap"},
+    {"Key":"ExhaustionTrap","Id":910453,"Name":"Exhaustion Trap","Classification":"trap","Group":"Trap"},
+    {"Key":"CursedTrap","Id":910454,"Name":"Cursed Trap","Classification":"trap","Group":"Trap"},
+    {"Key":"Aether500","Id":910418,"Name":"500 Aether","Classification":"useful","Group":"AetherBundle","Amount":500,"Copies":10},
+    {"Key":"Aether750","Id":910419,"Name":"750 Aether","Classification":"useful","Group":"AetherBundle","Amount":750,"Copies":10},
+    {"Key":"Aether1000","Id":910420,"Name":"1000 Aether","Classification":"useful","Group":"AetherBundle","Amount":1000,"Copies":5},
+    {"Key":"ExtraStartingTraitPick","Id":910628,"Name":"Extra Starting Trait Pick","Classification":"useful","Group":"StartingTraitUpgrade","Copies":1},
+    {"Key":"ExtraStartingTraitOption","Id":910629,"Name":"Extra Starting Trait Option","Classification":"useful","Group":"StartingTraitUpgrade","Copies":3},
+    {"Key":"MaximumHealthBonus","Id":910440,"Name":"Player Bonus: Maximum Health +1","Classification":"useful","Group":"PlayerBonus","Copies":5},
+    {"Key":"DashChargesBonus","Id":910441,"Name":"Player Bonus: Dash Charges +1","Classification":"useful","Group":"PlayerBonus","Copies":3},
+    {"Key":"DashImpactBonus","Id":910442,"Name":"Player Bonus: Dash Impact +5","Classification":"useful","Group":"PlayerBonus","Copies":3},
+    {"Key":"ComboLimitBonus","Id":910443,"Name":"Player Bonus: Combo Limit +1","Classification":"useful","Group":"PlayerBonus","Copies":3},
+    {"Key":"EnhanceSuperBonus","Id":910444,"Name":"Player Bonus: Enhance Super","Classification":"useful","Group":"PlayerBonus","Copies":1},
+    {"Key":"CriticalWindowBonus","Id":910445,"Name":"Player Bonus: +10% Critical Strike Window Length","Classification":"useful","Group":"PlayerBonus","Copies":3},
+    {"Key":"DashRechargeBonus","Id":910446,"Name":"Player Bonus: -10% Dash Recharge Time","Classification":"useful","Group":"PlayerBonus","Copies":3}
+  ]
+}

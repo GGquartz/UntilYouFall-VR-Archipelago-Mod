@@ -1,0 +1,605 @@
+[
+  {
+    "key": "starting_weapon",
+    "display": "Starting Weapon",
+    "help": "Excludes Spellsword's Charm and Knight-Blooded Crest",
+    "type": "choice",
+    "choices": [
+      "engraved_arming_sword",
+      "heartsplitter",
+      "ritual_dagger",
+      "high_arcanists_blade",
+      "fates_end",
+      "cold_iron_greataxe",
+      "captains_warhammer",
+      "mistcutter",
+      "gemini_stranded",
+      "gemini_esper",
+      "vestals_wrath",
+      "rokari_keenblade",
+      "duelists_edge",
+      "random"
+    ],
+    "default": "random",
+    "both_hands_choices": [
+      "fates_end",
+      "cold_iron_greataxe",
+      "captains_warhammer"
+    ]
+  },
+  {
+    "key": "second_starting_weapon",
+    "display": "Second Starting Weapon",
+    "help": "Optional, must be different than the first weapon",
+    "type": "choice",
+    "choices": [
+      "none",
+      "spellswords_charm",
+      "knight_blooded_crest",
+      "engraved_arming_sword",
+      "heartsplitter",
+      "ritual_dagger",
+      "high_arcanists_blade",
+      "fates_end",
+      "cold_iron_greataxe",
+      "captains_warhammer",
+      "mistcutter",
+      "gemini_stranded",
+      "gemini_esper",
+      "vestals_wrath",
+      "rokari_keenblade",
+      "duelists_edge",
+      "random"
+    ],
+    "default": "none"
+  },
+  {
+    "key": "starting_hands",
+    "display": "Starting Hands",
+    "help": "Choose which hands are available at the start",
+    "type": "choice",
+    "choices": [
+      "both",
+      "left_only",
+      "right_only"
+    ],
+    "default": "right_only"
+  },
+  {
+    "key": "early_hand",
+    "display": "Early Hand",
+    "help": "If starting with only one hand, make sure missing hand is available early",
+    "type": "choice",
+    "choices": [
+      "first_25_percent_of_checks",
+      "first_50_percent_of_checks",
+      "unrestricted"
+    ],
+    "default": "first_50_percent_of_checks"
+  },
+  {
+    "key": "weapon_supers",
+    "display": "Weapon Supers",
+    "help": "Unlock weapon supers together with weapons or as separate items",
+    "type": "choice",
+    "choices": [
+      "unlocked_with_weapon",
+      "separate_items"
+    ],
+    "default": "separate_items"
+  },
+  {
+    "key": "stage_reward_checks",
+    "display": "Stage Reward Checks Count",
+    "help": "Clearing rooms has a chance to offer sequential AP checks",
+    "type": "range",
+    "min": 10,
+    "max": 30,
+    "default": 20
+  },
+  {
+    "key": "trap_percent",
+    "display": "Trap %",
+    "help": "Percentage of filler slots replaced with traps",
+    "type": "range",
+    "min": 0,
+    "max": 100,
+    "default": 10
+  },
+  {
+    "key": "trap_weights",
+    "display": "Trap Weights",
+    "help": "Relative share of each trap type",
+    "type": "weights",
+    "default": {
+      "Enemy Spawn Trap": 20,
+      "Elite Encounter Trap": 20,
+      "Dodge Only Trap": 20,
+      "Exhaustion Trap": 20,
+      "Cursed Trap": 20
+    },
+    "keys": [
+      "Enemy Spawn Trap",
+      "Elite Encounter Trap",
+      "Dodge Only Trap",
+      "Exhaustion Trap",
+      "Cursed Trap"
+    ]
+  },
+  {
+    "key": "trap_effect_length",
+    "display": "Trap Effect Length",
+    "help": "Active gameplay seconds for timed traps",
+    "type": "range",
+    "min": 30,
+    "max": 300,
+    "default": 60
+  },
+  {
+    "key": "starting_difficulty",
+    "display": "Starting Difficulty",
+    "help": "Random selects below maximum difficulty",
+    "type": "choice",
+    "choices": [
+      "relaxed",
+      "challenging",
+      "relentless",
+      "nightmare",
+      "random"
+    ],
+    "default": "challenging"
+  },
+  {
+    "key": "max_difficulty",
+    "display": "Max Difficulty",
+    "help": "Hardest available difficulty",
+    "type": "choice",
+    "choices": [
+      "relaxed",
+      "challenging",
+      "relentless",
+      "nightmare"
+    ],
+    "default": "nightmare"
+  },
+  {
+    "key": "quest_board",
+    "display": "Quest Board",
+    "help": "Adds randomized quests (6 Easy, 6 Medium, 6 Hard) worth 1, 2 and 3 checks each",
+    "type": "toggle",
+    "default": true
+  },
+  {
+    "key": "required_quests",
+    "display": "Required Quests",
+    "help": "Quests that are always on the board, random by default",
+    "type": "set",
+    "default": "",
+    "tier_limits": {
+      "1": 6,
+      "2": 6,
+      "3": 6
+    },
+    "values": [
+      {
+        "name": "A Fine Collection",
+        "tier": 3
+      },
+      {
+        "name": "Ain't Got Time to Heal",
+        "tier": 3
+      },
+      {
+        "name": "Brink of Ruin",
+        "tier": 2
+      },
+      {
+        "name": "Buntmaster",
+        "tier": 2
+      },
+      {
+        "name": "Burning Retribution",
+        "tier": 2
+      },
+      {
+        "name": "Burning a Hole in your Armor",
+        "tier": 2
+      },
+      {
+        "name": "Champion of The Runeguard",
+        "tier": 3
+      },
+      {
+        "name": "Champion of The Unbroken",
+        "tier": 3
+      },
+      {
+        "name": "Champion of the Soul Tenders",
+        "tier": 3
+      },
+      {
+        "name": "Champion of the Void Keepers",
+        "tier": 3
+      },
+      {
+        "name": "Cleaver of Captains",
+        "tier": 1
+      },
+      {
+        "name": "Cognitive Overload",
+        "tier": 2
+      },
+      {
+        "name": "Cold Iron Verdict",
+        "tier": 2
+      },
+      {
+        "name": "Crowd Control",
+        "tier": 1
+      },
+      {
+        "name": "Dodge, Duck, Dip, Dive and Dodge",
+        "tier": 1
+      },
+      {
+        "name": "Extermin-aether",
+        "tier": 2
+      },
+      {
+        "name": "Fat Stacks of Aether",
+        "tier": 2
+      },
+      {
+        "name": "Forged in Iron",
+        "tier": 3
+      },
+      {
+        "name": "Full Arsenal",
+        "tier": 3
+      },
+      {
+        "name": "Fundamentalist",
+        "tier": 3
+      },
+      {
+        "name": "Guard Breaker",
+        "tier": 1
+      },
+      {
+        "name": "Hewer of Husks",
+        "tier": 1
+      },
+      {
+        "name": "Katarstrophy",
+        "tier": 3
+      },
+      {
+        "name": "Killer of Knights",
+        "tier": 1
+      },
+      {
+        "name": "Masterwork",
+        "tier": 3
+      },
+      {
+        "name": "Monk of Rokar",
+        "tier": 3
+      },
+      {
+        "name": "On the Wings of the Knight",
+        "tier": 1
+      },
+      {
+        "name": "Parry Party",
+        "tier": 1
+      },
+      {
+        "name": "Quick on the Draw",
+        "tier": 2
+      },
+      {
+        "name": "Shatter Storm",
+        "tier": 2
+      },
+      {
+        "name": "Slayer of Spellweavers",
+        "tier": 1
+      },
+      {
+        "name": "Sold Out",
+        "tier": 1
+      },
+      {
+        "name": "Speedrun",
+        "tier": 3
+      },
+      {
+        "name": "Spellweaver-in-Training",
+        "tier": 3
+      },
+      {
+        "name": "Super-est",
+        "tier": 2
+      },
+      {
+        "name": "Sweeping Statement",
+        "tier": 1
+      },
+      {
+        "name": "Sword God",
+        "tier": 3
+      },
+      {
+        "name": "Titan's Grip",
+        "tier": 3
+      },
+      {
+        "name": "Tricked Out",
+        "tier": 2
+      },
+      {
+        "name": "Unbreakable Wall",
+        "tier": 2
+      },
+      {
+        "name": "Unempower-er",
+        "tier": 2
+      },
+      {
+        "name": "Unleashed Potential",
+        "tier": 1
+      },
+      {
+        "name": "Untouched",
+        "tier": 2
+      },
+      {
+        "name": "Vow of Poverty",
+        "tier": 3
+      },
+      {
+        "name": "Wrecker of Fools",
+        "tier": 2
+      }
+    ]
+  },
+  {
+    "key": "excluded_quests",
+    "display": "Excluded Quests",
+    "help": "Set specific quests to never appear on the board",
+    "type": "set",
+    "default": "",
+    "tier_limits": {
+      "1": 6,
+      "2": 10,
+      "3": 11
+    },
+    "values": [
+      {
+        "name": "A Fine Collection",
+        "tier": 3
+      },
+      {
+        "name": "Ain't Got Time to Heal",
+        "tier": 3
+      },
+      {
+        "name": "Brink of Ruin",
+        "tier": 2
+      },
+      {
+        "name": "Buntmaster",
+        "tier": 2
+      },
+      {
+        "name": "Burning Retribution",
+        "tier": 2
+      },
+      {
+        "name": "Burning a Hole in your Armor",
+        "tier": 2
+      },
+      {
+        "name": "Champion of The Runeguard",
+        "tier": 3
+      },
+      {
+        "name": "Champion of The Unbroken",
+        "tier": 3
+      },
+      {
+        "name": "Champion of the Soul Tenders",
+        "tier": 3
+      },
+      {
+        "name": "Champion of the Void Keepers",
+        "tier": 3
+      },
+      {
+        "name": "Cleaver of Captains",
+        "tier": 1
+      },
+      {
+        "name": "Cognitive Overload",
+        "tier": 2
+      },
+      {
+        "name": "Cold Iron Verdict",
+        "tier": 2
+      },
+      {
+        "name": "Crowd Control",
+        "tier": 1
+      },
+      {
+        "name": "Dodge, Duck, Dip, Dive and Dodge",
+        "tier": 1
+      },
+      {
+        "name": "Extermin-aether",
+        "tier": 2
+      },
+      {
+        "name": "Fat Stacks of Aether",
+        "tier": 2
+      },
+      {
+        "name": "Forged in Iron",
+        "tier": 3
+      },
+      {
+        "name": "Full Arsenal",
+        "tier": 3
+      },
+      {
+        "name": "Fundamentalist",
+        "tier": 3
+      },
+      {
+        "name": "Guard Breaker",
+        "tier": 1
+      },
+      {
+        "name": "Hewer of Husks",
+        "tier": 1
+      },
+      {
+        "name": "Katarstrophy",
+        "tier": 3
+      },
+      {
+        "name": "Killer of Knights",
+        "tier": 1
+      },
+      {
+        "name": "Masterwork",
+        "tier": 3
+      },
+      {
+        "name": "Monk of Rokar",
+        "tier": 3
+      },
+      {
+        "name": "On the Wings of the Knight",
+        "tier": 1
+      },
+      {
+        "name": "Parry Party",
+        "tier": 1
+      },
+      {
+        "name": "Quick on the Draw",
+        "tier": 2
+      },
+      {
+        "name": "Shatter Storm",
+        "tier": 2
+      },
+      {
+        "name": "Slayer of Spellweavers",
+        "tier": 1
+      },
+      {
+        "name": "Sold Out",
+        "tier": 1
+      },
+      {
+        "name": "Speedrun",
+        "tier": 3
+      },
+      {
+        "name": "Spellweaver-in-Training",
+        "tier": 3
+      },
+      {
+        "name": "Super-est",
+        "tier": 2
+      },
+      {
+        "name": "Sweeping Statement",
+        "tier": 1
+      },
+      {
+        "name": "Sword God",
+        "tier": 3
+      },
+      {
+        "name": "Titan's Grip",
+        "tier": 3
+      },
+      {
+        "name": "Tricked Out",
+        "tier": 2
+      },
+      {
+        "name": "Unbreakable Wall",
+        "tier": 2
+      },
+      {
+        "name": "Unempower-er",
+        "tier": 2
+      },
+      {
+        "name": "Unleashed Potential",
+        "tier": 1
+      },
+      {
+        "name": "Untouched",
+        "tier": 2
+      },
+      {
+        "name": "Vow of Poverty",
+        "tier": 3
+      },
+      {
+        "name": "Wrecker of Fools",
+        "tier": 2
+      }
+    ]
+  },
+  {
+    "key": "quest_hint_cost",
+    "display": "Quest Hint Cost",
+    "help": "How much aether to hint quest rewards",
+    "type": "range",
+    "min": 0,
+    "max": 5000,
+    "default": 500
+  },
+  {
+    "key": "goal",
+    "display": "Goal",
+    "help": "Quests = complete all quests on the board;\nAll Weapons = clear a run with each weapon;\nRuns on max difficulty = finish X runs on the max difficulty you can get;\nRuns = finish X runs",
+    "type": "choice",
+    "choices": [
+      "quests",
+      "all_weapons",
+      "runs_max_difficulty",
+      "runs"
+    ],
+    "default": "quests"
+  },
+  {
+    "key": "goal_runs",
+    "display": "Goal Runs",
+    "help": "Number of required runs for the finish X runs goals (ignored by other goals)",
+    "type": "range",
+    "min": 1,
+    "max": 20,
+    "default": 5
+  },
+  {
+    "key": "death_link_mode",
+    "display": "Death Link Mode",
+    "help": "Hard = instant loss;\nSoft = set HP to 1;\nTrap = random trap;\nDeath's Door = near-death state",
+    "type": "choice",
+    "choices": [
+      "hard",
+      "soft",
+      "trap",
+      "off",
+      "deaths_door"
+    ],
+    "default": "deaths_door"
+  }
+]
