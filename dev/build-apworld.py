@@ -25,6 +25,11 @@ class UntilYouFallContainer(APWorldContainer):
     world_version = tuplize_version(metadata["world_version"])
     minimum_ap_version = tuplize_version(metadata["minimum_ap_version"])
 
+    def get_manifest(self):
+        manifest = super().get_manifest()
+        manifest["authors"] = metadata["authors"]
+        return manifest
+
     def write_contents(self, archive):
         super().write_contents(archive)
         for path in sorted(
