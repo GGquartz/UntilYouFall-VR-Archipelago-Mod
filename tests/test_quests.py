@@ -13,7 +13,6 @@ from worlds.until_you_fall.items import (
     WEAPON_ABILITY_ITEMS,
     WEAPON_UPGRADE_LEVEL_ITEM,
 )
-from worlds.until_you_fall.rules import quest_access_rule
 from worlds.until_you_fall.options import (
     QuestBoard,
 )
@@ -23,6 +22,7 @@ from worlds.until_you_fall.quest_locations import (
     quest_location_name,
     quest_upgrades_needed,
 )
+from worlds.until_you_fall.rules import quest_access_rule
 
 
 class TestQuests(UntilYouFallWorldTest):

@@ -11,6 +11,7 @@ if has_staged '*.cs'; then
   staged '*.cs' | xargs -0 git add --
 fi
 if has_staged '*.py'; then
+  staged '*.py' | xargs -0 python -m ruff check --fix || exit 1
   staged '*.py' | xargs -0 python -m ruff format || exit 1
   staged '*.py' | xargs -0 git add --
 fi
