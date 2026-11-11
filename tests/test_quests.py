@@ -10,8 +10,10 @@ from worlds.until_you_fall.catalogs import (
     WEAPONS,
 )
 from worlds.until_you_fall.items import (
+    WEAPON_ABILITY_ITEMS,
     WEAPON_UPGRADE_LEVEL_ITEM,
 )
+from worlds.until_you_fall.rules import quest_access_rule
 from worlds.until_you_fall.options import (
     QuestBoard,
 )
@@ -112,6 +114,7 @@ class TestQuests(UntilYouFallWorldTest):
                         or quest["Need"].get("AnyWeapons")
                         or quest["Need"].get("WeaponCount")
                         or quest["Need"].get("AllSupers")
+                        or quest["Need"].get("AnySuper")
                     ):
                         continue
                     location = self.multiworld.get_location(quest_location_name(quest, 1), self.player)
@@ -189,3 +192,36 @@ class TestQuests(UntilYouFallWorldTest):
         self.world.quests = [index for index, quest in enumerate(QUESTS) if quest["Name"] == "Katarstrophy"]
         quest = QUESTS[self.world.quests[0]]
         self.assertEqual(quest["Need"]["Weapons"], ["Gemini Stranded", "Gemini Esper"])
+
+    def quest_rule_with(self, quest_name: str, *items: str):
+        """The quest's access rule evaluated on a state holding exactly its tier upgrades plus the given items"""
+        quest = next(quest for quest in QUESTS if quest["Name"] == quest_name)
+        self.world_setup(seed=1)
+        state = self.multiworld.state.copy()
+        owned = [weapon["Name"] for weapon in WEAPONS] + list(WEAPON_ABILITY_ITEMS)
+        for name in owned + ["Left Hand", "Right Hand", WEAPON_UPGRADE_LEVEL_ITEM]:
+            for _ in range(state.count(name, self.player)):
+                state.remove(self.world.create_item(name))
+        for name in [WEAPON_UPGRADE_LEVEL_ITEM] * 6 + list(items):
+            state.collect(self.world.create_item(name))
+        return quest_access_rule(self.world, quest)(state)
+
+    def test_super_est_needs_a_super_and_a_weapon_that_has_it(self):
+        self.options = {"weapon_supers": "separate_items"}
+        sword = next(weapon for weapon in WEAPONS if weapon["Name"] == "Engraved Arming Sword")
+        self.assertFalse(self.quest_rule_with("Super-est"))
+        self.assertFalse(self.quest_rule_with("Super-est", sword["Name"]))
+        self.assertFalse(self.quest_rule_with("Super-est", sword["Super"]))
+        self.assertTrue(self.quest_rule_with("Super-est", sword["Name"], sword["Super"], "Left Hand"))
+
+    def test_super_est_needs_no_super_item_when_supers_come_with_weapons(self):
+        self.options = {"weapon_supers": "unlocked_with_weapon"}
+        self.assertTrue(self.quest_rule_with("Super-est"))
+
+    def test_unbreakable_wall_ignores_a_two_handed_weapon_without_both_hands(self):
+        self.options = {"weapon_supers": "separate_items"}
+        self.assertFalse(self.quest_rule_with("Unbreakable Wall", "Captain's Warhammer", "Bulwark", "Left Hand"))
+        self.assertTrue(
+            self.quest_rule_with("Unbreakable Wall", "Captain's Warhammer", "Bulwark", "Left Hand", "Right Hand")
+        )
+        self.assertTrue(self.quest_rule_with("Unbreakable Wall", "Engraved Arming Sword", "Bulwark", "Left Hand"))

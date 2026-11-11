@@ -142,7 +142,9 @@
   "Tier": 2,
   "Source": "SuperLevel4",
   "Icon": "ACH_SUPER_LEVEL_4",
-  "Need": {},
+  "Need": {
+   "AnySuper": true
+  },
   "Description": "In a run, upgrade a Super to Level IV",
   "Target": 4
  },

@@ -11,6 +11,7 @@ internal sealed class QuestNeed
     public string[] AnyWeapons { get; set; } = Array.Empty<string>();
     public string[] Abilities { get; set; } = Array.Empty<string>();
     public int AnyCount { get; set; }
+    public bool AnySuper { get; set; }
 }
 
 internal sealed class Quest
@@ -155,6 +156,13 @@ internal static class QuestChecks
                 !separateSupers
                 || need.Abilities.All(name =>
                     WeaponAbilityCatalog.ItemIds.TryGetValue(name, out var id) && abilityIds.Contains(id)
+                )
+            )
+            && (
+                !separateSupers
+                || !need.AnySuper
+                || WeaponCatalog.All.Any(weapon =>
+                    weaponIds.Contains(weapon.Id) && abilityIds.Contains(weapon.SuperItemId)
                 )
             );
     }

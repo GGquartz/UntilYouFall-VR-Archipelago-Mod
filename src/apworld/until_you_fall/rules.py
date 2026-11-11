@@ -187,6 +187,16 @@ def state_has_shop_unlocks(player: int, count: int, state: CollectionState) -> b
     return state.has(SHOP_UNLOCK_ITEM, player, count)
 
 
+def usable_weapons(weapons: Iterable[dict], state: CollectionState, player: int) -> list[str]:
+    both_hands = has_both_hands(state, player)
+
+    return [
+        weapon["Name"]
+        for weapon in weapons
+        if state.has(weapon["Name"], player) and (both_hands or not requires_both_hands(weapon))
+    ]
+
+
 def quest_access_rule(world: "UntilYouFallWorld", quest: dict) -> Rule:
     player = world.player
     need = quest["Need"]
@@ -208,6 +218,16 @@ def quest_access_rule(world: "UntilYouFallWorld", quest: dict) -> Rule:
         if separate_abilities:
             abilities = tuple(WEAPON_ABILITY_ITEMS)
     all_weapon_names = [weapon["Name"] for weapon in WEAPONS]
+    any_weapon_dicts = [weapon for weapon in WEAPONS if weapon["Name"] in (any_weapons or ())]
+    any_super = separate_abilities and need.get("AnySuper", False)
+    weapons_by_super = {
+        name: [weapon for weapon in WEAPONS if weapon["Super"] == name] for name in WEAPON_ABILITY_ITEMS
+    }
+
+    def owns_any_super(state: CollectionState) -> bool:
+        return any(
+            state.has(name, player) and usable_weapons(group, state, player) for name, group in weapons_by_super.items()
+        )
 
     return lambda state: (
         strong_enough(state, player, tier_upgrades)
@@ -216,7 +236,8 @@ def quest_access_rule(world: "UntilYouFallWorld", quest: dict) -> Rule:
         and all(state.has(name, player) for name in abilities)
         and all(state.has_any(group, player) for group in super_groups)
         and (not both_hands or has_both_hands(state, player))
-        and (not any_weapons or state.has_from_list(any_weapons, player, any_count))
+        and (not any_weapons or len(usable_weapons(any_weapon_dicts, state, player)) >= any_count)
+        and (not any_super or owns_any_super(state))
         and (not weapon_count or state.has_from_list(all_weapon_names, player, weapon_count))
     )
 

@@ -164,6 +164,17 @@ internal static class QuestChecksTests
         Assert(!QuestChecks.UnlocksOwned(storm, none, shardstorm, true), "any-of needs one of the listed weapons");
         Assert(QuestChecks.UnlocksOwned(storm, esper, shardstorm, true), "one listed weapon is enough");
         Assert(!QuestChecks.UnlocksOwned(storm, esper, none, true), "any-of weapon still needs the ability");
+        var superest = QuestChecks.All.Single(quest => quest.Name == "Super-est");
+        var sword = new[] { Weapon("Engraved Arming Sword") };
+        var swordSuper = new[] { WeaponCatalog.ByName("Engraved Arming Sword")!.SuperItemId };
+        Assert(!QuestChecks.UnlocksOwned(superest, none, none, true), "Super-est needs a super");
+        Assert(!QuestChecks.UnlocksOwned(superest, sword, none, true), "a weapon without its super item is not enough");
+        Assert(
+            !QuestChecks.UnlocksOwned(superest, none, swordSuper, true),
+            "a super item without its weapon is not enough"
+        );
+        Assert(QuestChecks.UnlocksOwned(superest, sword, swordSuper, true), "weapon plus its super unlocks Super-est");
+        Assert(QuestChecks.UnlocksOwned(superest, none, none, false), "bundled supers need no extra item");
     }
 
     private static void HintCosts()
