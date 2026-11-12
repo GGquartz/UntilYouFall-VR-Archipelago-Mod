@@ -38,6 +38,7 @@ internal static class ApNotificationUiTests
         );
         RunKeepsRemainingTime();
         RunUrgentNoticesJumpTheQueue();
+        RunBacklogIsShownQuickly();
     }
 
     private static void RunKeepsRemainingTime()
@@ -101,6 +102,43 @@ internal static class ApNotificationUiTests
         ui.Update();
         Assert(panel.LastNotice == normal && panel.Visible, "the normal notice returns after the urgent ones finish");
         Console.WriteLine("PASS: traps and DeathLink jump the notification queue and the displaced notice resumes");
+    }
+
+    private static void RunBacklogIsShownQuickly()
+    {
+        using var ui = new ApNotificationUi(_ => { });
+        for (var number = 1; number <= 6; number++)
+            ui.Enqueue(ApNotice.Plain("Backlog " + number));
+        ui.Update();
+        var panel = VrNotificationPanel.Created.Last(panel => panel.Name == "Archipelago Notification");
+        Assert(panel.Visible && panel.ShowCount == 1, "a backlog of six notices starts with the first one");
+
+        Thread.Sleep(1100);
+        ui.Update();
+        Assert(!panel.Visible, "with six queued notices a notice is shown for about one second, not seven");
+
+        var deadline = Environment.TickCount64 + 12000;
+        while (panel.ShowCount < 6 && Environment.TickCount64 < deadline)
+        {
+            Thread.Sleep(100);
+            ui.Update();
+        }
+        Assert(panel.ShowCount == 6, "the whole backlog is shown within the rushed time");
+
+        Thread.Sleep(1100);
+        ui.Update();
+        Assert(!panel.Visible, "the last backlog notice is also rushed");
+
+        Thread.Sleep(550);
+        ui.Update();
+        ui.Enqueue(ApNotice.Plain("After the backlog"));
+        Thread.Sleep(550);
+        ui.Update();
+        Assert(panel.ShowCount == 7, "a notice after the backlog is shown");
+        Thread.Sleep(1600);
+        ui.Update();
+        Assert(panel.Visible, "once the queue has emptied the normal display time returns");
+        Console.WriteLine("PASS: six or more queued notices are rushed until the queue empties");
     }
 
     private static void Assert(bool condition, string message)

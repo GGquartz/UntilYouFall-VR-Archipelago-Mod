@@ -4,6 +4,9 @@ internal sealed class ApNotificationUi : IDisposable
 {
     private const long DisplayMilliseconds = 7000;
 
+    private const int RushQueueSize = 6;
+    private const long RushDisplayMilliseconds = 1000;
+
     private readonly List<QueuedNotice> _queue = [];
     private readonly TechnicalNoticeGate _technicalGate = new();
     private readonly LogChannel _log;
@@ -13,8 +16,10 @@ internal sealed class ApNotificationUi : IDisposable
     private readonly VrNotificationPanel _technicalPanel;
     private ApNotice? _technicalNotice;
     private long _hideAt;
+    private long _shownAt;
     private QueuedNotice? _shown;
     private long _retryAt;
+    private bool _rushing;
     private bool _showing;
     private long _diagnoseAt;
     private long _technicalHideAt;
@@ -65,6 +70,11 @@ internal sealed class ApNotificationUi : IDisposable
 
     public void Update()
     {
+        if (_queue.Count == 0)
+            _rushing = false;
+        else if (_queue.Count >= RushQueueSize)
+            _rushing = true;
+
         if (!_showing && !_technicalShowing && _queue.Count == 0 && _technicalNotice == null)
             return;
 
@@ -77,6 +87,8 @@ internal sealed class ApNotificationUi : IDisposable
     {
         try
         {
+            if (_showing && _rushing)
+                _hideAt = Math.Min(_hideAt, _shownAt + RushDisplayMilliseconds);
             if (_showing && !_panel.IsReady)
             {
                 _log.Write("Presentation interrupted");
@@ -109,6 +121,8 @@ internal sealed class ApNotificationUi : IDisposable
             {
                 _panel.Hide();
                 _queue.Remove(_shown!);
+                if (_queue.Count == 0)
+                    _rushing = false;
                 _showing = false;
                 _retryAt = now + 500;
             }
@@ -133,6 +147,7 @@ internal sealed class ApNotificationUi : IDisposable
             }
             _shown = entry;
             _showing = true;
+            _shownAt = now;
             _hideAt = now + entry.RemainingMilliseconds;
             _diagnoseAt = now + 500;
 
@@ -229,6 +244,7 @@ internal sealed class ApNotificationUi : IDisposable
     public void Dispose()
     {
         _queue.Clear();
+        _rushing = false;
         _shown = null;
         _technicalNotice = null;
         _technicalGate.Release();
