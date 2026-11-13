@@ -82,8 +82,10 @@ internal sealed class ClientProgress
         });
     }
 
+    private bool IsEarned(long locationId) => _state != null && _state.Checks.Contains(locationId);
+
     private int FinalClearedWeapons() =>
-        WeaponCatalog.All.Count(weapon => IsChecked(StageChecks.LocationId(StageChecks.Count, weapon.Id)));
+        WeaponCatalog.All.Count(weapon => IsEarned(StageChecks.LocationId(StageChecks.Count, weapon.Id)));
 
     public string? WeaponStageProgress(long weaponId) =>
         _state == null || WeaponCatalog.ById(weaponId) == null
@@ -101,7 +103,7 @@ internal sealed class ClientProgress
     private string StageProgress(Func<int, long> locationId, Func<int, bool>? exists = null)
     {
         var stages = Enumerable.Range(1, StageChecks.Count).Where(stage => exists == null || exists(stage)).ToArray();
-        var count = stages.Count(stage => IsChecked(locationId(stage)));
+        var count = stages.Count(stage => IsEarned(locationId(stage)));
 
         return $"Stages Cleared {count}/{stages.Length}";
     }

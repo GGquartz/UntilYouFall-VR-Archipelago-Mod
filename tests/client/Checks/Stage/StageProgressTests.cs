@@ -24,10 +24,13 @@ internal static class StageProgressTests
             foreach (var goal in Enum.GetValues<GoalMode>())
             {
                 ClientSessionTestHelpers.SetSettings(client, "Goal", new GoalSettings(goal, 5));
-                Assert(client.WeaponStageProgress(910012) == "Stages Cleared 3/21", "union, gaps and all goals");
+                Assert(
+                    client.WeaponStageProgress(910012) == "Stages Cleared 2/21",
+                    "released/server-only checks are not counted, gaps and all goals"
+                );
             }
             client.Disconnect();
-            Assert(client.WeaponStageProgress(910012) == "Stages Cleared 3/21", "available offline");
+            Assert(client.WeaponStageProgress(910012) == "Stages Cleared 2/21", "available offline");
             Assert(client.WeaponStageProgress(910013) == "Stages Cleared 0/21", "weapon isolation");
             foreach (var stage in Enumerable.Range(1, StageChecks.Count))
                 state.RecordCheck(StageChecks.LocationId(stage, 910012));
@@ -45,7 +48,7 @@ internal static class StageProgressTests
                 {
                     var expected =
                         tier <= starting || tier > maximum ? null
-                        : tier == 2 ? "Stages Cleared 3/21"
+                        : tier == 2 ? "Stages Cleared 2/21"
                         : "Stages Cleared 0/21";
                     Assert(client.DifficultyStageProgress(tier) == expected, "difficulty existence and isolation");
                 }
@@ -58,7 +61,7 @@ internal static class StageProgressTests
             );
             ClientSessionTestHelpers.SetSettings(client, "Goal", new GoalSettings(GoalMode.RunsMaxDifficulty, 2));
             Assert(
-                client.DifficultyStageProgress(2) == "Stages Cleared 3/21",
+                client.DifficultyStageProgress(2) == "Stages Cleared 2/21",
                 "repeated-run goal retains its final-stage check"
             );
             var restored = new ArchipelagoClient(directory, _ => { });
