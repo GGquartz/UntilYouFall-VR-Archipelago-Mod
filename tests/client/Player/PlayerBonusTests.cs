@@ -148,6 +148,13 @@ internal static class PlayerBonusTests
             "scene replay applies only the missing permanent count"
         );
         Assert(
+            PlayerBonusRules.AllowedMaxHealthApplications(10f, 5f, 1f, 5) == 5
+                && PlayerBonusRules.AllowedMaxHealthApplications(10f, 6f, 1f, 5) == 4
+                && PlayerBonusRules.AllowedMaxHealthApplications(10f, 10f, 1f, 3) == 0
+                && PlayerBonusRules.AllowedMaxHealthApplications(10f, 11f, 1f, 3) == 0,
+            "maximum health bonus never pushes the total above the native pip capacity"
+        );
+        Assert(
             PlayerBonusRules.CanEnhanceSuper(0, 3)
                 && PlayerBonusRules.CanEnhanceSuper(1, 3)
                 && !PlayerBonusRules.CanEnhanceSuper(2, 3)

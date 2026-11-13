@@ -66,6 +66,18 @@ internal static class PlayerBonusRules
 
     public static int RemainingApplications(int wanted, int applied) => Math.Max(0, wanted - applied);
 
+    public const float FallbackMaxHealthCap = 10f;
+
+    public static int AllowedMaxHealthApplications(
+        float cap,
+        float currentMaxHealth,
+        float amountPerCopy,
+        int remaining
+    ) =>
+        amountPerCopy <= 0f
+            ? remaining
+            : Math.Clamp((int)MathF.Floor((cap - currentMaxHealth) / amountPerCopy), 0, remaining);
+
     public static bool CanEnhanceSuper(int abilityLevel, int maxAbilityLevel) =>
         maxAbilityLevel > 0 && abilityLevel < maxAbilityLevel - 1;
 

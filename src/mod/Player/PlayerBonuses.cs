@@ -6,6 +6,7 @@ using Il2CppSG.Claymore.Entities;
 using Il2CppSG.Claymore.Interaction.Rewards;
 using Il2CppSG.Claymore.Movement.Dash;
 using Il2CppSG.Claymore.SaveSystem;
+using Il2CppSG.Claymore.UI;
 using Il2CppSG.Claymore.UI.Inspection;
 using Il2CppSG.GlobalEvents.Variables;
 using Il2CppTMPro;
@@ -37,6 +38,7 @@ internal sealed partial class PlayerBonuses
     private StatModArmamentTrait? _dashChargeTrait;
     private UpgradeSuperTrait? _superTrait;
     private bool _playerStatsReady;
+    private PlayerHealth? _player;
     private StatModArmamentTrait? _guardDamageTrait;
     private StatModArmamentTrait? _healthDamageTrait;
     private FloatVariable? _dashRechargeVariable;
@@ -145,6 +147,7 @@ internal sealed partial class PlayerBonuses
     private static void OnPlayerStarting(PlayerHealth __instance)
     {
         _instance._playerStatsReady = true;
+        _instance._player = __instance;
         _instance._appliedMods.Clear();
         _instance._enhancedAbilityLevels.Clear();
         var before = __instance.MaxHealth;
@@ -168,6 +171,7 @@ internal sealed partial class PlayerBonuses
     private static void OnPlayerDestroyed()
     {
         _instance._playerStatsReady = false;
+        _instance._player = null;
         _instance._appliedMods.Clear();
         _instance._enhancedAbilityLevels.Clear();
         _instance._traitsAppliedArmaments.Clear();
@@ -318,6 +322,15 @@ internal sealed partial class PlayerBonuses
         ApplyResolvedMod(variable, ApItems.MaximumHealthBonusId, statTrait.StatMods[0], wanted);
     }
 
+    private float NativeHealthPipCapacity()
+    {
+        var cap = (float)UIPipRenderer.PIP_MAX;
+        if (_loggedDiagnostics.Add("pip-capacity"))
+            _log.Write($"Native pip capacity PIP_MAX={cap:F0}");
+
+        return cap > 0f ? cap : PlayerBonusRules.FallbackMaxHealthCap;
+    }
+
     private void ApplyRewardTrait(Armament armament, long itemId, string developerName)
     {
         var wanted = _counts.GetValueOrDefault(itemId);
@@ -369,14 +382,39 @@ internal sealed partial class PlayerBonuses
 
     private void ApplyResolvedMod(Variable variable, long itemId, StatMod mod, int wanted)
     {
-        var key = (itemId, variable.Pointer, mod.Pointer);
+        var isMaxHealth = itemId == ApItems.MaximumHealthBonusId;
+        var key = (itemId, isMaxHealth ? IntPtr.Zero : variable.Pointer, mod.Pointer);
         var current = _appliedMods.GetValueOrDefault(key);
         var remaining = PlayerBonusRules.RemainingApplications(wanted, current);
         if (remaining == 0)
             return;
 
-        ArmamentStats.ApplyMod(variable, mod, remaining);
-        _appliedMods[key] = wanted;
+        var applied = isMaxHealth ? CapMaximumHealthCopies(mod, wanted, remaining) : remaining;
+        var healthBefore = isMaxHealth ? _player?.MaxHealth ?? 0f : 0f;
+        if (applied > 0)
+            ArmamentStats.ApplyMod(variable, mod, applied);
+        if (isMaxHealth && applied > 0)
+            _log.Write(
+                $"Max health applied wanted={wanted} recorded={current} applying={applied} MaxHealth={healthBefore:F1}->{_player?.MaxHealth ?? 0f:F1}"
+            );
+
+        var capReached = isMaxHealth && _player != null;
+        _appliedMods[key] = applied == remaining || capReached ? wanted : current + applied;
+    }
+
+    private int CapMaximumHealthCopies(StatMod mod, int wanted, int remaining)
+    {
+        if (_player == null)
+            return 0;
+
+        var cap = NativeHealthPipCapacity();
+        var allowed = PlayerBonusRules.AllowedMaxHealthApplications(cap, _player.MaxHealth, mod.Amount, remaining);
+        if (allowed < remaining && _loggedDiagnostics.Add($"max-health-cap:{_player.MaxHealth}:{wanted}"))
+            _log.Write(
+                $"Max health capped at {cap:F0}: current={_player.MaxHealth:F1} wanted={wanted} applying={allowed} of {remaining}"
+            );
+
+        return allowed;
     }
 
     private StatModArmamentTrait? DashChargeTrait()
