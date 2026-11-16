@@ -79,7 +79,7 @@ internal static class PlayerBonusRules
             : Math.Clamp((int)MathF.Floor((cap - currentMaxHealth) / amountPerCopy), 0, remaining);
 
     public static bool CanEnhanceSuper(int abilityLevel, int maxAbilityLevel) =>
-        maxAbilityLevel > 0 && abilityLevel < maxAbilityLevel - 1;
+        maxAbilityLevel > 0 && abilityLevel < maxAbilityLevel;
 
     public static bool IsSuperMaxed(int abilityLevel, int maxAbilityLevel) =>
         maxAbilityLevel > 0 && abilityLevel >= maxAbilityLevel;

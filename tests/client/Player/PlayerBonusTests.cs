@@ -157,9 +157,9 @@ internal static class PlayerBonusTests
         Assert(
             PlayerBonusRules.CanEnhanceSuper(0, 3)
                 && PlayerBonusRules.CanEnhanceSuper(1, 3)
-                && !PlayerBonusRules.CanEnhanceSuper(2, 3)
+                && PlayerBonusRules.CanEnhanceSuper(2, 3)
                 && !PlayerBonusRules.CanEnhanceSuper(3, 3),
-            "the Player Bonus leaves the top super level to a reward"
+            "the Player Bonus raises the super up to the native maximum (reward offers are blocked there by IsSuperMaxed)"
         );
         Assert(
             !PlayerBonusRules.IsSuperMaxed(2, 3)
