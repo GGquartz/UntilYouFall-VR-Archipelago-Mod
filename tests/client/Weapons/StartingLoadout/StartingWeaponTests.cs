@@ -4,6 +4,9 @@ internal static class StartingWeaponTests
 {
     public static void Run()
     {
+        Assert(!StartingWeaponRules.LoadoutKnown([], null), "loadout is unknown before the first login");
+        Assert(!StartingWeaponRules.LoadoutKnown([1], null), "loadout needs hands");
+        Assert(StartingWeaponRules.LoadoutKnown([1], StartingHands.Both), "loadout is known after login");
         var slot = new Dictionary<string, object> { ["starting_weapons"] = new[] { "Cold Iron Greataxe" } };
         Assert(StartingWeaponRules.Read(slot).SequenceEqual([910017]), "slot-selected two-handed starter is accepted");
         slot["starting_weapons"] = new[] { "Mistcutter", "Ritual Dagger" };

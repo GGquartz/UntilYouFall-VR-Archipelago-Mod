@@ -41,6 +41,8 @@ internal sealed class WeaponUnlocks
 
     public bool HasApLoadout => _startingWeapons.Count > 0;
 
+    private bool LoadoutKnown => StartingWeaponRules.LoadoutKnown(_startingWeapons, _startingHands);
+
     public WeaponUnlocks(
         HarmonyLib.Harmony harmony,
         Action<string> log,
@@ -105,13 +107,14 @@ internal sealed class WeaponUnlocks
 
     [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.IsPurchased))]
     [HarmonyPrefix]
-    private static bool ReadOwnership(ArmamentID __0, ref bool __result) => AllowPurchase(__0, ref __result);
+    private static bool ReadOwnership(ArmamentID __0, ref bool __result) =>
+        !_instance.LoadoutKnown || AllowPurchase(__0, ref __result);
 
     [HarmonyPatch(typeof(ArmamentInventory), nameof(ArmamentInventory.GetLevel))]
     [HarmonyPrefix]
     private static bool ReadLevel(ArmamentID __0, ref int __result)
     {
-        if (!_instance.IsLocked(__0))
+        if (!_instance.LoadoutKnown || !_instance.IsLocked(__0))
             return true;
 
         __result = -1;
@@ -204,6 +207,11 @@ internal sealed class WeaponUnlocks
         }
         if (__0 == null || !_instance.IsLocked(__0.ID))
             return true;
+        if (!_instance.LoadoutKnown)
+        {
+            _instance.LogKeptBeforeLogin(__0.ID);
+            return true;
+        }
         if (__instance.BoundArmament == null)
         {
             var starter = _instance.Starter(__instance.State);
@@ -227,11 +235,24 @@ internal sealed class WeaponUnlocks
         }
         if (!_instance.IsLocked(__0))
             return true;
+        if (!_instance.LoadoutKnown)
+        {
+            _instance.LogKeptBeforeLogin(__0);
+            return true;
+        }
 
         var starter = _instance.Starter(__instance.State);
         __0 = starter!;
 
         return true;
+    }
+
+    private readonly HashSet<string> _keptBeforeLogin = [];
+
+    private void LogKeptBeforeLogin(ArmamentID id)
+    {
+        if (_keptBeforeLogin.Add(id.GUID))
+            _log.Write($"Kept saved weapon {id.GUID} in hand until AP login (loadout unknown)");
     }
 
     private ArmamentID? Starter(PlayerHandState hand)

@@ -21,6 +21,9 @@ internal static class StartingWeaponRules
         return weapons.Select(weapon => weapon!.Id).ToArray();
     }
 
+    public static bool LoadoutKnown(IReadOnlyCollection<long> startingWeapons, StartingHands? startingHands) =>
+        startingWeapons.Count > 0 && startingHands.HasValue;
+
     public static long? ForHand(IReadOnlyList<long> weapons, StartingHands hands, bool left, bool rightDominant)
     {
         if (weapons.Count == 0)

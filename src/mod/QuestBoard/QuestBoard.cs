@@ -70,6 +70,8 @@ internal sealed partial class QuestBoard : IDisposable
     private RectTransform? _root;
     private long _retryAt;
     private long _nextRefreshAt;
+    private int _boardLayer = -1;
+    private PauseScreen? _pauseScreen;
     private int _builtQuestCount = -1;
     private int _builtHintCost = -1;
     private static readonly Dictionary<string, Sprite?> Icons = [];
@@ -124,6 +126,7 @@ internal sealed partial class QuestBoard : IDisposable
         if (_material.HasProperty("_FaceColor"))
             _material.SetColor("_FaceColor", Color.white);
 
+        _boardLayer = layer;
         _board = new GameObject("AP Quest Board") { layer = layer };
         var root = _board.AddComponent<RectTransform>();
         root.position = BoardPosition;
@@ -475,7 +478,7 @@ internal sealed partial class QuestBoard : IDisposable
             Dispose();
         if (_board == null)
         {
-            if (Environment.TickCount64 < _retryAt)
+            if (Environment.TickCount64 < _retryAt || IsPaused())
                 return;
             _retryAt = Environment.TickCount64 + 3000;
             try
@@ -493,6 +496,31 @@ internal sealed partial class QuestBoard : IDisposable
         UpdateBoard();
     }
 
+    private bool IsPaused()
+    {
+        SceneCache.Find(ref _pauseScreen, pause => pause.gameObject.scene.IsValid());
+
+        return _pauseScreen?.isPauseScreenDisplayed?.Value == true || Time.timeScale <= 0;
+    }
+
+    private bool LayerVisible()
+    {
+        if (IsPaused())
+            return true;
+
+        var camera = SceneCache.StereoCamera();
+        if (camera == null || WorldTextRules.IsLayerVisible(camera.cullingMask, _boardLayer))
+            return true;
+
+        _log.Write(
+            $"Board layer {_boardLayer} is not rendered by camera={camera.name} cullingMask={camera.cullingMask}"
+        );
+        Dispose();
+        _retryAt = Environment.TickCount64 + 3000;
+
+        return false;
+    }
+
     private void UpdateBoard()
     {
         if (_board == null)
@@ -500,6 +528,9 @@ internal sealed partial class QuestBoard : IDisposable
         if (Environment.TickCount64 >= _nextRefreshAt)
         {
             _nextRefreshAt = Environment.TickCount64 + 500;
+            if (!LayerVisible())
+                return;
+
             foreach (var card in _cards)
                 card.Refresh?.Invoke();
         }

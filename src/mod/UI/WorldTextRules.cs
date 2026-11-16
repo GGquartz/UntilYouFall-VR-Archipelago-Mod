@@ -10,4 +10,7 @@ internal static class WorldTextRules
 
         return -1;
     }
+
+    public static bool IsLayerVisible(int cullingMask, int layer) =>
+        layer >= 0 && layer < 32 && (cullingMask & (1 << layer)) != 0;
 }

@@ -11,6 +11,9 @@ internal static class WorldTextRulesTests
             "lowest visible layer is selected deterministically"
         );
         Assert(WorldTextRules.FirstVisibleLayer(0) == -1, "empty culling mask is rejected");
+        Assert(WorldTextRules.IsLayerVisible(1 << 28, 28), "layer in mask is visible");
+        Assert(!WorldTextRules.IsLayerVisible(1 << 0, 28), "layer outside mask is hidden");
+        Assert(!WorldTextRules.IsLayerVisible(-1, -1), "invalid layer is hidden");
         Console.WriteLine("PASS: world text layer and occlusion rules");
     }
 
