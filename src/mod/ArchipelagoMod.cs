@@ -37,6 +37,7 @@ public sealed partial class ArchipelagoMod : MelonMod
     private DifficultyUnlocks _difficultyUnlocks = null!;
     private TutorialSkip _tutorialSkip = null!;
     private ProfileModStatus _profileModStatus = null!;
+    private ProfileConnectionGuard _profileConnectionGuard = null!;
     private PauseModStatus _pauseModStatus = null!;
     private ExtraTraitSlots _extraTraitSlots = null!;
     private WeaponAbilityLocks _weaponAbilityLocks = null!;
@@ -66,6 +67,10 @@ public sealed partial class ArchipelagoMod : MelonMod
 
     private void WriteApStatus(ConnectionState state, string detail)
     {
+        _noticeUi.UpdateConnection(
+            _apClient.Connected,
+            _levelManager != null && _levelManager.saveManager.HasProfile()
+        );
         try
         {
             AtomicFile.Write(
@@ -137,7 +142,6 @@ public sealed partial class ArchipelagoMod : MelonMod
         _apStatusPath = Path.Combine(MelonEnvironment.UserDataDirectory, LauncherProtocol.StatusFile);
         File.Delete(_apStatusPath);
         _apClient.StatusChanged = WriteApStatus;
-        _apClient.ConnectionLost = () => _noticeUi.ShowTechnical(ApNotice.Error("Disconnected from AP Server"));
 
         var debugEnabled = ConsumeDebugMarker("Archipelago.debug.enabled");
         DebugWeaponDamage.Install(HarmonyInstance, debugEnabled, log);
@@ -239,6 +243,13 @@ public sealed partial class ArchipelagoMod : MelonMod
         );
         _ = new ProfileWeaponIcons(HarmonyInstance, log);
         _profileModStatus = new ProfileModStatus(HarmonyInstance, () => _apClient.Connected, log);
+        _profileConnectionGuard = new ProfileConnectionGuard(
+            HarmonyInstance,
+            () => _apClient.Connected,
+            _noticeUi.ShowTechnical,
+            _noticeUi.DismissDisconnected,
+            log
+        );
         _pauseModStatus = new PauseModStatus(HarmonyInstance, () => _apClient.Connected, log);
         _tutorialSkip = new TutorialSkip(HarmonyInstance, () => _apClient.Connected, log);
         _ = new EnemyKillChecks(
@@ -279,6 +290,10 @@ public sealed partial class ArchipelagoMod : MelonMod
         if (now < _nextNoticeUiUpdateAt)
             return;
         _nextNoticeUiUpdateAt = now + NoticeUiUpdateIntervalMs;
+        _noticeUi.UpdateConnection(
+            _apClient.Connected,
+            _levelManager != null && _levelManager.saveManager.HasProfile()
+        );
         _noticeUi.Update();
     }
 
@@ -304,6 +319,7 @@ public sealed partial class ArchipelagoMod : MelonMod
         {
             _apClient.Update();
             _profileModStatus.Update();
+            _profileConnectionGuard.Update();
             _pauseModStatus.Update();
             _aetherMultiplierHubLabel.Update(_levelManager);
             _runeforgeShop.Update(_levelManager);

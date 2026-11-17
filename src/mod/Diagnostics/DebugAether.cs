@@ -32,9 +32,9 @@ internal static class DebugAether
 
     [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
     [HarmonyPostfix]
-    private static void Grant(ProfileUI __instance, bool __state)
+    private static void Grant(ProfileUI __instance, bool __state, bool __runOriginal)
     {
-        if (!__state || __instance._currencyVariable == null || __instance._saveManager == null)
+        if (!__runOriginal || !__state || __instance._currencyVariable == null || __instance._saveManager == null)
             return;
 
         var before = __instance._currencyVariable.Value;

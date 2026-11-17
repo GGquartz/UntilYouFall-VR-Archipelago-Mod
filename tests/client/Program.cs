@@ -32,6 +32,7 @@ if (args.Length > 0)
 }
 
 SharedCatalogTests.Run();
+ProfileConnectionGuardTests.Run();
 RuneforgeShopLayoutTests.Run();
 ApConsoleTests.Run();
 TutorialTests.Run();

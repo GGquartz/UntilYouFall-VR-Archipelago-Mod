@@ -27,6 +27,9 @@ internal sealed class ApNotificationUi : IDisposable
     private long _technicalRetryAt;
     private bool _technicalShowing;
     private long _technicalDiagnoseAt;
+    private bool _wasConnected;
+    private bool _disconnected;
+    private static readonly ApNotice DisconnectedNotice = ApNotice.Error("Disconnected from AP server");
 
     public ApNotificationUi(Action<string> log)
     {
@@ -68,6 +71,35 @@ internal sealed class ApNotificationUi : IDisposable
             _technicalNotice = notice;
     }
 
+    public void UpdateConnection(bool connected, bool hasProfile)
+    {
+        var disconnected = !connected && (_disconnected || (_wasConnected && hasProfile));
+        _wasConnected = connected;
+        SetDisconnected(disconnected);
+    }
+
+    public void DismissDisconnected()
+    {
+        _wasConnected = false;
+        SetDisconnected(false);
+    }
+
+    private void SetDisconnected(bool disconnected)
+    {
+        if (_disconnected == disconnected)
+            return;
+
+        if (_technicalShowing && !_disconnected)
+            _technicalResumeMilliseconds = RemainingMilliseconds(_technicalHideAt, Environment.TickCount64);
+        _technicalPanel.Hide();
+        _technicalShowing = false;
+        _technicalDiagnoseAt = 0;
+        _technicalRetryAt = 0;
+        _disconnected = disconnected;
+
+        _technicalUILog.Write($"Disconnect warning active={disconnected}");
+    }
+
     public void Update()
     {
         if (_queue.Count == 0)
@@ -75,7 +107,7 @@ internal sealed class ApNotificationUi : IDisposable
         else if (_queue.Count >= RushQueueSize)
             _rushing = true;
 
-        if (!_showing && !_technicalShowing && _queue.Count == 0 && _technicalNotice == null)
+        if (!_showing && !_technicalShowing && _queue.Count == 0 && _technicalNotice == null && !_disconnected)
             return;
 
         var now = Environment.TickCount64;
@@ -172,7 +204,8 @@ internal sealed class ApNotificationUi : IDisposable
             {
                 _technicalUILog.Write("Presentation interrupted");
                 _technicalPanel.LogRenderState();
-                _technicalResumeMilliseconds = RemainingMilliseconds(_technicalHideAt, now);
+                if (!_disconnected)
+                    _technicalResumeMilliseconds = RemainingMilliseconds(_technicalHideAt, now);
                 _technicalPanel.Dispose();
                 _technicalShowing = false;
                 _technicalDiagnoseAt = 0;
@@ -180,7 +213,7 @@ internal sealed class ApNotificationUi : IDisposable
             }
             if (_technicalShowing && _technicalDiagnoseAt != 0 && now >= _technicalDiagnoseAt)
             {
-                _technicalDiagnoseAt = now + 2000;
+                _technicalDiagnoseAt = _disconnected ? 0 : now + 2000;
                 try
                 {
                     _technicalPanel.LogRenderState();
@@ -190,7 +223,7 @@ internal sealed class ApNotificationUi : IDisposable
                     _technicalUILog.Write("RenderState unavailable: " + ex.Message);
                 }
             }
-            if (_technicalShowing && now >= _technicalHideAt)
+            if (_technicalShowing && !_disconnected && now >= _technicalHideAt)
             {
                 _technicalPanel.Hide();
                 _technicalNotice = null;
@@ -199,7 +232,8 @@ internal sealed class ApNotificationUi : IDisposable
                 _technicalGate.Release();
                 _technicalRetryAt = now + 500;
             }
-            if (_technicalShowing || _technicalNotice == null || now < _technicalRetryAt)
+            var notice = _disconnected ? DisconnectedNotice : _technicalNotice;
+            if (_technicalShowing || notice == null || now < _technicalRetryAt)
                 return;
             if (!_technicalPanel.IsReady)
             {
@@ -211,12 +245,14 @@ internal sealed class ApNotificationUi : IDisposable
                 }
             }
 
-            var notice = _technicalNotice;
             _technicalPanel.Show(notice);
             _technicalShowing = true;
-            _technicalHideAt =
-                now + (_technicalResumeMilliseconds > 0 ? _technicalResumeMilliseconds : DisplayMilliseconds);
-            _technicalResumeMilliseconds = 0;
+            if (!_disconnected)
+            {
+                _technicalHideAt =
+                    now + (_technicalResumeMilliseconds > 0 ? _technicalResumeMilliseconds : DisplayMilliseconds);
+                _technicalResumeMilliseconds = 0;
+            }
             _technicalDiagnoseAt = now + 500;
 
             _technicalUILog.Write($"Showing: {notice.PlainText}");
@@ -224,7 +260,7 @@ internal sealed class ApNotificationUi : IDisposable
         catch (Exception ex)
         {
             _technicalUILog.Write("Retrying: " + ex.Message);
-            if (_technicalShowing)
+            if (_technicalShowing && !_disconnected)
                 _technicalResumeMilliseconds = RemainingMilliseconds(_technicalHideAt, now);
             _technicalPanel.Dispose();
             _technicalShowing = false;
@@ -247,6 +283,8 @@ internal sealed class ApNotificationUi : IDisposable
         _rushing = false;
         _shown = null;
         _technicalNotice = null;
+        _disconnected = false;
+        _wasConnected = false;
         _technicalGate.Release();
         _panel.Dispose();
         _technicalPanel.Dispose();

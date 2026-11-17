@@ -63,17 +63,18 @@ internal sealed class WeaponUnlocks
 
     [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
     [HarmonyPrefix]
-    private static void BeforeProfileLoad(ProfileUI __instance, out bool __state)
+    private static void BeforeProfileLoad(ProfileUI __instance, out bool __state, bool __runOriginal)
     {
-        __state = __instance._isNewGame;
-        _instance._freshProfile = -1;
+        __state = __runOriginal && __instance._isNewGame;
+        if (__runOriginal)
+            _instance._freshProfile = -1;
     }
 
     [HarmonyPatch(typeof(ProfileUI), nameof(ProfileUI.LoadProfile))]
     [HarmonyPostfix]
-    private static void AfterProfileLoad(ProfileUI __instance, bool __state)
+    private static void AfterProfileLoad(ProfileUI __instance, bool __state, bool __runOriginal)
     {
-        if (!__state)
+        if (!__runOriginal || !__state)
             return;
 
         _instance._freshProfile = __instance._profileIndex;

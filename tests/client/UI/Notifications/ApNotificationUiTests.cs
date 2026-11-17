@@ -5,6 +5,7 @@ internal static class ApNotificationUiTests
 {
     public static void Run()
     {
+        RunDisconnectedWarning();
         using var ui = new ApNotificationUi(_ => { });
         var notice = ApNotice.Plain("Spawn Failed - In Runeforge");
         ui.ShowTechnical(notice);
@@ -40,6 +41,87 @@ internal static class ApNotificationUiTests
         RunUrgentNoticesJumpTheQueue();
         RunBacklogIsShownQuickly();
     }
+
+    private static void RunDisconnectedWarning()
+    {
+        using var ui = new ApNotificationUi(_ => { });
+        var panel = VrNotificationPanel.Created.Last(panel => panel.Name == "Archipelago Technical Notification");
+        ui.UpdateConnection(connected: false, hasProfile: false);
+        ui.Update();
+        Assert(!panel.Visible, "offline startup at profile selection does not create a disconnect warning");
+        ui.UpdateConnection(connected: true, hasProfile: false);
+        ui.UpdateConnection(connected: false, hasProfile: false);
+        ui.Update();
+        Assert(!panel.Visible, "a disconnect before entering a save needs only the profile-entry prompt");
+
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        var timed = ApNotice.Plain("Weapon is locked");
+        ui.ShowTechnical(timed);
+        var now = Environment.TickCount64;
+        AdvanceTechnical(ui, now);
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        AdvanceTechnical(ui, now + 1);
+        Assert(
+            panel.Visible && panel.LastNotice?.PlainText == "Disconnected from AP server",
+            "losing connection in an active profile preempts a timed technical alert"
+        );
+        var item = ApNotice.Plain("Received an item");
+        ui.Enqueue(item);
+        ui.Update();
+        var itemPanel = VrNotificationPanel.Created.Last(panel => panel.Name == "Archipelago Notification");
+        Assert(
+            itemPanel.Visible && itemPanel.LastNotice == item,
+            "the warning does not block ordinary AP notifications"
+        );
+        AdvanceTechnical(ui, now + 60_000);
+        Assert(panel.Visible, "the disconnect warning has no seven-second expiry");
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        Assert(panel.Visible, "an unsuccessful reconnect cannot dismiss the warning");
+
+        panel.IsReady = false;
+        AdvanceTechnical(ui, now + 60_001);
+        ui.UpdateConnection(connected: false, hasProfile: false);
+        AdvanceTechnical(ui, now + 60_502);
+        Assert(
+            panel.Visible && panel.LastNotice?.PlainText == "Disconnected from AP server",
+            "the warning survives camera/scene loss and remains latched without a profile"
+        );
+        ui.ShowTechnical(ApNotice.Plain("Another technical alert"));
+        Assert(panel.LastNotice?.PlainText == "Disconnected from AP server", "timed alerts cannot replace the warning");
+
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        AdvanceTechnical(ui, now + 60_503);
+        Assert(panel.Visible && panel.LastNotice == timed, "successful login restores the interrupted technical alert");
+        AdvanceTechnical(ui, now + 68_000);
+        Assert(!panel.Visible, "ordinary technical alerts still expire after reconnect");
+
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        AdvanceTechnical(ui, now + 68_001);
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        Assert(!panel.Visible, "successful login hides a warning when no timed alert is pending");
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        AdvanceTechnical(ui, now + 68_002);
+        Assert(!panel.Visible, "reconnect also clears a warning before its renderer has been created");
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        AdvanceTechnical(ui, now + 68_003);
+        Assert(panel.Visible, "disconnect warning is active before returning to the menu");
+        ui.DismissDisconnected();
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        AdvanceTechnical(ui, now + 68_004);
+        Assert(!panel.Visible, "the profile menu dismisses the warning and offline polling does not bring it back");
+        Console.WriteLine("PASS: persistent disconnect warning, profile gate, scene recovery and successful reconnect");
+    }
+
+    private static void AdvanceTechnical(ApNotificationUi ui, long now) =>
+        typeof(ApNotificationUi)
+            .GetMethod(
+                "UpdateTechnical",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            )!
+            .Invoke(ui, [now]);
 
     private static void RunKeepsRemainingTime()
     {

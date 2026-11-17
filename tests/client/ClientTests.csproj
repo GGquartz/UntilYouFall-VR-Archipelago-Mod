@@ -91,6 +91,8 @@
     <Compile Include="../../src/mod/UI/ApColors.cs" Link="ApColors.cs" />
     <Compile Include="../../src/mod/UI/Notifications/ApNotice.cs" Link="ApNotice.cs" />
     <Compile Include="../../src/mod/UI/Notifications/ApNotificationUi.cs" Link="ApNotificationUi.cs" />
+    <Compile Include="../../src/mod/UI/Menu/ProfileConnectionGuard.cs" Link="ProfileConnectionGuard.cs" />
+    <Compile Include="../../src/mod/Diagnostics/DebugAether.cs" Link="DebugAether.cs" />
     <Compile Include="../../src/mod/UI/WristConsole/ApConsoleMessage.cs" Link="ApConsoleMessage.cs" />
     <Compile Include="../../src/mod/UI/WristConsole/ApConsoleBuffer.cs" Link="ApConsoleBuffer.cs" />
     <Compile Include="../../src/mod/Archipelago/ApItems.cs" Link="ApItems.cs" />

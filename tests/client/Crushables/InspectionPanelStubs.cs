@@ -28,6 +28,8 @@ namespace UnityEngine
     public class GameObject
     {
         public bool activeSelf;
+
+        public void SetActive(bool active) => activeSelf = active;
     }
 
     public struct Rect
