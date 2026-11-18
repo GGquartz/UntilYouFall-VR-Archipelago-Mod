@@ -28,6 +28,19 @@ internal static class ItemVisualsTests
             ItemVisuals.TryAttach(reward, info with { ItemName = "Unknown" }, _ => { }) == ApLogoCrushableVisual.Visual,
             "known unmapped item uses logo"
         );
+        var foreign = info with { Game = "Other Game" };
+        ItemVisuals.TryAttach(reward, foreign, _ => { }, grayscaleFiller: true);
+        Check(!ApLogoCrushableVisual.LastGrayscale, "foreign progression keeps its colors");
+        ItemVisuals.TryAttach(reward, foreign with { Flags = ItemFlags.NeverExclude }, _ => { }, grayscaleFiller: true);
+        Check(!ApLogoCrushableVisual.LastGrayscale, "useful items keep their colors");
+        ItemVisuals.TryAttach(reward, foreign with { Flags = ItemFlags.Trap }, _ => { }, grayscaleFiller: true);
+        Check(!ApLogoCrushableVisual.LastGrayscale, "traps keep their colors");
+        ItemVisuals.TryAttach(reward, foreign with { Flags = ItemFlags.None }, _ => { }, grayscaleFiller: true);
+        Check(ApLogoCrushableVisual.LastGrayscale, "foreign filler logo is grayscale");
+        ItemVisuals.TryAttach(reward, foreign with { Flags = ItemFlags.None }, _ => { });
+        Check(!ApLogoCrushableVisual.LastGrayscale, "locked ghost items never request grayscale");
+        ItemVisuals.TryAttach(reward, info with { ItemName = "Unknown", Flags = ItemFlags.None }, _ => { }, true);
+        Check(ApLogoCrushableVisual.LastGrayscale, "unmapped own filler falling back to the logo is grayscale");
         NativeModelCrushableVisual.Waiting = true;
         Check(ItemVisuals.TryAttach(reward, info, _ => { }) == null, "native resource pending retries");
         NativeModelCrushableVisual.Waiting = false;

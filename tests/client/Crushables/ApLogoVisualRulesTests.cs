@@ -29,6 +29,15 @@ internal static class ApLogoVisualRulesTests
                 && Math.Abs(emission.A - 0.4f) < 0.0001f,
             "emission strengthens RGB while preserving alpha"
         );
+        var gray = ApLogoVisualRules.Grayscale(new ApLogoColor(1f, 0f, 0f, 0.4f));
+        Assert(
+            Math.Abs(gray.R - ApLogoVisualRules.LumaRed) < 0.0001f
+                && gray.R == gray.G
+                && gray.G == gray.B
+                && gray.A == 0.4f,
+            "grayscale keeps alpha and uses perceived brightness, so submesh shading differences survive"
+        );
+        Assert(ApLogoVisualRules.Grayscale(new ApLogoColor(1f, 1f, 1f, 1f)).R > 0.999f, "white stays white");
         Assert(
             !ApLogoVisualRules.KeepOriginalRenderer(0, 0) && ApLogoVisualRules.KeepOriginalRenderer(1, 0),
             "only the original crystal mesh is replaced; effect renderers remain"

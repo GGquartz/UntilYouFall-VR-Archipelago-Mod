@@ -1,3 +1,4 @@
+using Archipelago.MultiClient.Net.Enums;
 using Il2CppSG.Claymore.Interaction;
 
 namespace UntilYouFallArchipelago;
@@ -9,14 +10,20 @@ internal interface IItemVisual : IDisposable
 
 internal static class ItemVisuals
 {
-    public static IItemVisual? TryAttach(RewardInteractable reward, StageRewardItemInfo? info, Action<string> log)
+    public static IItemVisual? TryAttach(
+        RewardInteractable reward,
+        StageRewardItemInfo? info,
+        Action<string> log,
+        bool grayscaleFiller = false
+    )
     {
         if (info == null)
             return null;
 
         var resource = ItemVisualModels.Resource(info.Game, info.ItemName);
         if (resource == null || NativeModelCrushableVisual.HasFailed(resource))
-            return ApLogoCrushableVisual.TryAttach(reward, log);
+            return ApLogoCrushableVisual.TryAttach(reward, log, grayscaleFiller && info.Flags == ItemFlags.None);
+
         return NativeModelCrushableVisual.TryAttach(reward, resource, log);
     }
 }

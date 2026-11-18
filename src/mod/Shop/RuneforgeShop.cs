@@ -466,7 +466,7 @@ internal sealed class RuneforgeShop : IDisposable
                 return;
 
             var info = client.TryGetStageRewardInfo(LocationId, out var scouted) ? scouted : null;
-            _visual = ItemVisuals.TryAttach(_reward, info, log);
+            _visual = ItemVisuals.TryAttach(_reward, info, log, grayscaleFiller: !Locked);
             if (_visual == null)
                 _visualRetryAt = Environment.TickCount64 + RuneforgeShopRules.VisualRetryDelayMs;
             else if (_ghostStyle != null)

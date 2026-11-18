@@ -15,11 +15,17 @@ namespace UntilYouFallArchipelago
     internal static class ApLogoCrushableVisual
     {
         public static readonly IItemVisual Visual = new TestItemVisual();
+        public static bool LastGrayscale;
 
         public static IItemVisual TryAttach(
             Il2CppSG.Claymore.Interaction.RewardInteractable reward,
-            Action<string> log
-        ) => Visual;
+            Action<string> log,
+            bool grayscale = false
+        )
+        {
+            LastGrayscale = grayscale;
+            return Visual;
+        }
     }
 
     internal static class NativeModelCrushableVisual

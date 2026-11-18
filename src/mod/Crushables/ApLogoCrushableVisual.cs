@@ -55,7 +55,11 @@ internal sealed class ApLogoCrushableVisual : IItemVisual
                 original.enabled = false;
     }
 
-    public static ApLogoCrushableVisual? TryAttach(RewardInteractable reward, Action<string> log)
+    public static ApLogoCrushableVisual? TryAttach(
+        RewardInteractable reward,
+        Action<string> log,
+        bool grayscale = false
+    )
     {
         var visuals = reward.Visuals;
         var originalRenderers = visuals?.Renderers;
@@ -120,6 +124,7 @@ internal sealed class ApLogoCrushableVisual : IItemVisual
             materials = CreateMaterials(
                 sourceRenderer.sharedMaterial,
                 data.Colors,
+                grayscale,
                 out albedoTextures,
                 out var colorProperties
             );
@@ -238,6 +243,7 @@ internal sealed class ApLogoCrushableVisual : IItemVisual
     private static Material[] CreateMaterials(
         Material source,
         ApLogoColor[] colors,
+        bool grayscale,
         out Texture2D[] albedoTextures,
         out string[] usedColorProperties
     )
@@ -248,6 +254,8 @@ internal sealed class ApLogoCrushableVisual : IItemVisual
         for (var index = 0; index < colors.Length; index++)
         {
             var color = ApLogoVisualRules.DisplayColor(colors[index]);
+            if (grayscale)
+                color = ApLogoVisualRules.Grayscale(color);
             var material = new Material(source) { name = $"Archipelago Logo Material {index + 1}" };
             foreach (var property in ApLogoVisualRules.ColorProperties)
             {
