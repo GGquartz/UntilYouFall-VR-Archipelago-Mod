@@ -67,6 +67,7 @@ public sealed partial class ArchipelagoMod
         _instance._levelManager = __instance;
         _instance._playerHealth = null;
         _instance._consoleUi.SetCombatHidden(level.Encounter != null);
+        _instance._consoleUi.SceneLoaded();
         _instance
             .Channel("RoomLoad")
             .Write(

@@ -24,7 +24,10 @@ internal sealed class ApWristConsole : IDisposable
     private Material? _material;
     private Material? _backgroundMaterial;
     private WristConsoleAnchor? _anchor;
+    private const long CreateRetryMilliseconds = 1000;
+
     private long _retryAt;
+    private string? _lastCreateFailure;
     private long _nextTrackingSearchAt;
     private bool _dirty = true;
     private bool _combatHidden;
@@ -45,6 +48,8 @@ internal sealed class ApWristConsole : IDisposable
         _dirty = true;
         _consoleLog.Write("" + message.PlainText);
     }
+
+    public void SceneLoaded() => _retryAt = 0;
 
     public void SetCombatHidden(bool hidden)
     {
@@ -78,14 +83,21 @@ internal sealed class ApWristConsole : IDisposable
             if (_inventory != null && (_hand == null || !_hand.isActiveAndEnabled))
                 _hand = SelectHand(_inventory);
             RefreshTracking();
-            if (_root == null || _camera == null || !_camera.isActiveAndEnabled)
+            if (
+                _root == null
+                || _camera == null
+                || !_camera.isActiveAndEnabled
+                || !WorldTextRules.IsLayerVisible(_camera.cullingMask, _root.layer)
+            )
             {
                 if (Environment.TickCount64 < _retryAt)
                     return;
                 DisposePanel();
-                _retryAt = Environment.TickCount64 + 5000;
                 if (!TryCreate())
+                {
+                    _retryAt = Environment.TickCount64 + CreateRetryMilliseconds;
                     return;
+                }
             }
 
             var handPosition = HandPosition(_camera!.transform);
@@ -148,15 +160,18 @@ internal sealed class ApWristConsole : IDisposable
     {
         var camera = SceneCache.StereoCamera();
         if (camera == null || !camera.isActiveAndEnabled || camera.cullingMask == 0)
-            return false;
+            return CreateFailed(
+                camera == null
+                    ? "no stereo camera"
+                    : $"camera not ready (active={camera.isActiveAndEnabled}, cullingMask={camera.cullingMask})"
+            );
         var inventory = FindInventory();
         var hand = SelectHand(inventory);
-        var sourceText = SceneCache.MenuFontSource();
-        if (sourceText == null)
-            return false;
+        var font = SceneCache.MenuFont();
+        if (font == null)
+            return CreateFailed("menu font source not found");
         if (_xr == null && hand == null)
-            return false;
-        var font = sourceText.font;
+            return CreateFailed("no left hand and no XR tracking source");
 
         _camera = camera;
         _inventory = inventory;
@@ -189,11 +204,7 @@ internal sealed class ApWristConsole : IDisposable
         textRect.offsetMax = new Vector2(-18, -16);
         _text = textObject.AddComponent<TextMeshProUGUI>();
         _text.font = font;
-        _text.fontStyle = sourceText.fontStyle & ~(FontStyles.UpperCase | FontStyles.LowerCase | FontStyles.SmallCaps);
-        _text.fontWeight = sourceText.fontWeight;
-        _material = new Material(sourceText.fontSharedMaterial) { name = "Archipelago Console Font Material" };
-        if (_material.HasProperty("_FaceColor"))
-            _material.SetColor("_FaceColor", Color.white);
+        _material = TmpOverlayMaterial.Copy(font.material, "Archipelago Console Font Material", Color.white);
         TmpOverlayMaterial.Apply(_material);
         if (_material.HasProperty("_VertexOffsetX"))
             _material.SetFloat("_VertexOffsetX", 0);
@@ -221,10 +232,20 @@ internal sealed class ApWristConsole : IDisposable
         _dirty = true;
         _root.SetActive(false);
 
+        _lastCreateFailure = null;
         _log.Write(
-            $"Ready hand={(hand != null ? hand.name : "none")} camera={camera.name} layer={layer} font={font.name} fontSource=PauseScreen/resumeButton material={sourceText.fontSharedMaterial.name}"
+            $"Ready hand={(hand != null ? hand.name : "none")} camera={camera.name} layer={layer} font={font.name} material={font.material.name}"
         );
         return true;
+    }
+
+    private bool CreateFailed(string reason)
+    {
+        if (reason != _lastCreateFailure)
+            _log.Write($"Cannot create panel yet: {reason}");
+
+        _lastCreateFailure = reason;
+        return false;
     }
 
     private ArmamentInventory? FindInventory()

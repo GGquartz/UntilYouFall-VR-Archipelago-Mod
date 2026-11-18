@@ -104,8 +104,11 @@ public sealed partial class ArchipelagoMod : MelonMod
         return true;
     }
 
-    public override void OnSceneWasLoaded(int buildIndex, string sceneName) =>
+    public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+    {
+        _consoleUi.SceneLoaded();
         Channel("AP").Write($"Scene loaded: {sceneName} (build {buildIndex})");
+    }
 
     private LogChannel Channel(string category) =>
         new(
