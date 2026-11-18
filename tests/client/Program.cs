@@ -64,6 +64,7 @@ EnemyStasisStateTests.Run();
 RunOnlyEffectTests.Run();
 ReconnectStateTests.Run();
 ClientConnectionTests.Run();
+ConnectionFileTests.Run();
 ClientSlotSettingsTests.Run();
 ReceivedItemHistoryTests.Run();
 SessionIdentityTests.Run();

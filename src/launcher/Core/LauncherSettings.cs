@@ -1,9 +1,6 @@
-using System.Text.Json;
 using UntilYouFall.Shared;
 
 namespace UntilYouFall.Launcher.Core;
-
-internal sealed record ConnectionSettings(string Server, string Slot);
 
 internal static class LauncherSettings
 {
@@ -16,49 +13,6 @@ internal static class LauncherSettings
             );
 
     private static string FilePath => Path.Combine(SettingsDirectory, "game-dir.txt");
-
-    public static ConnectionSettings? LoadConnection(string? path = null)
-    {
-        path ??= Path.Combine(SettingsDirectory, "connection.json");
-        try
-        {
-            if (!File.Exists(path))
-                return null;
-            var settings = JsonSerializer.Deserialize<ConnectionSettings>(File.ReadAllText(path));
-            return settings?.Server != null && settings.Slot != null ? settings : null;
-        }
-        catch (IOException)
-        {
-            return null;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return null;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-    }
-
-    public static bool SaveConnection(ConnectionSettings settings, string? path = null)
-    {
-        path ??= Path.Combine(SettingsDirectory, "connection.json");
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            AtomicFile.Write(path, temporary => File.WriteAllText(temporary, JsonSerializer.Serialize(settings)));
-            return true;
-        }
-        catch (IOException)
-        {
-            return false;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return false;
-        }
-    }
 
     public static string? LoadGameDir()
     {

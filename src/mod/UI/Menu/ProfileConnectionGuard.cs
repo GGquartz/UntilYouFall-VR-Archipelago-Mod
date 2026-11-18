@@ -31,6 +31,8 @@ internal sealed class ProfileConnectionGuard
         harmony.PatchAll(typeof(ProfileConnectionGuard));
     }
 
+    public bool MenuOpen => _slots.Any(slot => slot.Profile != null && slot.Profile.isActiveAndEnabled);
+
     public void Update()
     {
         var connected = _isConnected();

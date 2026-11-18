@@ -6,6 +6,7 @@ internal static class ApNotificationUiTests
     public static void Run()
     {
         RunDisconnectedWarning();
+        RunFailedConnectOverridesWarning();
         using var ui = new ApNotificationUi(_ => { });
         var notice = ApNotice.Plain("Spawn Failed - In Runeforge");
         ui.ShowTechnical(notice);
@@ -86,9 +87,6 @@ internal static class ApNotificationUiTests
             panel.Visible && panel.LastNotice?.PlainText == "Disconnected from AP server",
             "the warning survives camera/scene loss and remains latched without a profile"
         );
-        ui.ShowTechnical(ApNotice.Plain("Another technical alert"));
-        Assert(panel.LastNotice?.PlainText == "Disconnected from AP server", "timed alerts cannot replace the warning");
-
         ui.UpdateConnection(connected: true, hasProfile: true);
         AdvanceTechnical(ui, now + 60_503);
         Assert(panel.Visible && panel.LastNotice == timed, "successful login restores the interrupted technical alert");
@@ -113,6 +111,33 @@ internal static class ApNotificationUiTests
         AdvanceTechnical(ui, now + 68_004);
         Assert(!panel.Visible, "the profile menu dismisses the warning and offline polling does not bring it back");
         Console.WriteLine("PASS: persistent disconnect warning, profile gate, scene recovery and successful reconnect");
+    }
+
+    private static void RunFailedConnectOverridesWarning()
+    {
+        using var ui = new ApNotificationUi(_ => { });
+        var panel = VrNotificationPanel.Created.Last(panel => panel.Name == "Archipelago Technical Notification");
+        var now = Environment.TickCount64;
+        ui.UpdateConnection(connected: true, hasProfile: true);
+        ui.UpdateConnection(connected: false, hasProfile: true);
+        AdvanceTechnical(ui, now);
+        Assert(panel.LastNotice?.PlainText == "Disconnected from AP server", "the warning is shown first");
+
+        var failedConnect = ApNotice.Error("Connection refused");
+        ui.ShowTechnical(failedConnect);
+        AdvanceTechnical(ui, now + 1);
+        AdvanceTechnical(ui, now + 2);
+        Assert(
+            panel.Visible && panel.LastNotice == failedConnect,
+            "a failed Connect shows its reason over the warning"
+        );
+        AdvanceTechnical(ui, now + 7_100);
+        AdvanceTechnical(ui, now + 7_700);
+        Assert(
+            panel.Visible && panel.LastNotice?.PlainText == "Disconnected from AP server",
+            "the warning returns once the reason has been shown"
+        );
+        Console.WriteLine("PASS: a failed Connect notice overrides the persistent disconnect warning");
     }
 
     private static void AdvanceTechnical(ApNotificationUi ui, long now) =>

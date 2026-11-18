@@ -18,6 +18,7 @@ namespace Il2CppSG.Claymore.UI
         public Il2CppTMPro.TextMeshProUGUI _newGameTextMeshPro = new() { text = "New Game" };
         public PressAndHoldButton playButton = new();
         public bool _isNewGame;
+        public bool isActiveAndEnabled = true;
         public int _profileIndex;
         public CurrencyVariable? _currencyVariable;
         public ProfileSaveManager? _saveManager;

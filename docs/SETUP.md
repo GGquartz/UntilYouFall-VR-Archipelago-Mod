@@ -10,7 +10,7 @@
 
   - `UYF-Archipelago-windows-x86_64.zip`
 
-  - `UYF-Archipelago-linux-x86_64.zip` (experimental, see [Linux / Steam / Proton](#linux--steam--proton))
+  - `UYF-Archipelago-linux-x86_64.zip` (experimental, see [Linux / Steam / Proton](#linux--steam--proton-with-the-launcher-recommended))
 
 ## Installing the APWorld
 
@@ -44,33 +44,7 @@ To remove the mod, press **Uninstall mod** on the **Install** tab
 
 Press **Install / Repair** at any time to fix missing or outdated files, for example after updating to a newer release
 
-## Installing the Mod Manually
-
-Use this if **Install / Repair** fails, launcher is still required to connect the game to the server (this will change in future releases)
-
-1. Close Until You Fall
-
-2. Download [MelonLoader 0.7.3](https://github.com/LavaGang/MelonLoader/releases/download/v0.7.3/MelonLoader.x64.zip)
-
-3. Extract the contents into the game folder, next to `UntilYouFall.exe`
-
-4. Copy the files from the mod's `payload` folder into the game folder, keeping the folder names:
-
-   | File | Destination |
-   | --- | --- |
-   | `Mods\UntilYouFall.Archipelago.dll` | `<game folder>\Mods\` |
-   | `UserLibs\Archipelago.MultiClient.Net.dll` | `<game folder>\UserLibs\` |
-   | `UserLibs\Newtonsoft.Json.dll` | `<game folder>\UserLibs\` |
-
-   Create the `Mods` and `UserLibs` folders if they do not exist
-
-5. Launch the game from Steam, you should see `Archipelago Mod Loaded` in the profile selection screen
-
-6. Connect to the server via the launcher
-
-7. Start playing by creating a new profile (save)
-
-## Linux / Steam / Proton
+## Linux / Steam / Proton with the Launcher (recommended)
 
 Linux support is very experimental and needs testing
 
@@ -97,6 +71,44 @@ Linux support is very experimental and needs testing
 7. Connect to the server via the launcher
 
 8. Start playing by creating a new profile (save)
+
+## Installing the Mod Manually
+
+Use this if **Install / Repair** fails, if you cannot run the launcher (ARM, Steam Frame...) or if you don't want to use the launcher for any reason
+
+1. Close Until You Fall
+
+2. Download [MelonLoader 0.7.3](https://github.com/LavaGang/MelonLoader/releases/download/v0.7.3/MelonLoader.x64.zip)
+
+3. Extract the contents into the game folder, next to `UntilYouFall.exe`
+
+4. Copy the files from the mod's `payload` folder into the game folder:
+
+   | File | Destination |
+   | --- | --- |
+   | `Mods\UntilYouFall.Archipelago.dll` | `<game folder>\Mods\` |
+   | `UserLibs\Archipelago.MultiClient.Net.dll` | `<game folder>\UserLibs\` |
+   | `UserLibs\Newtonsoft.Json.dll` | `<game folder>\UserLibs\` |
+
+   Create the `Mods` and `UserLibs` folders if they do not exist
+
+5. Launch the game from Steam, you should see `Archipelago Mod Loaded` in the profile selection screen
+
+   - On Linux or Proton, first add the launch option `WINEDLLOVERRIDES="version=n,b" %command%` in Steam
+
+6. Connect to the server via the launcher or in-game, see [Connecting without the Launcher](#connecting-without-the-launcher)
+
+7. Start playing by creating a new profile (save)
+
+### Connecting without the Launcher
+
+1. Launch the game once
+
+2. Open `<game folder>\UserData\Archipelago.connection.txt` and fill in your connection
+
+3. Save the file and press **Connect**
+
+4. The **Archipelago Mod Loaded** text should show `Connected`
 
 
 
@@ -135,7 +147,7 @@ If you are generating the game, put the file in Archipelago Players folder: `C:\
 
   MelonLoader could be generating assemblies, wait a few minutes
 
-- **The launcher cannot connect**
+- **Connect is failing**
 
   Make sure the game is running, check the server address and port, the slot name (it is case sensitive) and the password
 

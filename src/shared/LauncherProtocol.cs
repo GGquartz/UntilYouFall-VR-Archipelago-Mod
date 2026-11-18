@@ -10,7 +10,6 @@ internal enum ConnectionState
 
 internal static class LauncherProtocol
 {
-    public const string PreferencesSection = "UntilYouFallArchipelago";
     public const string DisconnectCommand = "Disconnect";
     public const string CommandFile = "Archipelago.command.request";
     public const string StatusFile = "Archipelago.status";

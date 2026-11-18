@@ -92,7 +92,6 @@ Features planned before a full 1.0 release, some of these might be researched an
 - Better hinting mechanisms
 - More quests, add more quests tied to weapons and weapon supers
 - Show the AP console in the pause menu
-- Connect to the server directly in the game, without the launcher: Launcher-less install
 - Option to randomize weapon abilities between weapons
 - Live launcher settings for the wrist console (on/off, toggle hide during combat, font size, opacity and dominant hand)
 - Live launcher settings for DeathLink mode

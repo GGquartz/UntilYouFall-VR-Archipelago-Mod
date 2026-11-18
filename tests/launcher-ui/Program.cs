@@ -114,9 +114,28 @@ async Task RunPlayerFlow()
     }
     await Screenshot(window, "install-launch-option.png");
 
+    await CheckConnectionFile(window);
     if (OperatingSystem.IsLinux())
         CheckLogExport();
     window.Close();
+}
+
+async Task CheckConnectionFile(Window window)
+{
+    var file = GameLink.ConnectionPath(gameDir);
+    Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+    File.WriteAllText(file, "Server=ws://example.test:1234\nSlot=From File\nPassword=pw\n");
+    var tabs = window.GetVisualDescendants().OfType<TabControl>().First();
+    tabs.SelectedIndex = 0;
+    await Settle();
+    tabs.SelectedIndex = tabs.Items.OfType<TabItem>().ToList().FindIndex(tab => tab.Header as string == "Connect");
+    await Settle();
+    Check(
+        "connect tab shows the server from the connection file",
+        Find<TextBox>(window, "Server").Text == "ws://example.test:1234"
+    );
+    Check("connect tab shows the slot from the connection file", Find<TextBox>(window, "Slot").Text == "From File");
+    Check("connect tab shows the password from the connection file", Find<TextBox>(window, "Password").Text == "pw");
 }
 
 void CheckLogExport()

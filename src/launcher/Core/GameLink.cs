@@ -4,6 +4,8 @@ namespace UntilYouFall.Launcher.Core;
 
 internal static class GameLink
 {
+    public static string ConnectionPath(string gameDir) => Path.Combine(gameDir, "UserData", ConnectionFile.FileName);
+
     public static string StatusPath(string gameDir) => Path.Combine(gameDir, "UserData", LauncherProtocol.StatusFile);
 
     public static (ConnectionState State, string Detail)? ReadStatus(string gameDir)

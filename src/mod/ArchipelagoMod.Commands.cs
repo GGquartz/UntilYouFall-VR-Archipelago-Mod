@@ -34,13 +34,12 @@ public sealed partial class ArchipelagoMod
                     {
                         if (commandLines.Length != 4)
                             throw new ArgumentException("Failed Connect command");
-                        LauncherProtocol.ConnectCommand(commandLines[1], commandLines[2], commandLines[3]);
-                        _apServer.Value = commandLines[1];
-                        _apSlot.Value = commandLines[2];
-                        _apPassword = commandLines[3];
-                        MelonPreferences.GetCategory(LauncherProtocol.PreferencesSection).SaveToFile(false);
+                        Connect(commandLines[1], commandLines[2], commandLines[3]);
                     }
-                    _apClient.Connect(_apServer.Value, _apSlot.Value, _apPassword);
+                    else
+                    {
+                        ConnectFromFile();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -49,12 +48,75 @@ public sealed partial class ArchipelagoMod
                 }
                 break;
             case LauncherProtocol.DisconnectCommand:
-                _apClient.Disconnect();
-                WriteApStatus(ConnectionState.Disconnected, "Disconnected by launcher");
+                Disconnect("Disconnected by launcher");
                 break;
             default:
                 Channel("AP").Warn("Unknown launcher command rejected");
                 break;
+        }
+    }
+
+    private void Connect(string server, string slot, string password)
+    {
+        if (_apClient.Connected)
+        {
+            Channel("AP").Write("Already connected");
+            return;
+        }
+
+        LauncherProtocol.ConnectCommand(server, slot, password);
+        ConnectionFile.Write(_connectionPath, new ConnectionDetails(server, slot, password));
+        _apClient.Connect(server, slot, password);
+    }
+
+    private void Disconnect(string detail)
+    {
+        _apClient.Disconnect();
+        WriteApStatus(ConnectionState.Disconnected, detail);
+    }
+
+    private void EnsureConnectionFile()
+    {
+        if (File.Exists(_connectionPath))
+            return;
+
+        try
+        {
+            ConnectionFile.Write(_connectionPath, new ConnectionDetails("", "", ""));
+            Channel("AP").Write("Connection file created: " + _connectionPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Channel("AP").Warn("Failed to create the connection file: " + ex.Message);
+        }
+    }
+
+    private void ConnectFromFile()
+    {
+        if (_apClient.Connected)
+        {
+            Channel("AP").Write("Already connected");
+            return;
+        }
+
+        try
+        {
+            if (!File.Exists(_connectionPath))
+            {
+                EnsureConnectionFile();
+                _noticeUi.ShowTechnical(ApNotice.Plain($"Fill in UserData/{ConnectionFile.FileName} first"));
+                return;
+            }
+
+            var details = ConnectionFile.Parse(File.ReadAllText(_connectionPath));
+            _buttonConnectPending = true;
+            _apClient.Connect(details.Server, details.Slot, details.Password);
+        }
+        catch (Exception ex)
+        {
+            _buttonConnectPending = false;
+            Channel("AP").Write("Connect button rejected: " + ex.Message);
+            _noticeUi.ShowTechnical(ApNotice.Error(ex.Message));
         }
     }
 }

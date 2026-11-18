@@ -12,24 +12,55 @@ public partial class ConnectView : UserControl
     private LauncherContext _context = null!;
     private bool _connecting;
 
-    public ConnectView() => InitializeComponent();
+    private bool _dirty;
+    private bool _loading;
 
-    internal void Initialize(LauncherContext context)
+    public ConnectView()
     {
-        _context = context;
-        var saved = LauncherSettings.LoadConnection();
-        if (saved == null)
+        InitializeComponent();
+        foreach (var box in new[] { Server, Slot, Password })
+            box.TextChanged += (_, _) => _dirty |= !_loading && box.IsFocused;
+    }
+
+    internal void Initialize(LauncherContext context) => _context = context;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (_dirty)
             return;
-        Server.Text = saved.Server;
-        Slot.Text = saved.Slot;
+
+        var path = ConnectionPath();
+        if (path == null || ConnectionFile.TryRead(path) is not { } details)
+            return;
+
+        _loading = true;
+        Server.Text = details.Server;
+        Slot.Text = details.Slot;
+        Password.Text = details.Password;
+        _loading = false;
+    }
+
+    private string? ConnectionPath()
+    {
+        var dir = _context.GameDirectoryText();
+        return GameLocator.IsGameDir(dir) ? GameLink.ConnectionPath(dir) : null;
     }
 
     public void SaveConnection()
     {
-        if (
-            !LauncherSettings.SaveConnection(new ConnectionSettings(Server.Text?.Trim() ?? "", Slot.Text?.Trim() ?? ""))
-        )
-            _context.Log("Failed to save connection settings");
+        if (!_dirty || ConnectionPath() is not { } path)
+            return;
+
+        try
+        {
+            ConnectionFile.Write(path, new ConnectionDetails(Server.Text ?? "", Slot.Text ?? "", Password.Text ?? ""));
+            _dirty = false;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _context.Log("Failed to save the connection file: " + ex.Message);
+        }
     }
 
     private async void Connect_Click(object? sender, RoutedEventArgs args)
@@ -42,13 +73,18 @@ public partial class ConnectView : UserControl
         DisconnectButton.IsEnabled = false;
         try
         {
-            SaveConnection();
             var dir = _context.GetGameDirectory();
             var server = Server.Text?.Trim() ?? "";
             var slot = Slot.Text?.Trim() ?? "";
             var password = Password.Text ?? "";
             LauncherProtocol.ConnectCommand(server, slot, password);
-            if (ModInstaller.GameRunning())
+            _dirty = true;
+            SaveConnection();
+            if (ModInstaller.GameRunning() && GameLink.ReadStatus(dir)?.State == ConnectionState.Connected)
+            {
+                Show("Already connected", "SecondaryTextBrush");
+            }
+            else if (ModInstaller.GameRunning())
             {
                 GameLink.SendConnectCommand(dir, server, slot, password);
                 Show("Connecting...", "SecondaryTextBrush");

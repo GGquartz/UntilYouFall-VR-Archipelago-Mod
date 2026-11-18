@@ -25,8 +25,6 @@ namespace UntilYouFallArchipelago;
 public sealed partial class ArchipelagoMod : MelonMod
 {
     private static ArchipelagoMod _instance = null!;
-    private MelonPreferences_Entry<string> _apServer = null!;
-    private MelonPreferences_Entry<string> _apSlot = null!;
 
     private PlayerVitality _playerVitality = null!;
     private ArchipelagoClient _apClient = null!;
@@ -38,6 +36,7 @@ public sealed partial class ArchipelagoMod : MelonMod
     private TutorialSkip _tutorialSkip = null!;
     private ProfileModStatus _profileModStatus = null!;
     private ProfileConnectionGuard _profileConnectionGuard = null!;
+    private ConnectionButtons _connectionButtons = null!;
     private PauseModStatus _pauseModStatus = null!;
     private ExtraTraitSlots _extraTraitSlots = null!;
     private WeaponAbilityLocks _weaponAbilityLocks = null!;
@@ -61,16 +60,23 @@ public sealed partial class ArchipelagoMod : MelonMod
     private ItemEffects? _itemEffects;
     private bool _rewardScaleApplied;
     private string _apCommandPath = "";
+    private string _connectionPath = "";
     private string _apStatusPath = "";
 
-    private string _apPassword = "";
+    private bool _buttonConnectPending;
+
+    private bool InRun() =>
+        _levelManager != null && _levelManager.saveManager.HasProfile() && !_profileConnectionGuard.MenuOpen;
 
     private void WriteApStatus(ConnectionState state, string detail)
     {
-        _noticeUi.UpdateConnection(
-            _apClient.Connected,
-            _levelManager != null && _levelManager.saveManager.HasProfile()
-        );
+        if (_buttonConnectPending && state != ConnectionState.Connecting)
+        {
+            _buttonConnectPending = false;
+            if (state == ConnectionState.Error)
+                _noticeUi.ShowTechnical(ApNotice.Error(detail));
+        }
+        _noticeUi.UpdateConnection(_apClient.Connected, InRun());
         try
         {
             AtomicFile.Write(
@@ -128,9 +134,6 @@ public sealed partial class ArchipelagoMod : MelonMod
 
         _playerVitality = new PlayerVitality(() => _playerHealth, () => _levelManager, log);
 
-        var preferences = MelonPreferences.CreateCategory(LauncherProtocol.PreferencesSection);
-        _apServer = preferences.CreateEntry("APServer", "");
-        _apSlot = preferences.CreateEntry("APSlot", "");
         _noticeUi = new ApNotificationUi(log);
         _consoleUi = new ApWristConsole(() => _levelManager, log);
         _apClient = new ArchipelagoClient(
@@ -142,6 +145,8 @@ public sealed partial class ArchipelagoMod : MelonMod
         );
         _apCommandPath = Path.Combine(MelonEnvironment.UserDataDirectory, LauncherProtocol.CommandFile);
         File.Delete(_apCommandPath);
+        _connectionPath = Path.Combine(MelonEnvironment.UserDataDirectory, ConnectionFile.FileName);
+        EnsureConnectionFile();
         _apStatusPath = Path.Combine(MelonEnvironment.UserDataDirectory, LauncherProtocol.StatusFile);
         File.Delete(_apStatusPath);
         _apClient.StatusChanged = WriteApStatus;
@@ -254,6 +259,12 @@ public sealed partial class ArchipelagoMod : MelonMod
             log
         );
         _pauseModStatus = new PauseModStatus(HarmonyInstance, () => _apClient.Connected, log);
+        _connectionButtons = new ConnectionButtons(
+            HarmonyInstance,
+            ConnectFromFile,
+            () => Disconnect("Disconnected by menu button"),
+            log
+        );
         _tutorialSkip = new TutorialSkip(HarmonyInstance, () => _apClient.Connected, log);
         _ = new EnemyKillChecks(
             HarmonyInstance,
@@ -293,16 +304,14 @@ public sealed partial class ArchipelagoMod : MelonMod
         if (now < _nextNoticeUiUpdateAt)
             return;
         _nextNoticeUiUpdateAt = now + NoticeUiUpdateIntervalMs;
-        _noticeUi.UpdateConnection(
-            _apClient.Connected,
-            _levelManager != null && _levelManager.saveManager.HasProfile()
-        );
+        _noticeUi.UpdateConnection(_apClient.Connected, InRun());
         _noticeUi.Update();
     }
 
     public override void OnUpdate()
     {
         _questBoard.Update(_levelManager);
+        _connectionButtons.Update();
         _startingTraitRewards.Update();
         UpdateNoticeUi();
         _enemySpawnTrap.Update();
