@@ -113,18 +113,16 @@ internal sealed partial class QuestBoard : IDisposable
             return;
         }
         var layer = WorldTextRules.FirstVisibleLayer(camera.cullingMask);
-        var source = SceneCache.MenuFontSource();
-        if (layer < 0 || source == null)
+        var font = SceneCache.MenuFont();
+        if (layer < 0 || font == null)
         {
             _log.Write("Layer or menu font unavailable");
             return;
         }
-        _font = source.font;
-        _material = new Material(source.fontSharedMaterial);
+        _font = font;
+        _material = TmpOverlayMaterial.Copy(font.material, "AP Quest Board Font Material", Color.white);
         if (_material.HasProperty("_ZTestMode"))
             _material.SetInt("_ZTestMode", (int)UnityEngine.Rendering.CompareFunction.LessEqual);
-        if (_material.HasProperty("_FaceColor"))
-            _material.SetColor("_FaceColor", Color.white);
 
         _boardLayer = layer;
         _board = new GameObject("AP Quest Board") { layer = layer };

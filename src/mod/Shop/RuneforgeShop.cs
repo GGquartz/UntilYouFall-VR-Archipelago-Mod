@@ -105,14 +105,15 @@ internal sealed class RuneforgeShop : IDisposable
     private void Build(LevelManager levelManager, bool ignoreLoading)
     {
         var source = FindNativePriceText();
+        var font = SceneCache.MenuFont();
         var stand = RuneforgeShopStand.Find();
         var ghostStyle = SceneCache.GhostStyle();
         var prefab = Resources.Load<GameObject>(RuneforgeShopRules.PrefabResource);
         var camera = Camera.main;
-        if (source == null || stand == null || ghostStyle == null || prefab == null || camera == null)
+        if (source == null || font == null || stand == null || ghostStyle == null || prefab == null || camera == null)
         {
             _log.Write(
-                $"Waiting nativePriceText={source != null} nativeStand={stand != null} ghostStyle={ghostStyle != null} prefab={prefab != null} camera={camera != null}"
+                $"Waiting nativePriceText={source != null} font={font != null} nativeStand={stand != null} ghostStyle={ghostStyle != null} prefab={prefab != null} camera={camera != null}"
             );
             return;
         }
@@ -159,13 +160,13 @@ internal sealed class RuneforgeShop : IDisposable
                 var slot = SlotByColumn[column];
                 if (_client.IsShopItemBought(ShopChecks.LocationId(index + 1, slot)))
                     continue;
-                _items.Add(CreateItem(prefab, columns[column], index + 1, slot, source, stand, ghostStyle));
+                _items.Add(CreateItem(prefab, columns[column], index + 1, slot, source, font, stand, ghostStyle));
             }
         }
 
         _built = true;
         _log.Write(
-            $"Build passed sections={_sections.Count} items={_items.Count} unlockLevel={_builtUnlockCount} font={source.font?.name}"
+            $"Build passed sections={_sections.Count} items={_items.Count} unlockLevel={_builtUnlockCount} font={font.name}"
         );
     }
 
@@ -177,6 +178,7 @@ internal sealed class RuneforgeShop : IDisposable
         int section,
         int slot,
         TMP_Text source,
+        TMP_FontAsset font,
         RuneforgeShopStand stand,
         ArmamentVisualPreview ghostStyle
     )
@@ -208,6 +210,7 @@ internal sealed class RuneforgeShop : IDisposable
                 $"AP Shop Price {section}-{slot}",
                 RuneforgeShopRules.PriceText(source.text, price),
                 source,
+                font,
                 _log.Sink
             );
             var locked = RuneforgeShopRules.IsPreviewLocked(section, _client.ShopUnlockCount);
@@ -470,10 +473,7 @@ internal sealed class RuneforgeShop : IDisposable
             if (_visual == null)
                 _visualRetryAt = Environment.TickCount64 + RuneforgeShopRules.VisualRetryDelayMs;
             else if (_ghostStyle != null)
-            {
                 _visual.UseUnownedStyle(_ghostStyle);
-                log.Write("APShop", $"Ghost applied item={_root.name} shader={_ghostStyle.unownedShader.name}");
-            }
         }
 
         public void Dispose()

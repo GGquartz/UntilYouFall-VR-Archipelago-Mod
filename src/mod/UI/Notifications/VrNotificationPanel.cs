@@ -40,13 +40,12 @@ internal sealed class VrNotificationPanel : IDisposable
         if (camera == null || !camera.isActiveAndEnabled || camera.cullingMask == 0)
             return false;
 
-        var sourceText = SceneCache.MenuFontSource();
-        if (sourceText == null)
+        var font = SceneCache.MenuFont();
+        if (font == null)
         {
-            _log.Write("Waiting for pause menu font");
+            _log.Write("Waiting for menu font");
             return false;
         }
-        var font = sourceText.font;
 
         var layer = WorldTextRules.FirstVisibleLayer(camera.cullingMask);
         _camera = camera;
@@ -77,12 +76,7 @@ internal sealed class VrNotificationPanel : IDisposable
         textRect.SetParent(rect, false);
         _text = textObject.AddComponent<TextMeshProUGUI>();
         _text.font = font;
-        _text.fontStyle = sourceText.fontStyle & ~(FontStyles.UpperCase | FontStyles.LowerCase | FontStyles.SmallCaps);
-        _text.fontWeight = sourceText.fontWeight;
-        var sourceMaterial = sourceText.fontSharedMaterial;
-        _material = new Material(sourceMaterial) { name = _name + " Font Material" };
-        if (_material.HasProperty("_FaceColor"))
-            _material.SetColor("_FaceColor", Color.white);
+        _material = TmpOverlayMaterial.Copy(font.material, _name + " Font Material", Color.white);
         TmpOverlayMaterial.Apply(_material);
         _text.fontSharedMaterial = _material;
         _text.color = Color.white;
@@ -109,7 +103,7 @@ internal sealed class VrNotificationPanel : IDisposable
         _root.SetActive(false);
 
         _log.Write(
-            $"Ready renderer=WorldSpaceCanvas skin={_skin} skinSource={_skinSource} camera={camera.name} stereo={camera.stereoEnabled} layer={layer} font={font.name} fontSource=PauseScreen/resumeButton sourceMaterial={sourceMaterial.name} fontStyle={(int)_text.fontStyle} fontWeight={(int)_text.fontWeight} fontFallbacks={font.fallbackFontAssetTable?.Count ?? 0}"
+            $"Ready renderer=WorldSpaceCanvas skin={_skin} skinSource={_skinSource} camera={camera.name} stereo={camera.stereoEnabled} layer={layer} font={font.name} fontSource=asset sourceMaterial={font.material.name} fontStyle={(int)_text.fontStyle} fontWeight={(int)_text.fontWeight} fontFallbacks={font.fallbackFontAssetTable?.Count ?? 0}"
         );
         return true;
     }

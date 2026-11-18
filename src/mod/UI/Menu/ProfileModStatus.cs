@@ -37,19 +37,15 @@ internal sealed class ProfileModStatus : ConnectionStatusLabel
 
     private TextMeshProUGUI? Create(ProfileUI profileUi)
     {
-        var source =
-            profileUi._newGameTextMeshPro
-            ?? profileUi
-                .GetComponentsInChildren<TextMeshProUGUI>(true)
-                .FirstOrDefault(candidate => candidate != null && candidate.font != null);
-        if (source == null)
+        var font = SceneCache.MenuFont();
+        if (font == null)
         {
-            Log("Profile selection has no loaded TMP font");
+            Log("Menu font is not loaded");
             return null;
         }
 
-        var parent = profileUi.transform.parent ?? source.rectTransform.parent ?? profileUi.transform;
-        var text = CreateText(parent, source, FontSize, out var rect);
+        var parent = profileUi.transform.parent ?? profileUi.transform;
+        var text = CreateText(parent, font, FontSize, out var rect);
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = rect.anchorMin;
         rect.pivot = new Vector2(0.5f, 0.5f);
@@ -59,7 +55,7 @@ internal sealed class ProfileModStatus : ConnectionStatusLabel
         rect.anchoredPosition = LabelPosition;
         rect.sizeDelta = LabelSize;
 
-        LogCreated(source, parent, rect, text);
+        LogCreated(parent, rect, text);
         return text;
     }
 }

@@ -77,7 +77,14 @@ internal sealed class RuneforgeShopStand : IDisposable
     public Quaternion ItemRotation(Transform column) =>
         column.rotation * Quaternion.Inverse(_column.transform.rotation) * _slot.transform.rotation;
 
-    public GameObject CreateLabel(Transform column, string name, string price, TMP_Text currency, Action<string> log)
+    public GameObject CreateLabel(
+        Transform column,
+        string name,
+        string price,
+        TMP_Text currency,
+        TMP_FontAsset font,
+        Action<string> log
+    )
     {
         var root = new GameObject(name);
         try
@@ -106,8 +113,7 @@ internal sealed class RuneforgeShopStand : IDisposable
             textRect.localRotation = sourceRect.localRotation;
             textRect.localScale = sourceRect.localScale;
             var text = textRoot.AddComponent<TextMeshProUGUI>();
-            text.font = currency.font;
-            text.fontSharedMaterial = currency.fontSharedMaterial;
+            text.font = font;
             text.spriteAsset = currency.spriteAsset;
             text.color = currency.color;
             text.enableVertexGradient = currency.enableVertexGradient;
@@ -125,14 +131,6 @@ internal sealed class RuneforgeShopStand : IDisposable
             text.text = price;
             root.SetActive(true);
             text.ForceMeshUpdate();
-            log.Write(
-                "APShop",
-                $"Native plate; item={name}; source={_slot.name}/{_canvas.name}; "
-                    + $"rect={rect.rect.size}; fontSize={text.fontSize}; background={_background.sprite?.name}; "
-                    + $"scale={rect.lossyScale.x:R},{rect.lossyScale.y:R},{rect.lossyScale.z:R}; "
-                    + $"text='{text.text}'; characters={text.textInfo.characterCount}"
-            );
-
             return root;
         }
         catch

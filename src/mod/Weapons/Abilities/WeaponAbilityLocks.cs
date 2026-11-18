@@ -198,10 +198,14 @@ internal sealed class WeaponAbilityLocks
             text.raycastTarget = false;
             text.maskable = false;
             text.isOverlay = true;
-            var sourceMaterial = panel.tmpAbilityName?.fontSharedMaterial ?? text.font?.material;
-            if (sourceMaterial != null)
+
+            if (panel.tmpAbilityName?.fontSharedMaterial is { } panelMaterial)
             {
-                var textMaterial = new Material(sourceMaterial) { name = "AP Locked Ability Text Material" };
+                var textMaterial = TmpOverlayMaterial.Copy(
+                    panelMaterial,
+                    "AP Locked Ability Text Material",
+                    Color.white
+                );
                 TmpOverlayMaterial.Apply(textMaterial);
                 text.fontSharedMaterial = textMaterial;
             }

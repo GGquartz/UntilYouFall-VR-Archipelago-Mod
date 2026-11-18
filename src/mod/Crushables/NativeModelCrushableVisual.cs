@@ -79,7 +79,6 @@ internal sealed class NativeModelCrushableVisual : IItemVisual
             var reactors = donor.GetComponentsInChildren<CrushReactor>(true);
             var baseTransform = donor.GetComponentInChildren<CrushableVisuals>(true)?.transform ?? donor.transform;
             var toBase = baseTransform.worldToLocalMatrix;
-            var rendererSummaries = new List<string>();
             foreach (var donorRenderer in donor.GetComponentsInChildren<MeshRenderer>(true))
             {
                 var filter = donorRenderer.GetComponent<MeshFilter>();
@@ -97,10 +96,6 @@ internal sealed class NativeModelCrushableVisual : IItemVisual
                                 material.SetColor(reactor.emissionPropertyName, reactor.baselineGlow);
                                 materials[index] = material;
                             }
-                        log.Write(
-                            "ItemModel",
-                            $"Native baseline resource={resource} renderer={donorRenderer.name} property={reactor.emissionPropertyName} color={reactor.baselineGlow} index={reactor.targetIndex}"
-                        );
                     }
                 var relative = toBase * donorRenderer.transform.localToWorldMatrix;
                 var forward = (Vector3)relative.GetColumn(2);
@@ -132,9 +127,6 @@ internal sealed class NativeModelCrushableVisual : IItemVisual
                 renderer.sharedMaterials = materials;
                 roots.Add(root);
                 renderers.Add(renderer);
-                rendererSummaries.Add(
-                    $"{donorRenderer.name}:{filter.sharedMesh.name}:{materials.Length}:{materials[0].name}"
-                );
             }
             if (renderers.Count == 0)
                 throw new InvalidOperationException("Donor has no usable mesh renderer");
@@ -151,7 +143,6 @@ internal sealed class NativeModelCrushableVisual : IItemVisual
             foreach (var renderer in renderers)
                 replacement[write++] = renderer;
             visuals.renderers = replacement;
-            log.Write("ItemModel", $"Attached resource={resource} renderers={string.Join(",", rendererSummaries)}");
             var result = new NativeModelCrushableVisual(visuals, originals, enabled, roots, renderers);
             result._ownedMaterials.AddRange(ownedMaterials);
             result.CopyGrip(
@@ -244,7 +235,6 @@ internal sealed class NativeModelCrushableVisual : IItemVisual
                 from = Named(donor, liveName);
             }
             var to = Named(shop, name);
-            log.Write("ItemModel", $"Grab geometry node={name} source={donor.name} found={from != null}/{to != null}");
             if (from == null || to == null)
                 continue;
             if (name == "Collider")

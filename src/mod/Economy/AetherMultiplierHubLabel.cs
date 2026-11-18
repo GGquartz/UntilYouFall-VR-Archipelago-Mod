@@ -118,7 +118,6 @@ internal sealed class AetherMultiplierHubLabel : IDisposable
                 value,
                 pose.Position,
                 selected.Rect.rotation,
-                selected.Font,
                 gold,
                 overlay: false,
                 _log.Sink,
@@ -311,6 +310,5 @@ internal sealed class AetherMultiplierHubLabel : IDisposable
     )
     {
         public bool IsAlive => Component != null && Component.gameObject.activeInHierarchy;
-        public TMP_FontAsset? Font => Component.TryCast<TMP_Text>()?.font;
     }
 }

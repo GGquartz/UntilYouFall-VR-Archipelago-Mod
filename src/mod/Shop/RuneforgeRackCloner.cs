@@ -76,13 +76,6 @@ internal sealed class RuneforgeRackCloner
             }
             copied += AddFrontColumns(clone.transform, camera);
             clone.SetActive(true);
-            var renderers = clone.GetComponentsInChildren<MeshRenderer>(true);
-
-            _log.Write(
-                $"Visual probe placed source={source.name} pos={position} "
-                    + $"meshes={copied} stillBatched={renderers.Count(renderer => renderer.isPartOfStaticBatch)} "
-                    + "colliders=0 gameplayComponents=0"
-            );
             return clone;
         }
         catch (Exception exception)

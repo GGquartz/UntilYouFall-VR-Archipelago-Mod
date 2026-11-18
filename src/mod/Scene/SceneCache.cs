@@ -10,7 +10,9 @@ namespace UntilYouFallArchipelago;
 
 internal static class SceneCache
 {
-    private static TextMeshProUGUI? _menuFont;
+    private const string MenuFontName = "Lovato Bold SDF";
+
+    private static TMP_FontAsset? _menuFont;
     private static ArmamentVisualPreview? _ghostStyle;
     private static readonly Dictionary<string, AudioClip> Clips = [];
     private static readonly Dictionary<string, Sprite> Sprites = [];
@@ -27,16 +29,14 @@ internal static class SceneCache
         return camera;
     }
 
-    public static TextMeshProUGUI? MenuFontSource()
+    public static TMP_FontAsset? MenuFont()
     {
         if (_menuFont != null)
             return _menuFont;
 
         _menuFont = Resources
-            .FindObjectsOfTypeAll<PauseScreen>()
-            .Where(pause => pause != null && pause.gameObject.scene.IsValid() && pause.resumeButton != null)
-            .SelectMany(pause => pause.resumeButton.GetComponentsInChildren<TextMeshProUGUI>(true))
-            .FirstOrDefault(text => text != null && text.font != null && text.fontSharedMaterial != null);
+            .FindObjectsOfTypeAll<TMP_FontAsset>()
+            .FirstOrDefault(font => font != null && font.name == MenuFontName && font.material != null);
 
         return _menuFont;
     }

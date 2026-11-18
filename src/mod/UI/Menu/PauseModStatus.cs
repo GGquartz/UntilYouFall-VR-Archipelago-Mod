@@ -33,17 +33,15 @@ internal sealed class PauseModStatus : ConnectionStatusLabel
     private TextMeshProUGUI? Create(PauseScreen pause)
     {
         var resume = pause.resumeButton;
-        var source = resume
-            ?.GetComponentsInChildren<TextMeshProUGUI>(true)
-            .FirstOrDefault(candidate => candidate != null && candidate.font != null);
+        var font = SceneCache.MenuFont();
         var parent = resume?.transform.parent;
-        if (resume == null || source == null || parent == null)
+        if (resume == null || font == null || parent == null)
         {
-            Log("Resume button has no loaded TMP font or parent");
+            Log("Menu font or resume button parent is not loaded");
             return null;
         }
 
-        var text = CreateText(parent, source, FontSize, out var rect);
+        var text = CreateText(parent, font, FontSize, out var rect);
         var resumeRect = resume.GetComponent<RectTransform>();
         rect.anchorMin = resumeRect.anchorMin;
         rect.anchorMax = resumeRect.anchorMax;
@@ -54,7 +52,7 @@ internal sealed class PauseModStatus : ConnectionStatusLabel
         rect.localScale = resumeRect.localScale;
         rect.SetSiblingIndex(resume.transform.GetSiblingIndex() + 1);
 
-        LogCreated(source, parent, rect, text);
+        LogCreated(parent, rect, text);
         return text;
     }
 }

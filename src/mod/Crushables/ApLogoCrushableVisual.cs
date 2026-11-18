@@ -153,15 +153,7 @@ internal sealed class ApLogoCrushableVisual : IItemVisual
 
             var triangleCount = data.SubmeshTriangles.Sum(indices => indices.Length / 3);
 
-            log.Write(
-                "APLogoVisual",
-                $"Attached vertices={data.VertexCount} submeshes={data.SubmeshTriangles.Length} "
-                    + $"triangles={triangleCount} shader='{sourceRenderer.sharedMaterial.shader?.name}' "
-                    + $"properties={string.Join(",", colorProperties)} sourceAlbedo='{sourceAlbedo?.name}' "
-                    + $"neutralAlbedo={sourceAlbedo != null} originalRenderers={string.Join(",", rendererNames)} "
-                    + $"bounds={mesh.bounds.size} localPosition={root.transform.localPosition} "
-                    + $"localRotation={root.transform.localRotation.eulerAngles} localScale={root.transform.localScale}"
-            );
+            log.Write("APLogoVisual", $"Attached vertices={data.VertexCount} triangles={triangleCount}");
 
             return new ApLogoCrushableVisual(
                 visuals,

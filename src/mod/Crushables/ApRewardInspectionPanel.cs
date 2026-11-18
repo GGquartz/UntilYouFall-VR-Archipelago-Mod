@@ -56,7 +56,6 @@ internal static class ApRewardInspectionPanel
             return;
         }
         reward.inspectionPanelKey = key;
-        log.Write(feature, $"Large inspection panel selected key='{key.name}'");
     }
 
     public static void Compact(DescriptionInspectionPanel panel, Action<string> log, string feature)

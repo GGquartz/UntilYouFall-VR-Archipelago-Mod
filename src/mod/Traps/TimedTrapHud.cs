@@ -74,9 +74,10 @@ internal sealed class TimedTrapHud : IDisposable
                 && candidate.isActiveAndEnabled
                 && candidate.gameObject.scene.IsValid()
                 && candidate._mainPanel != null
-                && candidate._dashDamageText?.font != null
+                && candidate._dashDamageText != null
             );
-        if (ui == null || ui._dashDamageText.fontSharedMaterial == null)
+        var font = SceneCache.MenuFont();
+        if (ui == null || font == null)
             return false;
 
         Dispose();
@@ -99,13 +100,9 @@ internal sealed class TimedTrapHud : IDisposable
         var textRect = textObject.AddComponent<RectTransform>();
         textRect.SetParent(rect, false);
         _text = textObject.AddComponent<TextMeshProUGUI>();
-        _text.font = source.font;
-        _material = new Material(source.fontSharedMaterial) { name = $"Archipelago {_title} HUD Font" };
-        if (_material.HasProperty("_FaceColor"))
-            _material.SetColor("_FaceColor", Color.white);
+        _text.font = font;
+        _material = TmpOverlayMaterial.Copy(font.material, $"Archipelago {_title} HUD Font", Color.white);
         _text.fontSharedMaterial = _material;
-        _text.fontStyle = source.fontStyle & ~(FontStyles.UpperCase | FontStyles.LowerCase | FontStyles.SmallCaps);
-        _text.fontWeight = source.fontWeight;
         _text.fontSize = 24;
         _text.alignment = TextAlignmentOptions.Center;
         _text.enableAutoSizing = false;
@@ -139,7 +136,7 @@ internal sealed class TimedTrapHud : IDisposable
         foreground.raycastTarget = false;
 
         _noBlockHudLog.Write(
-            $"Created ui={ui.Pointer} parent={ui._mainPanel.name} scene={ui.gameObject.scene.name} font={source.font.name} position={rect.localPosition} layer={_root.layer}"
+            $"Created ui={ui.Pointer} parent={ui._mainPanel.name} scene={ui.gameObject.scene.name} font={font.name} position={rect.localPosition} layer={_root.layer}"
         );
         return true;
     }

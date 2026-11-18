@@ -50,12 +50,7 @@ internal abstract class ConnectionStatusLabel
         }
     }
 
-    protected TextMeshProUGUI CreateText(
-        Transform parent,
-        TextMeshProUGUI source,
-        float fontSize,
-        out RectTransform rect
-    )
+    protected TextMeshProUGUI CreateText(Transform parent, TMP_FontAsset font, float fontSize, out RectTransform rect)
     {
         _root = new GameObject(_objectName) { layer = parent.gameObject.layer };
         rect = _root.AddComponent<RectTransform>();
@@ -63,8 +58,7 @@ internal abstract class ConnectionStatusLabel
         _root.AddComponent<LayoutElement>().ignoreLayout = true;
 
         var text = _root.AddComponent<TextMeshProUGUI>();
-        text.font = source.font;
-        text.fontSharedMaterial = source.fontSharedMaterial;
+        text.font = font;
         text.color = TextColor;
         text.alignment = TextAlignmentOptions.Center;
         text.richText = true;
@@ -78,9 +72,9 @@ internal abstract class ConnectionStatusLabel
         return text;
     }
 
-    protected void LogCreated(TextMeshProUGUI source, Transform parent, RectTransform rect, TextMeshProUGUI text) =>
+    protected void LogCreated(Transform parent, RectTransform rect, TextMeshProUGUI text) =>
         Log(
-            $"Mod status created source={source.name} parent={parent.name} position={rect.anchoredPosition} size={rect.sizeDelta} fontSize={text.fontSize}"
+            $"Mod status created font={text.font.name} parent={parent.name} position={rect.anchoredPosition} size={rect.sizeDelta} fontSize={text.fontSize}"
         );
 
     private void RefreshText()

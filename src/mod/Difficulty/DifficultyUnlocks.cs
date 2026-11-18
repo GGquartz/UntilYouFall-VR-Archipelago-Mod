@@ -182,10 +182,6 @@ internal sealed class DifficultyUnlocks : IDisposable
             }
             if (materials.Count == 0)
                 RestoreGhost(stone.Pointer);
-            else
-                _log.Write(
-                    $"Ghost applied tier={stone._selectedDifficulty.Value} visuals={stone.Visuals!.name} renderers={materials.Count}"
-                );
         }
         catch (Exception exception)
         {
@@ -207,8 +203,6 @@ internal sealed class DifficultyUnlocks : IDisposable
                 if (material != null)
                     Object.Destroy(material);
         }
-
-        _log.Write($"Ghost restored stone={stone}");
     }
 
     public void Dispose()

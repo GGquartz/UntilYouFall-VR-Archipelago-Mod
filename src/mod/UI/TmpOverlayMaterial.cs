@@ -5,6 +5,15 @@ namespace UntilYouFallArchipelago;
 
 internal static class TmpOverlayMaterial
 {
+    public static Material Copy(Material source, string name, Color faceColor)
+    {
+        var material = new Material(source) { name = name };
+        if (material.HasProperty("_FaceColor"))
+            material.SetColor("_FaceColor", faceColor);
+
+        return material;
+    }
+
     public static void Apply(Material material, CompareFunction depthTest = CompareFunction.Always)
     {
         if (material.HasProperty("_ZTestMode"))

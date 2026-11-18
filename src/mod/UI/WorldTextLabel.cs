@@ -10,15 +10,6 @@ internal sealed partial class WorldTextLabel : IDisposable
     private GameObject? _root;
     private TextMeshPro? _text;
     private Material? _material;
-    private static TMP_FontAsset? _fallbackFont;
-
-    private static TMP_FontAsset? FallbackFont() =>
-        _fallbackFont != null
-            ? _fallbackFont
-            : _fallbackFont = Resources
-                .FindObjectsOfTypeAll<TMP_Text>()
-                .Select(candidate => candidate.font)
-                .FirstOrDefault(candidate => candidate != null && candidate.material != null);
 
     public bool Create(
         Camera camera,
@@ -26,7 +17,6 @@ internal sealed partial class WorldTextLabel : IDisposable
         string value,
         Vector3 position,
         Quaternion rotation,
-        TMP_FontAsset? preferredFont,
         Color color,
         bool overlay,
         Action<string> log,
@@ -41,7 +31,7 @@ internal sealed partial class WorldTextLabel : IDisposable
             return false;
         }
 
-        var font = preferredFont ?? FallbackFont();
+        var font = SceneCache.MenuFont();
         if (font == null)
         {
             log.Write(logPrefix, "Failed: no loaded TMP font");
@@ -57,9 +47,7 @@ internal sealed partial class WorldTextLabel : IDisposable
 
         _text = _root.AddComponent<TextMeshPro>();
         _text.font = font;
-        _material = new Material(font.material) { name = objectName + " Material" };
-        if (_material.HasProperty("_FaceColor"))
-            _material.SetColor("_FaceColor", color);
+        _material = TmpOverlayMaterial.Copy(font.material, objectName + " Material", color);
         TmpOverlayMaterial.Apply(_material, overlay ? CompareFunction.Always : CompareFunction.LessEqual);
         if (_material.HasProperty("_CullMode"))
             _material.SetInt("_CullMode", (int)CullMode.Off);
