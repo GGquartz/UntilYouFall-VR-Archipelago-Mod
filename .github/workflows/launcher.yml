@@ -1,4 +1,4 @@
-name: Launcher on Linux
+name: Launcher
 
 on:
   push:
