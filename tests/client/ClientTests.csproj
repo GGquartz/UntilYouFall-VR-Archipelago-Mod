@@ -37,8 +37,8 @@
     <Compile Include="../../src/mod/Traps/NoBlockingTrapState.cs" Link="NoBlockingTrapState.cs" />
     <Compile Include="../../src/mod/Traps/TimedTrapState.cs" Link="TimedTrapState.cs" />
     <Compile Include="../../src/mod/Traps/CursedTrapState.cs" Link="CursedTrapState.cs" />
-    <Compile Include="../../src/mod/Traps/DeathLinkRules.cs" Link="DeathLinkRules.cs" />
-    <Compile Include="../../src/mod/Traps/DeathLinkController.cs" Link="DeathLinkController.cs" />
+    <Compile Include="../../src/mod/DeathLink/DeathLinkRules.cs" Link="DeathLinkRules.cs" />
+    <Compile Include="../../src/mod/DeathLink/DeathLinkController.cs" Link="DeathLinkController.cs" />
     <Compile Include="../../src/mod/Items/EnemyStasisState.cs" Link="EnemyStasisState.cs" />
     <Compile Include="../../src/mod/Items/SuperChargeRules.cs" Link="SuperChargeRules.cs" />
     <Compile Include="../../src/mod/Traps/TimedTrapHudLayout.cs" Link="TimedTrapHudLayout.cs" />

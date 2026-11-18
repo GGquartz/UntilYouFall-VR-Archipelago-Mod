@@ -59,6 +59,7 @@ public sealed partial class ArchipelagoMod
         var combatRoom = level.Encounter != null && level.Room?.GUID != RuneforgeShopRules.RuneforgeRoomGuid;
         if (!combatRoom)
             _instance._apClient.VoidRunOnlyEffects();
+        _instance._deathLink.ClearLowHealthProtection("room load");
         _instance._enemyStasis.RoomLoad(combatRoom);
         _instance._noBlockingTrap.RoomLoad(combatRoom);
         _instance._exhaustionTrap.RoomLoad(combatRoom);
@@ -85,6 +86,7 @@ public sealed partial class ArchipelagoMod
         {
             if (success)
             {
+                _instance._deathLink.ClearLowHealthProtection("room cleared");
                 _instance._enemyStasis.RoomCleared();
                 _instance._noBlockingTrap.RoomCleared();
                 _instance._exhaustionTrap.RoomCleared();
