@@ -38,7 +38,7 @@ if (OperatingSystem.IsLinux())
 BuildFakeSteamLibrary();
 BuildFakePayload();
 
-using var session = HeadlessUnitTestSession.StartNew(typeof(UiTestApp));
+var session = HeadlessUnitTestSession.StartNew(typeof(UiTestApp));
 try
 {
     await session.Dispatch(
@@ -57,7 +57,9 @@ catch (Exception exception)
 }
 
 Console.WriteLine(failed == 0 ? "All launcher UI tests passed." : $"{failed} launcher UI checks failed.");
-return failed == 0 ? 0 : 1;
+
+Environment.Exit(failed == 0 ? 0 : 1);
+return 0;
 
 async Task RunPlayerFlow()
 {
