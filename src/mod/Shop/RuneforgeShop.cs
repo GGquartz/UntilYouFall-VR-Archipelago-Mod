@@ -478,6 +478,7 @@ internal sealed class RuneforgeShop : IDisposable
 
         public void Dispose()
         {
+            _reward.ReleaseFromHand();
             _visual?.Dispose();
             if (_label != null)
                 Object.Destroy(_label);

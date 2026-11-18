@@ -504,9 +504,7 @@ internal sealed partial class StartingTraitRewards : IDisposable
             if (entry.Reward == null)
                 continue;
 
-            var hand = entry.Reward.ActiveHand;
-            if (hand != null && hand.HeldInteractable?.Pointer == entry.Reward.Pointer)
-                hand.ForceGrabEnd();
+            entry.Reward.ReleaseFromHand();
             entry.Reward.gameObject.SetActive(false);
             Object.Destroy(entry.Reward.gameObject);
         }
