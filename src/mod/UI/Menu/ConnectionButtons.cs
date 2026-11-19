@@ -24,12 +24,13 @@ internal sealed class ConnectionButtons
 
     private const float MinLookDirectionSqrMagnitude = 1e-6f;
     private const float PauseRowY = 40f;
+    private const float PauseRaiseMeters = 2f;
+    private const float PauseExtraTiltDownDegrees = 10f;
     private const float PauseButtonSpacing = 185f;
     private static readonly Vector2 PauseButtonSize = new(330f, 100f);
 
     private static ConnectionButtons _instance = null!;
     private readonly List<RectTransform> _pauseButtons = [];
-    private bool _needsOrient;
     private readonly Action _connect;
     private readonly Action _disconnect;
     private readonly LogChannel _log;
@@ -51,18 +52,14 @@ internal sealed class ConnectionButtons
 
     [HarmonyPatch(typeof(PauseScreen), "OnEnable")]
     [HarmonyPostfix]
-    private static void AfterPauseShown(PauseScreen __instance)
-    {
+    private static void AfterPauseShown(PauseScreen __instance) =>
         _instance.Guard(() => _instance.AddPauseButtons(__instance));
-        _instance._needsOrient = true;
-    }
 
     public void Update()
     {
-        if (!_needsOrient)
+        if (_pauseButtons.Count == 0 || _pauseButtons[0] == null || !_pauseButtons[0].gameObject.activeInHierarchy)
             return;
 
-        _needsOrient = false;
         Guard(OrientPauseButtons);
     }
 
@@ -76,8 +73,11 @@ internal sealed class ConnectionButtons
         foreach (var button in _pauseButtons)
         {
             var direction = button.parent.InverseTransformDirection(button.position - head.transform.position);
-            if (direction.sqrMagnitude > MinLookDirectionSqrMagnitude)
-                button.localRotation = Quaternion.LookRotation(direction, Vector3.up);
+            if (direction.sqrMagnitude <= MinLookDirectionSqrMagnitude)
+                continue;
+
+            button.localRotation =
+                Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(-PauseExtraTiltDownDegrees, 0f, 0f);
         }
     }
 
@@ -138,8 +138,10 @@ internal sealed class ConnectionButtons
         var connect = Clone(resume.transform, parent, ConnectName, ConnectLabel, _connect);
         var disconnect = Clone(resume.transform, parent, DisconnectName, DisconnectLabel, _disconnect);
         connect.sizeDelta = disconnect.sizeDelta = PauseButtonSize;
-        connect.anchoredPosition = new Vector2(-PauseButtonSpacing, PauseRowY);
-        disconnect.anchoredPosition = new Vector2(PauseButtonSpacing, PauseRowY);
+        var metersPerUnit = Mathf.Abs(connect.lossyScale.y);
+        var rowY = metersPerUnit > 1e-6f ? PauseRowY + PauseRaiseMeters / metersPerUnit : PauseRowY;
+        connect.anchoredPosition = new Vector2(-PauseButtonSpacing, rowY);
+        disconnect.anchoredPosition = new Vector2(PauseButtonSpacing, rowY);
 
         _pauseButtons.Clear();
         _pauseButtons.Add(connect);
@@ -177,10 +179,6 @@ internal sealed class ConnectionButtons
         var text = clone.GetComponentsInChildren<TextMeshProUGUI>(true).FirstOrDefault();
         if (text != null)
             text.text = label;
-
-        _log.Write(
-            $"{name} cloned from {template.name} parent={parent.name} components={string.Join(",", clone.GetComponents<Component>().Select(component => component.GetType().Name))}"
-        );
 
         return rect;
     }
