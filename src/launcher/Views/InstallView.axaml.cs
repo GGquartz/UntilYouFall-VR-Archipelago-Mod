@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using UntilYouFall.Launcher.Core;
+using UntilYouFall.Shared;
 
 namespace UntilYouFall.Launcher.Views;
 
@@ -53,6 +54,7 @@ public partial class InstallView : UserControl
             var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
             if (path == null)
                 return;
+
             GameDir.Text = GameLocator.Normalize(path);
             await RefreshStatusAsync();
         });
@@ -149,7 +151,7 @@ public partial class InstallView : UserControl
             MelonStatus,
             melon
                 ? "MelonLoader installed"
-                    + (MelonLoaderInstaller.AssembliesGenerated(dir) ? "" : " (the first game start takes longer)")
+                    + (MelonLoaderInstaller.AssembliesGenerated(dir) ? "" : " (the first game start could take longer)")
                 : "MelonLoader missing",
             melon
         );
@@ -181,6 +183,7 @@ public partial class InstallView : UserControl
     {
         if (_installing)
             return;
+
         _installing = true;
         Actions.IsEnabled = false;
         try

@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using UntilYouFall.Shared;
 
 namespace UntilYouFall.Launcher.Core;
 
@@ -7,7 +8,7 @@ internal static class GameLocator
 {
     public const string Executable = "UntilYouFall.exe";
 
-    public const string SteamAppId = "858260";
+    public const string SteamAppId = SteamQuestIcons.SteamAppId;
     private const string DefaultInstallDir = "UntilYouFall";
     private const string DataDirectorySuffix = "_Data";
 

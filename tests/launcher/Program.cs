@@ -509,6 +509,10 @@ Check(
     "steam icons: offline stops after the first icon",
     offlineCalls == 4 && offlineResult is { Downloaded: 0, Failed: 3 }
 );
+Check(
+    "steam icons: no temporary files are left behind",
+    !Directory.EnumerateFiles(SteamIconInstaller.IconFolder(iconGame), "*.tmp").Any()
+);
 SteamIconInstaller.Uninstall(iconGame);
 Check("steam icons: uninstall removes the folder", !Directory.Exists(SteamIconInstaller.IconFolder(iconGame)));
 

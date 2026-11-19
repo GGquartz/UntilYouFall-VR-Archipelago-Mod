@@ -2,6 +2,8 @@ namespace UntilYouFall.Shared;
 
 internal static class SteamQuestIcons
 {
+    public const string SteamAppId = "858260";
+
     public const string FolderRelativeToUserData = "Archipelago/steam-icons";
 
     public static readonly IReadOnlyDictionary<string, string> Sha1ByIconId = new Dictionary<string, string>

@@ -91,6 +91,21 @@ public sealed partial class ArchipelagoMod
         }
     }
 
+    private static void InstallSteamIconsInBackground(Action<string> log) =>
+        Task.Run(async () =>
+        {
+            try
+            {
+                var (downloaded, failed) = await SteamIconInstaller.InstallAsync(MelonEnvironment.GameRootDirectory);
+                if (downloaded > 0 || failed > 0)
+                    log.Write("AP", $"Steam quest icons: {downloaded} downloaded, {failed} missing");
+            }
+            catch (Exception ex)
+            {
+                log.Write("AP", $"Steam quest icons download failed: {ex.GetType().Name}: {ex.Message}");
+            }
+        });
+
     private void ConnectFromFile()
     {
         if (_apClient.Connected)

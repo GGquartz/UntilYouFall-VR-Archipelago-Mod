@@ -1,9 +1,8 @@
 using System.Security.Cryptography;
-using UntilYouFall.Shared;
 
-namespace UntilYouFall.Launcher.Core;
+namespace UntilYouFall.Shared;
 
-// Download steam achievement icons for the quest board during install to avoid redistributing assets in our repo
+// Download steam achievement icons for the quest board to avoid redistributing assets in our repo
 internal static class SteamIconInstaller
 {
     private static readonly string[] Hosts =
@@ -23,7 +22,7 @@ internal static class SteamIconInstaller
         );
 
     public static string Url(string host, string sha1) =>
-        $"https://{host}/steamcommunity/public/images/apps/{GameLocator.SteamAppId}/{sha1}.jpg";
+        $"https://{host}/steamcommunity/public/images/apps/{SteamQuestIcons.SteamAppId}/{sha1}.jpg";
 
     public static async Task<(int Downloaded, int Failed)> InstallAsync(
         string gameDir,
@@ -93,7 +92,7 @@ internal static class SteamIconInstaller
                 reachable = true;
                 if (Sha1Of(bytes) != sha1)
                     continue;
-                await File.WriteAllBytesAsync(target, bytes, cancel);
+                AtomicFile.Write(target, temporary => File.WriteAllBytes(temporary, bytes));
 
                 return DownloadResult.Saved;
             }

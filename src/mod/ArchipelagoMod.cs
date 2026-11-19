@@ -147,6 +147,7 @@ public sealed partial class ArchipelagoMod : MelonMod
         File.Delete(_apCommandPath);
         _connectionPath = Path.Combine(MelonEnvironment.UserDataDirectory, ConnectionFile.FileName);
         EnsureConnectionFile();
+        InstallSteamIconsInBackground(log);
         _apStatusPath = Path.Combine(MelonEnvironment.UserDataDirectory, LauncherProtocol.StatusFile);
         File.Delete(_apStatusPath);
         _apClient.StatusChanged = WriteApStatus;
