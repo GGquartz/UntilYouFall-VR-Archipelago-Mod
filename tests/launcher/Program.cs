@@ -98,12 +98,14 @@ Check(
 );
 Check("defaults: starting difficulty challenging", defaults["starting_difficulty"] == "challenging");
 Check("defaults: no second starting weapon", defaults["second_starting_weapon"] == "none");
-Check("defaults: early hand first half", defaults["early_hand"] == "first_50_percent_of_checks");
+Check("defaults: early hand first half", defaults["early_hand"] == "first_50_percent_of_playthrough");
 Check(
     "early hand choices",
     options
         .Single(option => option.Key == "early_hand")
-        .Choices.SequenceEqual(new[] { "first_25_percent_of_checks", "first_50_percent_of_checks", "unrestricted" })
+        .Choices.SequenceEqual(
+            new[] { "first_25_percent_of_playthrough", "first_50_percent_of_playthrough", "unrestricted" }
+        )
 );
 var duplicateStarters = new Dictionary<string, string>(defaults)
 {
@@ -202,7 +204,7 @@ Check("yaml section", yaml.Contains("\nUntil You Fall:\n  starting_weapon: rando
 Check("yaml every option", options.All(option => yaml.Contains("  " + option.Key + ": ")));
 Check("yaml toggle bool", yaml.Contains("  quest_board: true\n"));
 Check("yaml second starter none", yaml.Contains("  second_starting_weapon: none\n"));
-Check("yaml early hand default", yaml.Contains("  early_hand: first_50_percent_of_checks\n"));
+Check("yaml early hand default", yaml.Contains("  early_hand: first_50_percent_of_playthrough\n"));
 foreach (var choice in options.Single(option => option.Key == "early_hand").Choices)
 {
     var handOptions = new Dictionary<string, string>(defaults) { ["early_hand"] = choice };

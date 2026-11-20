@@ -71,11 +71,11 @@
     "help": "If starting with only one hand, make sure missing hand is available early",
     "type": "choice",
     "choices": [
-      "first_25_percent_of_checks",
-      "first_50_percent_of_checks",
+      "first_25_percent_of_playthrough",
+      "first_50_percent_of_playthrough",
       "unrestricted"
     ],
-    "default": "first_50_percent_of_checks"
+    "default": "first_50_percent_of_playthrough"
   },
   {
     "key": "weapon_supers",

@@ -33,8 +33,8 @@ class TestHands(UntilYouFallWorldTest):
     def test_early_hand_finalizes_after_other_placement_rules(self):
         for hands in ("both", "left_only", "right_only"):
             for option, percent in (
-                ("first_25_percent_of_checks", 25),
-                ("first_50_percent_of_checks", 50),
+                ("first_25_percent_of_playthrough", 25),
+                ("first_50_percent_of_playthrough", 50),
                 ("unrestricted", 100),
             ):
                 with self.subTest(hands=hands, early_hand=option):
@@ -115,8 +115,8 @@ class TestHandPlacement(unittest.TestCase):
     def test_option_defaults_to_first_half(self):
         self.assertEqual(EarlyHand.default, 50)
         for name, value in (
-            ("first_25_percent_of_checks", 25),
-            ("first_50_percent_of_checks", 50),
+            ("first_25_percent_of_playthrough", 25),
+            ("first_50_percent_of_playthrough", 50),
             ("unrestricted", 100),
         ):
             with self.subTest(name=name):

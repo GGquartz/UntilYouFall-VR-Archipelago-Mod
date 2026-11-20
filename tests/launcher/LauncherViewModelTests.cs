@@ -31,7 +31,7 @@ internal static class LauncherViewModelTests
             "early hand labels",
             early
                 .Choices.Select(choice => choice.Label)
-                .SequenceEqual(new[] { "First 25% of checks", "First 50% of checks", "Unrestricted" })
+                .SequenceEqual(new[] { "First 25% of playthrough", "First 50% of playthrough", "Unrestricted" })
         );
         check(
             "death's door label",

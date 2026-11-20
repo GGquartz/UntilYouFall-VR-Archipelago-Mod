@@ -26,8 +26,8 @@ internal sealed class OptionViewModel : INotifyPropertyChanged
     private static readonly Dictionary<string, string> LabelOverrides = new()
     {
         ["deaths_door"] = "Death's Door",
-        ["first_25_percent_of_checks"] = "First 25% of checks",
-        ["first_50_percent_of_checks"] = "First 50% of checks",
+        ["first_25_percent_of_playthrough"] = "First 25% of playthrough",
+        ["first_50_percent_of_playthrough"] = "First 50% of playthrough",
         ["spellswords_charm"] = "Spellsword's Charm",
         ["knight_blooded_crest"] = "Knight-Blooded Crest",
         ["high_arcanists_blade"] = "High Arcanist's Blade",

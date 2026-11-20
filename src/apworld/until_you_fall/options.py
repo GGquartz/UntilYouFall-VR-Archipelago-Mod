@@ -64,8 +64,8 @@ class EarlyHand(Choice):
     """If starting with only one hand, make sure missing hand is available early"""
 
     display_name = "Early Hand"
-    option_first_25_percent_of_checks = 25
-    option_first_50_percent_of_checks = 50
+    option_first_25_percent_of_playthrough = 25
+    option_first_50_percent_of_playthrough = 50
     option_unrestricted = 100
     default = 50
 
