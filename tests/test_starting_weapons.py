@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from BaseClasses import MultiWorld
+from BaseClasses import CollectionState, MultiWorld
 from Fill import distribute_items_restrictive
 from uyf_world_test import UntilYouFallWorldTest
 from worlds.until_you_fall.catalogs import (
@@ -29,6 +29,26 @@ class TestStartingWeapons(UntilYouFallWorldTest):
                     self.assertFalse(self.multiworld.local_early_items[self.player])
                     if hands != "both":
                         self.assertFalse(any(requires_both_hands(names[name]) for name in early))
+
+    def test_early_weapons_end_up_in_locations_reachable_from_the_start(self):
+        for hands in ("both", "right_only"):
+            for seed in range(10):
+                with self.subTest(hands=hands, seed=seed):
+                    self.options = {"starting_hands": hands, "quest_board": True}
+                    self.world_setup(seed=seed)
+                    early = set(self.multiworld.early_items[self.player])
+                    start = CollectionState(self.multiworld)
+                    reachable = {
+                        location.name for location in self.multiworld.get_locations() if location.can_reach(start)
+                    }
+                    distribute_items_restrictive(self.multiworld)
+                    placed = {
+                        location.item.name: location.name
+                        for location in self.multiworld.get_filled_locations()
+                        if location.item.player == self.player and location.item.name in early
+                    }
+                    self.assertEqual(set(placed), early)
+                    self.assertLessEqual(set(placed.values()), reachable)
 
     def test_early_weapons_skip_start_inventory_weapons(self):
         self.options = {"start_inventory": {"Heartsplitter": 1, "Mistcutter": 1}, "starting_weapon": "random"}
