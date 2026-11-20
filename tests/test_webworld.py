@@ -39,8 +39,11 @@ class TestWebWorld(unittest.TestCase):
         ):
             builder = runpy.run_path(str(script))
 
-        with ZipFile(io.BytesIO(), "w") as archive:
-            builder["UntilYouFallContainer"]().write_contents(archive)
+        buffer = io.BytesIO()
+        with ZipFile(buffer, "w") as writer:
+            builder["UntilYouFallContainer"]().write_contents(writer)
+
+        with ZipFile(buffer) as archive:
             guide_path = "until_you_fall/docs/setup_en.md"
             self.assertIn(guide_path, archive.namelist())
             self.assertEqual(archive.read(guide_path), (root / "docs/SETUP.md").read_bytes())
