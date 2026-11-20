@@ -104,8 +104,7 @@ Features planned before a full 1.0 release, some of these might be researched an
 - Enemy Spawn Trap for specific enemies
 - Quest descriptions in the launcher Options Creator
 - Custom AP shop models for specific games
-- Test out standalone Steam Frame setup and add instructions
-- ARM64 launcher build for Steam frame
+- Standalone Steam Frame setup (game runs badly on my frame, only if game becomes playable)
 - Map and add weapon logic requirements for Quest: On the Wings of the Knight
 
 ## Known Bugs
