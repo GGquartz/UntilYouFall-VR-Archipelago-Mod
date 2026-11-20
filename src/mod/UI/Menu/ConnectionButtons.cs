@@ -22,15 +22,18 @@ internal sealed class ConnectionButtons
     private const float ProfileButtonSpacing = 140f;
     private static readonly Vector2 ProfileButtonSize = new(900f, 240f);
 
+    private const string PauseRootName = "AP Connection Buttons";
     private const float MinLookDirectionSqrMagnitude = 1e-6f;
+    private const float PauseRefreshSeconds = 0.25f;
     private const float PauseRowY = 40f;
     private const float PauseRaiseMeters = 2f;
-    private const float PauseExtraTiltDownDegrees = 10f;
     private const float PauseButtonSpacing = 185f;
     private static readonly Vector2 PauseButtonSize = new(330f, 100f);
 
     private static ConnectionButtons _instance = null!;
-    private readonly List<RectTransform> _pauseButtons = [];
+    private RectTransform? _pauseRoot;
+    private float _nextPauseRefresh;
+    private bool _needsPauseOrient;
     private readonly Action _connect;
     private readonly Action _disconnect;
     private readonly LogChannel _log;
@@ -57,28 +60,29 @@ internal sealed class ConnectionButtons
 
     public void Update()
     {
-        if (_pauseButtons.Count == 0 || _pauseButtons[0] == null || !_pauseButtons[0].gameObject.activeInHierarchy)
+        if (!_needsPauseOrient || _pauseRoot == null || !_pauseRoot.gameObject.activeInHierarchy)
             return;
 
+        var now = Time.unscaledTime;
+        if (now < _nextPauseRefresh)
+            return;
+
+        _nextPauseRefresh = now + PauseRefreshSeconds;
         Guard(OrientPauseButtons);
     }
 
     private void OrientPauseButtons()
     {
         var head = Camera.main;
-        _pauseButtons.RemoveAll(button => button == null);
-        if (head == null)
+        if (head == null || _pauseRoot == null)
             return;
 
-        foreach (var button in _pauseButtons)
-        {
-            var direction = button.parent.InverseTransformDirection(button.position - head.transform.position);
-            if (direction.sqrMagnitude <= MinLookDirectionSqrMagnitude)
-                continue;
+        var direction = _pauseRoot.parent.InverseTransformDirection(_pauseRoot.position - head.transform.position);
+        if (direction.sqrMagnitude <= MinLookDirectionSqrMagnitude)
+            return;
 
-            button.localRotation =
-                Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(-PauseExtraTiltDownDegrees, 0f, 0f);
-        }
+        _pauseRoot.localRotation = Quaternion.LookRotation(direction, Vector3.up);
+        _needsPauseOrient = false;
     }
 
     private void Guard(Action action)
@@ -89,7 +93,7 @@ internal sealed class ConnectionButtons
         }
         catch (Exception ex)
         {
-            _log.Write($"Failed to add connection buttons: {ex.GetType().Name}: {ex.Message}");
+            _log.Write($"Connection buttons failed: {ex.GetType().Name}: {ex.Message}");
         }
     }
 
@@ -132,20 +136,36 @@ internal sealed class ConnectionButtons
         if (resume == null || parent == null)
             return;
 
-        if (parent.Find(ConnectName) != null)
+        _needsPauseOrient = true;
+        _nextPauseRefresh = 0f;
+        if (_pauseRoot != null)
             return;
 
-        var connect = Clone(resume.transform, parent, ConnectName, ConnectLabel, _connect);
-        var disconnect = Clone(resume.transform, parent, DisconnectName, DisconnectLabel, _disconnect);
-        connect.sizeDelta = disconnect.sizeDelta = PauseButtonSize;
-        var metersPerUnit = Mathf.Abs(connect.lossyScale.y);
+        var resumeRect = resume.GetComponent<RectTransform>();
+        var metersPerUnit = Mathf.Abs(resumeRect.lossyScale.y);
         var rowY = metersPerUnit > 1e-6f ? PauseRowY + PauseRaiseMeters / metersPerUnit : PauseRowY;
-        connect.anchoredPosition = new Vector2(-PauseButtonSpacing, rowY);
-        disconnect.anchoredPosition = new Vector2(PauseButtonSpacing, rowY);
+        var root = new GameObject(PauseRootName) { layer = parent.gameObject.layer };
+        _pauseRoot = root.AddComponent<RectTransform>();
+        _pauseRoot.SetParent(parent, false);
+        root.AddComponent<LayoutElement>().ignoreLayout = true;
+        PlaceLike(_pauseRoot, resumeRect, new Vector2(0f, rowY), PauseButtonSize);
+        _pauseRoot.SetSiblingIndex(resume.transform.GetSiblingIndex() + 1);
 
-        _pauseButtons.Clear();
-        _pauseButtons.Add(connect);
-        _pauseButtons.Add(disconnect);
+        var connect = Clone(resume.transform, _pauseRoot, ConnectName, ConnectLabel, _connect);
+        var disconnect = Clone(resume.transform, _pauseRoot, DisconnectName, DisconnectLabel, _disconnect);
+        PlaceLike(connect, resumeRect, new Vector2(-PauseButtonSpacing, 0f), PauseButtonSize);
+        PlaceLike(disconnect, resumeRect, new Vector2(PauseButtonSpacing, 0f), PauseButtonSize);
+    }
+
+    private static void PlaceLike(RectTransform rect, RectTransform reference, Vector2 position, Vector2 size)
+    {
+        rect.anchorMin = reference.anchorMin;
+        rect.anchorMax = reference.anchorMax;
+        rect.pivot = reference.pivot;
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+        rect.localRotation = reference.localRotation;
+        rect.localScale = reference.localScale;
     }
 
     private RectTransform Clone(Transform template, Transform parent, string name, string label, Action click)
