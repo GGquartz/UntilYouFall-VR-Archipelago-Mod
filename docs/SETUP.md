@@ -12,6 +12,8 @@
 
   - `UYF-Archipelago-linux-x86_64.zip` (experimental, see [Linux / Steam / Proton](#linux--steam--proton-with-the-launcher-recommended))
 
+- The mod should not corrupt your profiles, but just in case, you should back up your other saves (Windows: `%USERPROFILE%\AppData\LocalLow\Schell Games\UntilYouFall`)
+
 ## Installing the APWorld
 
 You only need this to generate a multiworld (or to create a YAML in the Archipelago Options Creator)
