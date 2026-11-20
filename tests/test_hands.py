@@ -47,21 +47,17 @@ class TestHands(UntilYouFallWorldTest):
                             side_effect=lambda *args: events.append("shop"),
                         ),
                         patch(
-                            "worlds.until_you_fall.enforce_stage_reward_pacing",
-                            side_effect=lambda *args: events.append("rewards"),
-                        ),
-                        patch(
                             "worlds.until_you_fall.enforce_early_hand", side_effect=lambda *args: events.append("hand")
                         ) as hand,
                     ):
                         self.world.finalize_multiworld()
                     if hands == "both":
                         hand.assert_not_called()
-                        self.assertEqual(events, ["shop", "rewards"])
+                        self.assertEqual(events, ["shop"])
                     else:
                         missing = "Right Hand" if hands == "left_only" else "Left Hand"
                         hand.assert_called_once_with(self.multiworld, self.player, missing, percent)
-                        self.assertEqual(events, ["shop", "rewards", "hand"])
+                        self.assertEqual(events, ["shop", "hand"])
 
     def test_both_hands_adds_no_hand_item(self):
         self.options = {"starting_hands": "both"}

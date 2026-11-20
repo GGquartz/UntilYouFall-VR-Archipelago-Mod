@@ -40,10 +40,10 @@ class TestGeneration(UntilYouFallWorldTest):
 
     def test_generation_matches_golden_hashes(self):
         cases = (
-            ({}, "314fb8f17394c4c61a36a3225dba0500275399aa8e51a2a69110d96fd94a27f1"),
+            ({}, "88af0c4da3184224cefc230a426355692ac9c75af22ffbd168e02775d3ca2b01"),
             (
                 {"quest_board": True, "goal": "quests", "weapon_supers": "separate_items"},
-                "bd1c13149bab5375b5a458fa7a4529aa13428488f93cd6aea26c6b64ba8676b1",
+                "c2ffb1d4938703916ea01691e00854453d8f8fb9c8ad786b3898f9556fc48ec0",
             ),
             (
                 {
@@ -52,7 +52,7 @@ class TestGeneration(UntilYouFallWorldTest):
                     "second_starting_weapon": "random",
                     "stage_reward_checks": 30,
                 },
-                "2f7e4bfa47eb303d3631afc0befb0b9f135ce3f7e666580328963b5f5e1445e6",
+                "43ae903cd77883e77f861f6d9fc87dc71a9d81380e84b0e56541f97ef0de8a84",
             ),
         )
         for options, expected in cases:

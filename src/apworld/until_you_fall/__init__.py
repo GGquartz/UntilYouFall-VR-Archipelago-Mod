@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import Any
 
-from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
+from BaseClasses import ItemClassification, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
 from .catalogs import ENEMIES, GAME_NAME, WEAPONS, load_catalog
@@ -25,9 +25,8 @@ from .options import SecondStartingWeapon, StartingWeapon, UntilYouFallOptions
 from .quest_locations import pick_quests
 from .rules import set_all_rules
 from .shop_locations import enforce_shop_quality
-from .stage_reward_locations import STAGE_REWARD_NAME_PREFIX, enforce_stage_reward_pacing
 from .stage_weapon_locations import STAGE_COUNT, WEAPONS_BY_NAME
-from .starting_loadout import resolve_starting_weapons
+from .starting_loadout import pick_early_weapons, resolve_starting_weapons
 from .validation import (
     validate_goal,
     validate_quest_selection,
@@ -89,6 +88,7 @@ class UntilYouFallWorld(World):
         validate_start_inventory(self.options, requested)
         self._resolve_starting_weapons()
         self._grant_starting_items(requested)
+        self._request_early_weapons(requested)
 
     def create_regions(self) -> None:
         menu = Region("Menu", self.player, self.multiworld)
@@ -101,22 +101,8 @@ class UntilYouFallWorld(World):
     def set_rules(self) -> None:
         set_all_rules(self)
 
-    def fill_hook(
-        self,
-        progitempool: list[Item],
-        usefulitempool: list[Item],
-        filleritempool: list[Item],
-        fill_locations: list[Location],
-    ) -> None:
-        fill_locations.sort(
-            key=lambda location: (
-                location.player != self.player or not location.name.startswith(STAGE_REWARD_NAME_PREFIX)
-            )
-        )
-
     def finalize_multiworld(self) -> None:
         enforce_shop_quality(self.multiworld, self.player)
-        enforce_stage_reward_pacing(self.multiworld, self.player, self.options.stage_reward_checks.value)
         hand_name = missing_hand_item(self.options.starting_hands.value)
         if hand_name:
             enforce_early_hand(self.multiworld, self.player, hand_name, self.options.early_hand.value)
@@ -162,6 +148,15 @@ class UntilYouFallWorld(World):
         second.value = weapon_ids[1] if len(weapon_ids) == 2 else 0
         names = {weapon["Id"]: weapon["Name"] for weapon in WEAPONS}
         self.starting_weapons = [names[weapon_id] for weapon_id in weapon_ids]
+
+    def _request_early_weapons(self, requested: Counter) -> None:
+        """
+        Force some early weapons to reduce unlucky seeds with only upgrade levels
+        """
+        owned = {*self.starting_weapons, *(name for name, count in requested.items() if count)}
+        has_both_hands = missing_hand_item(self.options.starting_hands.value) is None
+        for name in pick_early_weapons(WEAPONS, owned, has_both_hands, self.random.sample):
+            self.multiworld.early_items[self.player][name] = 1
 
     def _grant_starting_items(self, requested: Counter) -> None:
         for name in self.starting_weapons:

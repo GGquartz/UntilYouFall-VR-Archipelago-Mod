@@ -1,6 +1,10 @@
-from collections.abc import Callable, Collection, Sequence
+from collections.abc import Callable, Collection, Iterable, Sequence
 
 from Options import OptionError
+
+from .stage_weapon_locations import requires_both_hands
+
+EARLY_WEAPON_COUNT = 2
 
 
 def resolve_starting_weapons(
@@ -32,3 +36,18 @@ def resolve_starting_weapons(
         raise OptionError("Until You Fall: starting_weapon and second_starting_weapon must be different")
 
     return [first_id, second_id] if second_id else [first_id]
+
+
+def pick_early_weapons(
+    weapons: Iterable[dict],
+    owned: Collection[str],
+    has_both_hands: bool,
+    sample: Callable[[Sequence[str], int], list[str]],
+) -> list[str]:
+    candidates = [
+        weapon["Name"]
+        for weapon in weapons
+        if weapon["Name"] not in owned and (has_both_hands or not requires_both_hands(weapon))
+    ]
+
+    return sample(candidates, min(EARLY_WEAPON_COUNT, len(candidates)))

@@ -11,10 +11,31 @@ from worlds.until_you_fall.catalogs import (
 from worlds.until_you_fall.options import (
     SecondStartingWeapon,
 )
-from worlds.until_you_fall.stage_weapon_locations import location_name
+from worlds.until_you_fall.stage_weapon_locations import location_name, requires_both_hands
 
 
 class TestStartingWeapons(UntilYouFallWorldTest):
+    def test_two_other_weapons_are_requested_as_early_items(self):
+        names = {weapon["Name"]: weapon for weapon in WEAPONS}
+        for hands in ("both", "right_only", "left_only"):
+            for seed in (1, 2, 3):
+                with self.subTest(hands=hands, seed=seed):
+                    self.options = {"starting_hands": hands}
+                    self.world_setup(seed=seed)
+                    early = self.multiworld.early_items[self.player]
+                    self.assertEqual(len(early), 2)
+                    self.assertEqual(set(early.values()), {1})
+                    self.assertFalse(set(early) & set(self.world.starting_weapons))
+                    self.assertFalse(self.multiworld.local_early_items[self.player])
+                    if hands != "both":
+                        self.assertFalse(any(requires_both_hands(names[name]) for name in early))
+
+    def test_early_weapons_skip_start_inventory_weapons(self):
+        self.options = {"start_inventory": {"Heartsplitter": 1, "Mistcutter": 1}, "starting_weapon": "random"}
+        self.world_setup(seed=5)
+        early = self.multiworld.early_items[self.player]
+        self.assertFalse(set(early) & {"Heartsplitter", "Mistcutter"})
+
     def test_explicit_starter_is_the_only_precollected_weapon(self):
         for key, name in (
             ("engraved_arming_sword", "Engraved Arming Sword"),

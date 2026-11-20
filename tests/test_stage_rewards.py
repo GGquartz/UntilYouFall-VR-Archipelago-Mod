@@ -1,7 +1,5 @@
 """Run with the Archipelago 0.6.8 source directory on PYTHONPATH."""
 
-from unittest.mock import patch
-
 from BaseClasses import Item, ItemClassification
 from uyf_world_test import UntilYouFallWorldTest
 from worlds.until_you_fall.catalogs import (
@@ -22,7 +20,6 @@ from worlds.until_you_fall.stage_reward_locations import (
     MAX_STAGE_REWARD_CHECKS,
     STAGE_REWARD_BASE_ID,
     active_stage_rewards,
-    enforce_stage_reward_pacing,
     stage_reward_id,
     stage_reward_name,
 )
@@ -36,24 +33,19 @@ class TestStageRewards(UntilYouFallWorldTest):
                     expected = 0 if index <= 3 else max(1, round(9 * (index / count) ** 0.75))
                     self.assertEqual(stage_reward_need(index, count), expected)
 
-    def test_late_progression_selection_keeps_its_existing_rounding(self):
+    def test_final_quarter_of_rewards_refuses_progression(self):
+        foreign_progression = Item("Foreign progression", ItemClassification.progression, 125, 2)
+        foreign_useful = Item("Foreign useful", ItemClassification.useful, 124, 2)
         for count in range(10, 31):
             with self.subTest(count=count):
                 self.options = {"stage_reward_checks": count}
                 self.world_setup(seed=777)
-                rewards = [
-                    self.multiworld.get_location(stage_reward_name(index), self.player) for index in range(1, count + 1)
-                ]
-                for location in rewards:
-                    location.item = self.world.create_item(WEAPON_UPGRADE_LEVEL_ITEM)
-                with patch("worlds.until_you_fall.stage_reward_locations._replace_rewards_with_other_items") as replace:
-                    enforce_stage_reward_pacing(self.multiworld, self.player, count)
-
-                late_start = (2 * count + 2) // 3
-                late_rewards = rewards[late_start:]
-                first_replacement = replace.call_args_list[0].args
-                self.assertEqual(first_replacement[2], late_rewards[len(late_rewards) // 5 :])
-                self.assertEqual(first_replacement[4], {location.name for location in late_rewards})
+                for index in range(1, count + 1):
+                    reward = self.multiworld.get_location(stage_reward_name(index), self.player)
+                    refuses = index > count * 3 // 4
+                    self.assertEqual(reward.item_rule(foreign_progression), not refuses)
+                    self.assertEqual(reward.item_rule(self.world.create_item("Heartsplitter")), not refuses)
+                    self.assertTrue(reward.item_rule(foreign_useful))
 
     def test_stage_checks_and_matching_rewards(self):
         locations = [

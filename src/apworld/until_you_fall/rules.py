@@ -26,7 +26,7 @@ from .quest_locations import TIER_UPGRADES, quest_location_name
 from .shop_locations import SHOP_SECTIONS, SHOP_SLOTS, shop_name
 from .stage_difficulty_locations import is_goal_check
 from .stage_difficulty_locations import location_name as difficulty_location_name
-from .stage_reward_locations import LATE_REWARD_MIN_UPGRADES, stage_reward_name
+from .stage_reward_locations import FINAL_REWARD_QUARTER_START, LATE_REWARD_MIN_UPGRADES, stage_reward_name
 from .stage_weapon_locations import STAGE_COUNT, location_name, requires_both_hands
 
 if TYPE_CHECKING:
@@ -81,12 +81,14 @@ def can_hold_reward(world: "UntilYouFallWorld", item: Item, forbidden_own_names:
     return item.name not in FILLER_NAMES and item.name not in forbidden_own_names
 
 
-def can_hold_stage_reward(world: "UntilYouFallWorld", late: bool, item: Item) -> bool:
+def can_hold_stage_reward(world: "UntilYouFallWorld", index: int, count: int, item: Item) -> bool:
     if not can_hold_reward(world, item, AETHER_BULK_ITEMS):
+        return False
+    if item.advancement and index > count * FINAL_REWARD_QUARTER_START // 4:
         return False
 
     return not (
-        late
+        stage_reward_need(index, count) >= LATE_REWARD_MIN_UPGRADES
         and item.game == world.game
         and item.name in {WEAPON_UPGRADE_LEVEL_ITEM, SHOP_UNLOCK_ITEM, *DIFFICULTY_ITEMS}
     )
@@ -161,12 +163,13 @@ def set_stage_reward_rules(world: "UntilYouFallWorld") -> None:
     """
     Stage Reward Checks: later rewards need higher upgrade levels
     These items cannot be placed here: traps, own filler (except for dmg +1 items), aether items
+    Late rewards will not hold important items to reduce grind
     """
     count = world.options.stage_reward_checks.value
     for index in range(1, count + 1):
         location = world.get_location(stage_reward_name(index))
         need = stage_reward_need(index, count)
-        location.item_rule = partial(can_hold_stage_reward, world, need >= LATE_REWARD_MIN_UPGRADES)
+        location.item_rule = partial(can_hold_stage_reward, world, index, count)
         set_rule(location, upgrades_rule(world, need))
 
 

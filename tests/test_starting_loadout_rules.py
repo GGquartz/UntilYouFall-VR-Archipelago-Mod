@@ -21,6 +21,20 @@ class TestStartingLoadoutRules(unittest.TestCase):
         )
         cls.starting_hand_items = staticmethod(load("hands").starting_hand_items)
 
+    def test_early_weapons_skip_owned_and_two_handed_on_one_hand(self):
+        pick = load("starting_loadout").pick_early_weapons
+        weapons = [
+            {"Name": "A", "LogicRequiresBothHands": False},
+            {"Name": "B", "LogicRequiresBothHands": True},
+            {"Name": "C", "LogicRequiresBothHands": False},
+            {"Name": "D", "LogicRequiresBothHands": False},
+        ]
+        take_first = lambda names, count: list(names[:count])
+        self.assertEqual(pick(weapons, {"A"}, True, take_first), ["B", "C"])
+        self.assertEqual(pick(weapons, {"A"}, False, take_first), ["C", "D"])
+        self.assertEqual(pick(weapons, {"A", "C", "D"}, False, take_first), [])
+        self.assertEqual(pick(weapons, {"A", "B", "C"}, True, take_first), ["D"])
+
     def test_available_hands_are_precollected(self):
         self.assertEqual(self.starting_hand_items(0), ("Left Hand", "Right Hand"))
         self.assertEqual(self.starting_hand_items(1), ("Left Hand",))
