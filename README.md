@@ -103,6 +103,7 @@ Features planned before a full 1.0 release, some of these might be researched an
 - Pin / track a quest and see its progress during a run
 - Enemy Spawn Trap for specific enemies
 - Quest descriptions in the launcher Options Creator
+- Original custom icons for custom quests
 - Custom AP shop models for specific games
 - Standalone Steam Frame setup (game runs badly on my frame, only if game becomes playable)
 - Map and add weapon logic requirements for Quest: On the Wings of the Knight
@@ -114,4 +115,3 @@ Features planned before a full 1.0 release, some of these might be researched an
 ## Credits
 
 - Thanks to kiwi on the Archipelago discord for creating the AP Logo 3D model
-- Custom quest icons were created by me through editing existing steam achievement icons

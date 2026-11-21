@@ -4,7 +4,6 @@
   xmlns:views="using:UntilYouFall.Launcher.Views"
   x:Class="UntilYouFall.Launcher.MainWindow"
   Title="Until You Fall Archipelago Launcher"
-  Icon="avares://UYFArchipelagoLauncher/Assets/uyf.ico"
   Width="800"
   Height="700"
   MinWidth="760"
@@ -16,7 +15,6 @@
         <TextBlock Classes="heading" FontSize="20" Text="UYF Archipelago launcher" />
         <TextBlock x:Name="LauncherVersion" Classes="secondary" />
       </StackPanel>
-      <Image Grid.Column="1" Source="avares://UYFArchipelagoLauncher/Assets/uyf-logo.png" Height="56" />
       <Image Grid.Column="3" Source="avares://UYFArchipelagoLauncher/Assets/archipelago.png" Height="56" />
     </Grid>
 

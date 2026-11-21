@@ -14,7 +14,6 @@
     <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
     <DebugType>none</DebugType>
     <NoWarn>$(NoWarn);CA1416</NoWarn>
-    <ApplicationIcon>Resources\uyf.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.6" />
@@ -24,9 +23,7 @@
   <ItemGroup>
     <Compile Include="../shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
     <AvaloniaResource Include="Resources/archipelago.png" Link="Assets/archipelago.png" />
-    <AvaloniaResource Include="Resources/uyf-logo.png" Link="Assets/uyf-logo.png" />
     <AvaloniaResource Include="Resources/Fonts/*.ttf" Link="Assets/Fonts/%(Filename)%(Extension)" />
-    <AvaloniaResource Include="Resources/uyf.ico" Link="Assets/uyf.ico" />
     <EmbeddedResource Include="Resources/options.json" LogicalName="options.json" />
     <EmbeddedResource Include="Resources/general-options.json" LogicalName="general-options.json" />
     <EmbeddedResource Include="Resources/items.json" LogicalName="items.json" />

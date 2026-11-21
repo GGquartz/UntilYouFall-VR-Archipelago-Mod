@@ -325,7 +325,7 @@
   "Name": "Cold Iron Verdict",
   "Tier": 2,
   "Source": "ViciousKills",
-  "Icon": "CUSTOM_COLD_IRON_VERDICT",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "Weapons": [
     "Cold Iron Greataxe"
@@ -341,7 +341,7 @@
   "Name": "Shatter Storm",
   "Tier": 2,
   "Source": "ShardstormKills",
-  "Icon": "CUSTOM_SHATTER_STORM",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "AnyWeapons": [
     "Gemini Esper",
@@ -359,7 +359,7 @@
   "Name": "Burning Retribution",
   "Tier": 2,
   "Source": "SoulBurnKills",
-  "Icon": "CUSTOM_BURNING_RETRIBUTION",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "AnyWeapons": [
     "Ritual Dagger",
@@ -377,7 +377,7 @@
   "Name": "Unbreakable Wall",
   "Tier": 2,
   "Source": "BulwarkBlocks",
-  "Icon": "CUSTOM_UNBREAKABLE_WALL",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "AnyWeapons": [
     "Engraved Arming Sword",
@@ -395,7 +395,7 @@
   "Name": "Full Arsenal",
   "Tier": 3,
   "Source": "AllSupers",
-  "Icon": "CUSTOM_FULL_ARSENAL",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "AllSupers": true
   },
@@ -446,7 +446,7 @@
  {
   "Name": "Forged in Iron",
   "Tier": 3,
-  "Icon": "CUSTOM_FORGED_IN_IRON",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {
    "Weapons": [
     "Captain's Warhammer",
@@ -460,7 +460,7 @@
   "Name": "Brink of Ruin",
   "Tier": 2,
   "Source": "BrinkOfRuin",
-  "Icon": "CUSTOM_BRINK_OF_RUIN",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {},
   "Description": "Enter the near death state 3 times in a single run",
   "Target": 3
@@ -469,7 +469,7 @@
   "Name": "Sold Out",
   "Tier": 1,
   "Source": "ShopPurchase",
-  "Icon": "CUSTOM_SOLD_OUT",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {},
   "Description": "Buy something from the shop",
   "Target": 1
@@ -478,7 +478,7 @@
   "Name": "Crowd Control",
   "Tier": 1,
   "Source": "KillsInWindow",
-  "Icon": "CUSTOM_CROWD_CONTROL",
+  "Icon": "ACH_TRAITS_ON_WEAPON_LOTS",
   "Need": {},
   "Description": "Defeat 3 enemies in 5 seconds",
   "Target": 3
